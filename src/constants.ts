@@ -1,4 +1,4 @@
-export const EXTENSION_ID = 'mikesoftit.chutes-usage'
+export const EXTENSION_ID = 'mikesoft.chutes-usage'
 export const VIEW_CONTAINER_ID = 'chutesUsage'
 export const DASHBOARD_VIEW_ID = 'chutesUsage.dashboard'
 export const SECRET_KEY_API_TOKEN = 'chutes.apiKey'

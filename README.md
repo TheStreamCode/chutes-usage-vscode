@@ -15,6 +15,9 @@ Created by:
 Public repository:
 - `https://github.com/TheStreamCode/chutes-usage-vscode`
 
+Marketplace publisher:
+- `mikesoft`
+
 ## What It Shows
 
 - Monthly usage and remaining subscription credit

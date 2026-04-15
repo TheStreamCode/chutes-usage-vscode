@@ -1,6 +1,11 @@
 # Changelog
 
-## 0.1.2
+## 1.2.4
+
+- Fixed publisher identity alignment for marketplace publishing.
+- Refreshed the packaged extension icon colors.
+
+## 1.2.3
 
 - Improved packaging and marketplace metadata.
 
