@@ -1,0 +1,15 @@
+src/
+webview/
+docs/
+*.ts
+tsconfig.json
+pnpm-lock.yaml
+.playwright-mcp/
+Screenshot_*.jpeg
+out/src/test/
+.github/
+.editorconfig
+.gitignore
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md

@@ -1,0 +1,68 @@
+export type JsonPrimitive = string | number | boolean | null
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray
+export interface JsonObject {
+  [key: string]: JsonValue | undefined
+}
+export interface JsonArray extends Array<JsonValue> {}
+export type JsonContainer = JsonObject | JsonArray
+
+export type UsageWindowKind = 'billing-cycle' | 'rolling-4h' | 'daily-requests' | 'weekly' | 'unknown'
+export type UsageUnit = 'usd' | 'requests'
+
+export interface UsageWindow {
+  id: string
+  kind: UsageWindowKind
+  label: string
+  unit: UsageUnit
+  used: number | null
+  limit: number | null
+  remaining: number | null
+  percentUsed: number | null
+  resetLabel: string | null
+}
+
+export interface QuotaEntry {
+  modelLabel: string
+  quota: number | null
+  lastUpdated: string | null
+}
+
+export interface PlanInfo {
+  planName: string | null
+  monthlyPriceUsd: number | null
+  monthlyCapUsd: number | null
+  fourHourCapUsd: number | null
+  dailyRequestLimit: number | null
+  paygDiscountPercent: number | null
+}
+
+export interface DashboardData {
+  windows: UsageWindow[]
+  quotas: QuotaEntry[]
+  plan: PlanInfo | null
+}
+
+export interface QuotaUsageSummary {
+  used: number | null
+  quota: number | null
+}
+
+export type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
+
+export interface DashboardState {
+  connectionState: ConnectionState
+  connected: boolean
+  lastUpdatedAt: string | null
+  data: DashboardData | null
+  errorMessage: string | null
+}
+
+export interface WebviewStateMessage {
+  type: 'state'
+  state: DashboardState
+}
+
+export interface WebviewActionMessage {
+  type: 'refresh' | 'setApiKey' | 'removeApiKey' | 'openExternal'
+  href?: string
+}

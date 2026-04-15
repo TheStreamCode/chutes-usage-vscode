@@ -1,0 +1,146 @@
+{
+  "name": "chutes-usage",
+  "displayName": "Chutes Usage",
+  "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
+  "version": "0.1.2",
+  "publisher": "mikesoftit",
+  "author": {
+    "name": "Michael Gasperini",
+    "url": "https://mikesoft.it"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheStreamCode/chutes-usage-vscode"
+  },
+  "homepage": "https://github.com/TheStreamCode/chutes-usage-vscode",
+  "bugs": {
+    "url": "https://github.com/TheStreamCode/chutes-usage-vscode/issues"
+  },
+  "pricing": "Free",
+  "galleryBanner": {
+    "color": "#0d1117",
+    "theme": "dark"
+  },
+  "license": "MIT",
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "chutes",
+    "quota",
+    "usage",
+    "billing",
+    "dashboard",
+    "api"
+  ],
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "main": "./out/src/extension.js",
+  "icon": "media/icon.png",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "chutesUsage.openDashboard",
+        "title": "Open Dashboard",
+        "category": "Chutes Usage",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "chutesUsage.refresh",
+        "title": "Refresh",
+        "category": "Chutes Usage",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "chutesUsage.setApiKey",
+        "title": "Set API Key",
+        "category": "Chutes Usage",
+        "icon": "$(key)"
+      },
+      {
+        "command": "chutesUsage.removeApiKey",
+        "title": "Remove API Key",
+        "category": "Chutes Usage",
+        "icon": "$(trash)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "chutesUsage",
+          "title": "Chutes Usage",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "chutesUsage": [
+        {
+          "type": "webview",
+          "id": "chutesUsage.dashboard",
+          "name": "Dashboard",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "chutesUsage.dashboard",
+        "contents": "[Set your Chutes API key](command:chutesUsage.setApiKey) to start monitoring usage."
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "chutesUsage.refresh",
+          "when": "view == chutesUsage.dashboard",
+          "group": "navigation"
+        },
+        {
+          "command": "chutesUsage.setApiKey",
+          "when": "view == chutesUsage.dashboard",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Chutes Usage",
+      "properties": {
+        "chutesUsage.refreshIntervalSeconds": {
+          "type": "number",
+          "default": 60,
+          "minimum": 15,
+          "maximum": 900,
+          "description": "Refresh interval in seconds."
+        },
+        "chutesUsage.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Chutes Usage status bar item."
+        },
+        "chutesUsage.debugLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging for API shape diagnostics."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./ && powershell -NoProfile -Command \"New-Item -ItemType Directory -Force -Path 'out/webview' | Out-Null; Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force\"",
+    "watch": "tsc -w -p ./",
+    "test": "pnpm run compile && node --test out/src/test/**/*.test.js",
+    "package": "pnpm exec vsce package",
+    "vscode:prepublish": "pnpm run compile",
+    "vscode:uninstall": "node ./out/src/lifecycle.js"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.8.1",
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.103.0",
+    "typescript": "^5.8.3"
+  }
+}
