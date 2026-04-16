@@ -3,11 +3,6 @@ import { ChutesApiClient } from '../services/ChutesApiClient'
 import { SecretStore } from '../services/SecretStore'
 import type { DashboardState } from '../types'
 
-type DashboardStoreOptions = {
-  debugLoggingEnabled?: () => boolean
-  log?: (message: string) => void
-}
-
 export type DashboardListener = (state: DashboardState) => void
 
 export class DashboardStore {
@@ -21,10 +16,7 @@ export class DashboardStore {
 
   private readonly listeners = new Set<DashboardListener>()
 
-  public constructor(
-    private readonly secretStore: SecretStore,
-    private readonly options: DashboardStoreOptions = {}
-  ) {}
+  public constructor(private readonly secretStore: SecretStore) {}
 
   public getState(): DashboardState {
     return this.state
@@ -57,13 +49,7 @@ export class DashboardStore {
     })
 
     try {
-      const debugLogging = this.debugLoggingEnabled()
-      const client = new ChutesApiClient(apiKey, {
-        debug: debugLogging,
-        log: (message: string) => {
-          this.debugLog(message)
-        }
-      })
+      const client = new ChutesApiClient(apiKey)
       const payload = await client.getDashboardPayload()
       const data = normalizeDashboardData(
         payload.subscriptionUsage,
@@ -89,18 +75,6 @@ export class DashboardStore {
         errorMessage: error instanceof Error ? error.message : 'Unknown error'
       })
     }
-  }
-
-  protected debugLoggingEnabled(): boolean {
-    return this.options.debugLoggingEnabled?.() ?? false
-  }
-
-  protected debugLog(message: string): void {
-    if (!this.debugLoggingEnabled()) {
-      return
-    }
-
-    this.options.log?.(message)
   }
 
   private setState(state: DashboardState): void {

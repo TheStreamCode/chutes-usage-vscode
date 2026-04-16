@@ -8,13 +8,7 @@ import { ChutesWebviewProvider, registerChutesWebviewProvider } from './views/Ch
 
 export function activate(context: vscode.ExtensionContext): void {
   const secretStore = new SecretStore(context.secrets)
-  const outputChannel = vscode.window.createOutputChannel('Chutes Usage')
-  const dashboardStore = new DashboardStore(secretStore, {
-    debugLoggingEnabled: () => vscode.workspace.getConfiguration('chutesUsage').get<boolean>('debugLogging', false),
-    log: (message: string) => {
-      outputChannel.appendLine(message)
-    }
-  })
+  const dashboardStore = new DashboardStore(secretStore)
   const statusBarController = new StatusBarController()
 
   const provider = new ChutesWebviewProvider(context.extensionUri, {
@@ -33,32 +27,27 @@ export function activate(context: vscode.ExtensionContext): void {
   })
 
   context.subscriptions.push(statusBarController)
-  context.subscriptions.push(outputChannel)
   context.subscriptions.push(registerChutesWebviewProvider(context, provider))
 
-  context.subscriptions.push(vscode.commands.registerCommand('chutesUsage.openDashboard', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.openDashboard', async () => {
     await vscode.commands.executeCommand(`${VIEW_CONTAINER_ID}.focus`)
     await vscode.commands.executeCommand(`${DASHBOARD_VIEW_ID}.focus`)
   }))
 
-  context.subscriptions.push(vscode.commands.registerCommand('chutesUsage.refresh', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.refresh', async () => {
     await dashboardStore.refresh()
   }))
 
-  context.subscriptions.push(vscode.commands.registerCommand('chutesUsage.setApiKey', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.setApiKey', async () => {
     await setApiKey(secretStore, dashboardStore)
   }))
 
-  context.subscriptions.push(vscode.commands.registerCommand('chutesUsage.removeApiKey', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.removeApiKey', async () => {
     await removeApiKey(secretStore, dashboardStore)
   }))
 
-  context.subscriptions.push(vscode.commands.registerCommand('chutesUsage.openLogs', async () => {
-    outputChannel.show(true)
-  }))
-
   const unsubscribe = dashboardStore.subscribe((state) => {
-    const visible = vscode.workspace.getConfiguration('chutesUsage').get<boolean>('showStatusBar', true)
+    const visible = vscode.workspace.getConfiguration('chutesUsageVscode').get<boolean>('showStatusBar', true)
     statusBarController.render(state, visible)
     provider.postState(state)
   })
@@ -115,5 +104,5 @@ async function removeApiKey(secretStore: SecretStore, dashboardStore: DashboardS
 }
 
 function getRefreshInterval(): number {
-  return vscode.workspace.getConfiguration('chutesUsage').get<number>('refreshIntervalSeconds', DEFAULT_REFRESH_INTERVAL_SECONDS)
+  return vscode.workspace.getConfiguration('chutesUsageVscode').get<number>('refreshIntervalSeconds', DEFAULT_REFRESH_INTERVAL_SECONDS)
 }

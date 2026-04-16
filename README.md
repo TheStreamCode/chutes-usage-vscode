@@ -1,10 +1,10 @@
-# Chutes Usage
+# Chutes Usage for VS Code
 
 Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.
 
 ## Important Disclaimer
 
-`Chutes Usage` is a third-party tool.
+`Chutes Usage for VS Code` is a third-party tool.
 
 It is not official and is not affiliated with or endorsed by Chutes.
 
@@ -17,6 +17,9 @@ Public repository:
 
 Marketplace publisher:
 - `mikesoft`
+
+Marketplace extension id:
+- `mikesoft.chutes-usage-vscode`
 
 ## What It Shows
 
@@ -74,16 +77,15 @@ The extension is designed to be easy to use:
 ## Setup
 
 1. Open the Command Palette.
-2. Run `Chutes Usage: Set API Key`.
+2. Run `Chutes Usage for VS Code: Set API Key`.
 3. Open the `Chutes Usage` sidebar.
-4. If you need diagnostics, enable `Chutes Usage: Debug Logging` and run `Chutes Usage: Open Debug Logs`.
+4. If you previously installed the removed Marketplace package, install this extension as a fresh package and set the API key again.
 
 ## Notes
 
 - This extension uses your Chutes API key only to request your own usage data.
 - The key is stored using VS Code `SecretStorage`.
 - The extension is built as a practical unofficial utility for Chutes users.
-- When `Chutes Usage: Debug Logging` is enabled, open logs with `Chutes Usage: Open Debug Logs` or from the `Output` panel under `Chutes Usage`.
 - If Chutes quota metering is delayed, the daily card shows `--` with a `Possible sync delay` hint instead of a misleading `0`.
 
 ## Data Retention

@@ -1,8 +1,8 @@
 {
-  "name": "chutes-usage",
-  "displayName": "Chutes Usage",
+  "name": "chutes-usage-vscode",
+  "displayName": "Chutes Usage for VS Code",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -43,50 +43,44 @@
   "contributes": {
     "commands": [
       {
-        "command": "chutesUsage.openDashboard",
+        "command": "chutesUsageVscode.openDashboard",
         "title": "Open Dashboard",
-        "category": "Chutes Usage",
+        "category": "Chutes Usage for VS Code",
         "icon": "$(graph)"
       },
       {
-        "command": "chutesUsage.refresh",
+        "command": "chutesUsageVscode.refresh",
         "title": "Refresh",
-        "category": "Chutes Usage",
+        "category": "Chutes Usage for VS Code",
         "icon": "$(refresh)"
       },
       {
-        "command": "chutesUsage.setApiKey",
+        "command": "chutesUsageVscode.setApiKey",
         "title": "Set API Key",
-        "category": "Chutes Usage",
+        "category": "Chutes Usage for VS Code",
         "icon": "$(key)"
       },
       {
-        "command": "chutesUsage.removeApiKey",
+        "command": "chutesUsageVscode.removeApiKey",
         "title": "Remove API Key",
-        "category": "Chutes Usage",
+        "category": "Chutes Usage for VS Code",
         "icon": "$(trash)"
-      },
-      {
-        "command": "chutesUsage.openLogs",
-        "title": "Open Debug Logs",
-        "category": "Chutes Usage",
-        "icon": "$(output)"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "chutesUsage",
+          "id": "chutesUsageVscode",
           "title": "Chutes Usage",
           "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "chutesUsage": [
+      "chutesUsageVscode": [
         {
           "type": "webview",
-          "id": "chutesUsage.dashboard",
+          "id": "chutesUsageVscode.dashboard",
           "name": "Dashboard",
           "icon": "media/icon.svg"
         }
@@ -94,43 +88,38 @@
     },
     "viewsWelcome": [
       {
-        "view": "chutesUsage.dashboard",
-        "contents": "[Set your Chutes API key](command:chutesUsage.setApiKey) to start monitoring usage."
+        "view": "chutesUsageVscode.dashboard",
+        "contents": "[Set your Chutes API key](command:chutesUsageVscode.setApiKey) to start monitoring usage."
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "chutesUsage.refresh",
-          "when": "view == chutesUsage.dashboard",
+          "command": "chutesUsageVscode.refresh",
+          "when": "view == chutesUsageVscode.dashboard",
           "group": "navigation"
         },
         {
-          "command": "chutesUsage.setApiKey",
-          "when": "view == chutesUsage.dashboard",
+          "command": "chutesUsageVscode.setApiKey",
+          "when": "view == chutesUsageVscode.dashboard",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "Chutes Usage",
-      "properties": {
-        "chutesUsage.refreshIntervalSeconds": {
+        "title": "Chutes Usage",
+        "properties": {
+        "chutesUsageVscode.refreshIntervalSeconds": {
           "type": "number",
           "default": 60,
           "minimum": 15,
           "maximum": 900,
           "description": "Refresh interval in seconds."
         },
-        "chutesUsage.showStatusBar": {
+        "chutesUsageVscode.showStatusBar": {
           "type": "boolean",
           "default": true,
           "description": "Show the Chutes Usage status bar item."
-        },
-        "chutesUsage.debugLogging": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable debug logging for API shape diagnostics."
         }
       }
     }

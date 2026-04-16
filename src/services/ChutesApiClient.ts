@@ -1,16 +1,8 @@
 import { API_BASE_URL } from '../constants'
 import type { JsonContainer, JsonObject } from '../types'
 
-type ClientOptions = {
-  debug?: boolean
-  log?: (message: string) => void
-}
-
 export class ChutesApiClient {
-  public constructor(
-    private readonly apiKey: string,
-    private readonly options: ClientOptions = {}
-  ) {}
+  public constructor(private readonly apiKey: string) {}
 
   // Fetch all user-facing dashboard endpoints needed for the first extension version.
   public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; pricing: JsonContainer | null }> {
@@ -18,23 +10,10 @@ export class ChutesApiClient {
       this.getJsonContainer('/users/me/subscription_usage'),
       this.getJsonContainer('/users/me/quotas'),
       this.getJsonContainer('/pricing').catch(() => null),
-      this.getJsonContainer('/users/me/quota_usage/me').catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Unknown error'
-        this.debugLog(`quota usage me fetch failed: ${message}`)
-        return null
-      }),
-      this.getJsonContainer('/invocations/stats/llm').catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Unknown error'
-        this.debugLog(`invocation stats llm fetch failed: ${message}`)
-        return null
-      })
+      this.getJsonContainer('/users/me/quota_usage/me').catch(() => null),
+      this.getJsonContainer('/invocations/stats/llm').catch(() => null)
     ])
-    this.debugLog(`subscription usage shape: ${describeJsonContainer(subscriptionUsage)}`)
-    this.debugLog(`quotas shape: ${describeJsonContainer(quotas)}`)
-    this.debugLog(`quota usage me shape: ${describeJsonContainer(quotaUsageMe)}`)
-    this.debugLog(`invocation stats llm shape: ${describeJsonContainer(invocationStatsLlm)}`)
     const quotaUsageFallback = await this.getQuotaUsagePayload(quotas)
-    this.debugLog(`quota usage fallback shape: ${describeJsonContainer(quotaUsageFallback)}`)
 
     if (!isJsonObject(subscriptionUsage)) {
       throw new Error('Unexpected API response shape for /users/me/subscription_usage')
@@ -77,22 +56,12 @@ export class ChutesApiClient {
   private async getQuotaUsagePayload(quotas: JsonContainer): Promise<JsonContainer | null> {
     const chuteIds = getQuotaUsageChuteIds(quotas)
     if (chuteIds.length === 0) {
-      this.debugLog('quota usage skipped: no chute ids found in quotas payload')
       return null
     }
 
-    this.debugLog(`quota usage chute ids: ${chuteIds.join(', ')}`)
-
     const entries = await Promise.all(chuteIds.map(async (chuteId) => {
       const path = `/users/me/quota_usage/${encodePathSegment(chuteId)}`
-      const payload = await this.getJsonContainer(path).catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Unknown error'
-        this.debugLog(`quota usage fetch failed for ${chuteId}: ${message}`)
-        return null
-      })
-      if (payload !== null) {
-        this.debugLog(`quota usage fetch ok for ${chuteId}: ${describeJsonContainer(payload)}`)
-      }
+      const payload = await this.getJsonContainer(path).catch(() => null)
       return payload === null ? null : [chuteId, payload] as const
     }))
 
@@ -102,14 +71,6 @@ export class ChutesApiClient {
     }
 
     return Object.fromEntries(validEntries)
-  }
-
-  private debugLog(message: string): void {
-    if (!this.options.debug) {
-      return
-    }
-
-    this.options.log?.(`[Chutes Usage] ${message}`)
   }
 }
 
@@ -146,17 +107,4 @@ function getQuotaUsageChuteIds(payload: JsonContainer): string[] {
 // Encode path segments strictly so wildcard chute ids like '*' are sent as '%2A'.
 function encodePathSegment(value: string): string {
   return encodeURIComponent(value).replace(/\*/g, '%2A')
-}
-
-// Summarize JSON shapes for debug diagnostics without logging secrets or full payloads.
-function describeJsonContainer(value: JsonContainer | null): string {
-  if (value === null) {
-    return 'null'
-  }
-
-  if (Array.isArray(value)) {
-    return `array(length=${value.length})`
-  }
-
-  return `object(keys=${Object.keys(value).join(',') || 'none'})`
 }

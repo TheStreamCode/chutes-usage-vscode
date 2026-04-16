@@ -65,9 +65,8 @@ test('fetches quota usage through documented per-chute endpoints', async () => {
   }
 })
 
-test('emits debug logs when quota usage cannot be fetched from quota rows', async () => {
+test('returns null fallback quota usage when quota rows have no chute ids', async () => {
   const originalFetch = globalThis.fetch
-  const logs: string[] = []
 
   globalThis.fetch = (async (input: string | URL | Request) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
@@ -100,14 +99,9 @@ test('emits debug logs when quota usage cannot be fetched from quota rows', asyn
   }) as typeof fetch
 
   try {
-    await new ChutesApiClient('test-key', {
-      debug: true,
-      log: (message: string) => {
-        logs.push(message)
-      }
-    }).getDashboardPayload()
+    const payload = await new ChutesApiClient('test-key').getDashboardPayload()
 
-    assert.ok(logs.some((message) => message.includes('quota usage skipped: no chute ids found in quotas payload')))
+    assert.equal(payload.quotaUsageFallback, null)
   } finally {
     globalThis.fetch = originalFetch
   }

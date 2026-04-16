@@ -7,8 +7,8 @@ export class StatusBarController implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem
 
   public constructor() {
-    this.item = vscode.window.createStatusBarItem('chutesUsage.status', vscode.StatusBarAlignment.Left, 100)
-    this.item.command = 'chutesUsage.openDashboard'
+    this.item = vscode.window.createStatusBarItem('chutesUsageVscode.status', vscode.StatusBarAlignment.Left, 100)
+    this.item.command = 'chutesUsageVscode.openDashboard'
   }
 
   public render(state: DashboardState, visible: boolean): void {

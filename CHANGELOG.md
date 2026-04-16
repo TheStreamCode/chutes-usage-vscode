@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9
+
+- Republished the extension under the new Marketplace identity `mikesoft.chutes-usage-vscode`.
+- Removed development-only debug logging and cleaned up legacy command, view, and settings identifiers.
+
 ## 0.1.8
 
 - Switched daily quota sync to prefer `quota_usage/me` with `invocations/stats/llm` as a live cross-check.
