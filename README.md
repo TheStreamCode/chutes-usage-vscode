@@ -27,6 +27,7 @@ After installation:
 
 ## Latest Fixes
 
+- `0.2.6` refreshes the extension branding with a dedicated single-color icon for the VS Code Activity Bar/sidebar and an updated Marketplace icon.
 - `0.2.5` fixes a dashboard regression where the sidebar could render only the background after activation.
 - The dashboard bootstrap is now packaged as browser-safe ES modules to match the VS Code webview runtime.
 

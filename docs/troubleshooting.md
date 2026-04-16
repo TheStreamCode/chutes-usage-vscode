@@ -20,6 +20,13 @@ If the Activity Bar view opens but the dashboard content is blank:
 
 Version `0.2.5` fixes a webview bootstrap issue that could prevent the dashboard UI from rendering at all.
 
+### Sidebar Icon Looks Different From The Marketplace Icon
+
+This is expected from version `0.2.6` onward.
+
+- the Activity Bar/sidebar icon uses a dedicated single-color SVG to match VS Code icon guidelines
+- the Marketplace icon uses a separate PNG with the full branded artwork
+
 ### Refresh Errors
 
 If the extension shows an error state:

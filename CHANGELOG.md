@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6
+
+- Refreshed the extension branding with a new Marketplace icon and a dedicated single-color Activity Bar/sidebar icon.
+- Updated the public docs and release notes to reflect the current icon behavior and latest release.
+
 ## 0.2.5
 
 - Fixed a webview bootstrap regression that could leave the sidebar blank with only the background visible.

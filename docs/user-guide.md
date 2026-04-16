@@ -35,6 +35,8 @@ Depending on the current state, the dashboard shows onboarding, loading, ready, 
 
 If the sidebar ever appears blank after an update, make sure you are on version `0.2.5` or newer, which fixes a webview bootstrap regression from `0.2.4`.
 
+From version `0.2.6`, the Activity Bar/sidebar icon uses a dedicated single-color SVG for better visibility inside VS Code, while the Marketplace listing keeps a separate PNG icon.
+
 ### Status Bar
 
 The status bar item provides a compact summary of usage.
