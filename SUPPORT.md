@@ -1,11 +1,10 @@
 # Support
 
-If you need help with `Chutes Usage`, use one of these channels:
+Use GitHub Issues for bug reports, feature requests, and support questions:
 
-- Bug reports and feature requests: `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
-- Repository homepage: `https://github.com/TheStreamCode/chutes-usage-vscode`
+- `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
 
-## When Reporting Issues
+## What To Include In An Issue
 
 Please include:
 
@@ -16,4 +15,4 @@ Please include:
 - expected behavior
 - actual behavior
 
-If the problem is related to API parsing, include a redacted payload when possible. Remove secrets and personal identifiers, but keep field names and numeric values intact.
+If the issue is related to API parsing or quota behavior, include a redacted payload when possible. Remove secrets and personal identifiers, but keep field names and numeric values intact.

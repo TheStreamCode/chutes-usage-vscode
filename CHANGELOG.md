@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Reorganized the public documentation for a cleaner Marketplace and repository presentation.
+
 ## 0.2.1
 
 - Removed the non-working status bar click action and its misleading tooltip hint.

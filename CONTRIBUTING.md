@@ -1,36 +1,31 @@
 # Contributing
 
-Thanks for your interest in improving `Chutes Usage`.
+Thanks for your interest in improving `Chutes Usage for VS Code`.
+
+## Prerequisites
+
+- Node.js 22 or newer
+- `pnpm`
 
 ## Development Setup
 
-1. Install Node.js 22 or newer.
-2. Install `pnpm`.
-3. Install dependencies:
+1. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-4. Build the extension:
+2. Build the extension:
 
 ```bash
 pnpm run compile
 ```
 
-5. Run the test suite:
+3. Run the test suite:
 
 ```bash
 pnpm test
 ```
-
-## Project Structure
-
-- `src/`: extension runtime, API client, state, status bar, and webview provider
-- `webview/`: webview frontend source
-- `out/`: compiled output
-- `media/`: extension icons and static assets
-- `docs/`: design notes and internal project documentation
 
 ## Contribution Guidelines
 
@@ -42,19 +37,12 @@ pnpm test
 
 ## Pull Requests
 
-Before opening a pull request:
+Before opening a pull request, make sure to:
 
 1. Run `pnpm test`
 2. Run `pnpm package`
 3. Update `CHANGELOG.md` when the change is user-visible
 4. Update `README.md` when setup, behavior, or supported API shapes change
-
-## Changelog Style
-
-- Keep changelog entries short and release-oriented.
-- Group related work into one or two meaningful bullets when possible.
-- Do not list minor visual tweaks, refactors, or housekeeping individually unless they matter to users.
-- Include technical detail only when it affects compatibility, user behavior, migration, or debugging expectations.
 
 ## Reporting API Shape Issues
 

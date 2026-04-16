@@ -1,36 +1,36 @@
 # Chutes Usage for VS Code
 
-Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.
+Monitor Chutes subscription usage, rolling limits, and request quotas directly inside VS Code.
 
-## Important Disclaimer
+This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
 
-`Chutes Usage for VS Code` is a third-party tool.
-
-It is not official and is not affiliated with or endorsed by Chutes.
-
-Created by:
-- Michael Gasperini
-- `mikesoft.it`
-
-Public repository:
-- `https://github.com/TheStreamCode/chutes-usage-vscode`
-
-Marketplace publisher:
-- `mikesoft`
-
-Marketplace extension id:
-- `mikesoft.chutes-usage-vscode`
-
-## What It Shows
+## Features
 
 - Monthly usage and remaining subscription credit
 - 4-hour rolling window usage and remaining credit
 - Daily request quota usage and remaining requests
 - Quotas table for the authenticated user
-- Compact status bar summary
 - Sidebar dashboard with plan snapshot and usage cards
+- Compact status bar summary
 
-## Current Data Sources
+## Installation
+
+1. Open the Command Palette.
+2. Run `Chutes Usage for VS Code: Set API Key`.
+3. Open the `Chutes Usage` sidebar.
+
+If you previously installed the removed Marketplace package, install this extension as a fresh package and set the API key again.
+
+## Usage
+
+The extension shows your current Chutes usage in two places:
+
+- a sidebar dashboard with plan and quota details
+- an optional status bar summary
+
+Use the built-in refresh command whenever you want to request fresh data immediately.
+
+## Data Sources
 
 The extension reads only user-scoped Chutes endpoints tied to your API key:
 
@@ -39,82 +39,38 @@ The extension reads only user-scoped Chutes endpoints tied to your API key:
 - `GET /users/me/quota_usage/me`
 - `GET /users/me/quota_usage/{chute_id}`
 - `GET /invocations/stats/llm`
-- `GET /users/me/discounts`
-- `GET /users/me/price_overrides`
 
-Notes:
+Behavior summary:
 
 - Monthly and 4-hour windows come from `subscription_usage`.
-- Daily request usage comes primarily from `quota_usage/me` and falls back to per-chute aggregation only when needed.
-- `invocations/stats/llm` is used as a live cross-check to detect delayed quota sync.
-- Daily request limits come from `quotas`, and `quota: 0` is treated as `Unlimited`.
-- The public `GET /pricing` endpoint is not used to infer user usage windows.
+- Daily request usage comes primarily from `quota_usage/me`.
+- `invocations/stats/llm` is used as a live cross-check when quota metering appears delayed.
+- Daily request limits come from `quotas`.
+- `quota: 0` is treated as `Unlimited`.
 
-## Plan Name Behavior
+## Known Limitations
 
-Chutes user endpoints currently expose numeric subscription fields such as `monthly_price`, but do not appear to expose a stable tier name string for the authenticated user.
+- Chutes quota metering may lag behind live requests.
+- When daily quota data cannot be verified, the extension shows `--` instead of a potentially misleading `0`.
+- The extension does not migrate settings or secrets from the removed Marketplace package.
 
-The extension therefore maps known public pricing values to tier names:
+## Privacy and Storage
 
-- `$3` -> `Base`
-- `$10` -> `Plus`
-- `$20` -> `Pro`
-- no subscription -> `Free tier`
-- custom plan -> `Custom`
-
-If Chutes later exposes an official tier name in the API, the extension should prefer that value directly.
-
-## User Friendly By Design
-
-The extension is designed to be easy to use:
-
-- one quick setup action
-- one compact status bar item
-- one sidebar dashboard
-- clear labels instead of technical jargon where possible
-- safe defaults with very few settings
-
-## Setup
-
-1. Open the Command Palette.
-2. Run `Chutes Usage for VS Code: Set API Key`.
-3. Open the `Chutes Usage` sidebar.
-4. If you previously installed the removed Marketplace package, install this extension as a fresh package and set the API key again.
-
-## Notes
-
-- This extension uses your Chutes API key only to request your own usage data.
-- The key is stored using VS Code `SecretStorage`.
-- The extension is built as a practical unofficial utility for Chutes users.
-- If Chutes quota metering is delayed, the daily card shows `--` with a `Possible sync delay` hint instead of a misleading `0`.
-
-## Data Retention
-
-- The extension does not keep a local history of your usage data.
+- Your Chutes API key is stored using VS Code `SecretStorage`.
+- The extension uses the key only to request your own usage data.
+- The extension does not keep a local history of usage data.
 - The sidebar webview state is not persisted between sessions.
-- On uninstall, the extension runs a best-effort cleanup hook to remove its local extension storage.
-- VS Code does not document access to `SecretStorage` from the uninstall hook, so secure secret cleanup is guaranteed when you use `Chutes Usage: Remove API Key` before uninstalling.
 
-## Development Notes
+Before uninstalling, use `Chutes Usage for VS Code: Remove API Key` if you want to explicitly clear stored secrets.
 
-- Package manager: `pnpm`
-- Platform target: Windows-friendly workflows
-- Webview assets are compiled to `out/webview`
-- The packaged extension includes both `main.js` and `styles.css`
+## Support
 
-## Repository Standards
+Use GitHub Issues for bug reports and feature requests:
 
-This repository includes:
+- `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
 
-- CI workflow for build and test validation
-- issue and pull request templates
-- contribution guide
-- code of conduct
-- security policy
-- Dependabot configuration for dependency maintenance
+For API parsing issues, include a redacted payload when possible. Remove secrets and personal identifiers, but keep field names and numeric values intact.
 
-## Author
+## License
 
-Michael Gasperini
-
-`https://mikesoft.it`
+MIT
