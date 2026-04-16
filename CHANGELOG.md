@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.1.9
+## 0.2.1
+
+- Removed the non-working status bar click action and its misleading tooltip hint.
+
+## 0.2.0
 
 - Republished the extension under the new Marketplace identity `mikesoft.chutes-usage-vscode`.
 - Removed development-only debug logging and cleaned up legacy command, view, and settings identifiers.

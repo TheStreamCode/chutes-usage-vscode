@@ -8,7 +8,6 @@ export class StatusBarController implements vscode.Disposable {
 
   public constructor() {
     this.item = vscode.window.createStatusBarItem('chutesUsageVscode.status', vscode.StatusBarAlignment.Left, 100)
-    this.item.command = 'chutesUsageVscode.openDashboard'
   }
 
   public render(state: DashboardState, visible: boolean): void {
@@ -58,7 +57,5 @@ function buildTooltip(state: DashboardState): string {
   if (state.lastUpdatedAt) {
     lines.push(`Updated: ${new Date(state.lastUpdatedAt).toLocaleTimeString()}`)
   }
-
-  lines.push('Click to open the dashboard.')
   return lines.join('\n')
 }
