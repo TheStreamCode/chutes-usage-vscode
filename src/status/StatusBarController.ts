@@ -48,7 +48,10 @@ function buildTooltip(state: DashboardState): string {
   const lines: string[] = []
   if (state.data) {
     for (const window of state.data.windows) {
-      lines.push(`${window.label}: ${window.used ?? 0}/${window.limit ?? 0}`)
+      const used = window.used === null ? '--' : `${Math.round(window.used)}`
+      const limit = window.limit === null ? '--' : window.unit === 'requests' && window.limit === 0 ? 'Unlimited' : `${Math.round(window.limit)}`
+      const suffix = window.resetLabel ? ` (${window.resetLabel})` : ''
+      lines.push(`${window.label}: ${used}/${limit}${suffix}`)
     }
   }
 

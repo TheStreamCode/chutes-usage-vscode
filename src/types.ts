@@ -19,6 +19,8 @@ export interface UsageWindow {
   remaining: number | null
   percentUsed: number | null
   resetLabel: string | null
+  status?: 'trusted' | 'stale' | 'unknown'
+  dataSource?: 'quota-usage-me' | 'quota-usage-fallback' | 'subscription-usage' | 'quotas' | 'unknown'
 }
 
 export interface QuotaEntry {
@@ -46,6 +48,10 @@ export interface QuotaUsageSummary {
   used: number | null
   quota: number | null
   trusted: boolean
+}
+
+export interface InvocationStatsSummary {
+  totalRequests: number
 }
 
 export type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'

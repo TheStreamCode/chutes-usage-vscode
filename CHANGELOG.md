@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8
+
+- Switched daily quota sync to prefer `quota_usage/me` with `invocations/stats/llm` as a live cross-check.
+- Show `--` with a sync delay hint instead of a stale `0`, and treat `quota: 0` as `Unlimited`.
+
 ## 0.1.7
 
 - Added runtime debug logging for quota usage diagnostics.

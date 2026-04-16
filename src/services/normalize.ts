@@ -1,10 +1,18 @@
-import type { DashboardData, JsonArray, JsonContainer, JsonObject, PlanInfo, QuotaEntry, QuotaUsageSummary, UsageUnit, UsageWindow, UsageWindowKind } from '../types'
+import type { DashboardData, InvocationStatsSummary, JsonArray, JsonContainer, JsonObject, PlanInfo, QuotaEntry, QuotaUsageSummary, UsageUnit, UsageWindow, UsageWindowKind } from '../types'
 
-export function normalizeDashboardData(subscriptionUsage: JsonObject, quotasPayload: JsonContainer, quotaUsagePayload: JsonContainer | null = null): DashboardData {
+export function normalizeDashboardData(
+  subscriptionUsage: JsonObject,
+  quotasPayload: JsonContainer,
+  quotaUsagePayload: JsonContainer | null = null,
+  quotaUsageMePayload: JsonContainer | null = null,
+  invocationStatsPayload: JsonContainer | null = null
+): DashboardData {
   const usageSource = unwrapUsagePayload(subscriptionUsage)
   const quotas = normalizeQuotas(quotasPayload)
-  const quotaUsage = normalizeQuotaUsage(quotaUsagePayload)
-  const windows = normalizeUsageWindows(usageSource, quotas, quotaUsage)
+  const quotaUsageFallback = normalizeQuotaUsage(quotaUsagePayload)
+  const quotaUsageMe = normalizeQuotaUsage(quotaUsageMePayload)
+  const invocationStats = normalizeInvocationStats(invocationStatsPayload)
+  const windows = normalizeUsageWindows(usageSource, quotas, quotaUsageFallback, quotaUsageMe, invocationStats)
 
   return {
     windows,
@@ -14,7 +22,13 @@ export function normalizeDashboardData(subscriptionUsage: JsonObject, quotasPayl
 }
 
 // Normalize subscription usage payloads into a small set of UI-friendly windows.
-export function normalizeUsageWindows(payload: JsonObject, quotas: QuotaEntry[] = [], quotaUsage: QuotaUsageSummary | null = null): UsageWindow[] {
+export function normalizeUsageWindows(
+  payload: JsonObject,
+  quotas: QuotaEntry[] = [],
+  quotaUsageFallback: QuotaUsageSummary | null = null,
+  quotaUsageMe: QuotaUsageSummary | null = null,
+  invocationStats: InvocationStatsSummary | null = null
+): UsageWindow[] {
   const candidates: Array<{
     keys: string[]
     kind: UsageWindowKind
@@ -83,7 +97,7 @@ export function normalizeUsageWindows(payload: JsonObject, quotas: QuotaEntry[] 
     }
   ]
 
-  const liveDailyQuotaWindow = buildDailyQuotaWindow(quotas, quotaUsage)
+  const liveDailyQuotaWindow = buildDailyQuotaWindow(quotas, quotaUsageMe, quotaUsageFallback, invocationStats)
 
   return candidates
     .map((candidate) => {
@@ -196,6 +210,29 @@ export function normalizeQuotaUsage(payload: JsonContainer | null): QuotaUsageSu
   return null
 }
 
+export function normalizeInvocationStats(payload: JsonContainer | null): InvocationStatsSummary | null {
+  if (payload === null || !Array.isArray(payload)) {
+    return null
+  }
+
+  let totalRequests = 0
+  let hasStats = false
+  for (const entry of payload) {
+    const object = asObject(entry)
+    const requests = asNumber(object?.total_requests)
+    if (requests !== null) {
+      totalRequests += requests
+      hasStats = true
+    }
+  }
+
+  if (!hasStats) {
+    return null
+  }
+
+  return { totalRequests }
+}
+
 // Normalize plan metadata while allowing the API response to evolve over time.
 export function normalizePlan(payload: JsonObject, windows: UsageWindow[] = []): PlanInfo | null {
   const plan = asObject(payload.plan)
@@ -249,7 +286,12 @@ export function normalizePlan(payload: JsonObject, windows: UsageWindow[] = []):
   }
 }
 
-function buildDailyQuotaWindow(quotas: QuotaEntry[], quotaUsage: QuotaUsageSummary | null): UsageWindow[] {
+function buildDailyQuotaWindow(
+  quotas: QuotaEntry[],
+  quotaUsageMe: QuotaUsageSummary | null,
+  quotaUsageFallback: QuotaUsageSummary | null,
+  invocationStats: InvocationStatsSummary | null
+): UsageWindow[] {
   const totalQuota = quotas.reduce<number | null>((sum, entry) => {
     if (entry.quota === null) {
       return sum
@@ -262,9 +304,21 @@ function buildDailyQuotaWindow(quotas: QuotaEntry[], quotaUsage: QuotaUsageSumma
     return []
   }
 
-  const used = quotaUsage?.trusted ? quotaUsage.used : null
-  const limit = quotaUsage?.quota ?? totalQuota
-  const remaining = used !== null && limit !== null ? computeRemaining(used, limit) : null
+  const preferredQuotaUsage = quotaUsageMe ?? quotaUsageFallback
+  const liveTotalRequests = invocationStats?.totalRequests ?? 0
+  const limit = preferredQuotaUsage?.quota ?? totalQuota
+  const isUnlimited = limit === 0
+  const isStale = preferredQuotaUsage?.used === 0 && liveTotalRequests > 0
+  const used = isStale ? null : (preferredQuotaUsage?.trusted ? preferredQuotaUsage.used : null)
+  const remaining = isUnlimited ? null : used !== null && limit !== null ? computeRemaining(used, limit) : null
+  const status: UsageWindow['status'] = isStale ? 'stale' : used !== null ? 'trusted' : 'unknown'
+  const dataSource: UsageWindow['dataSource'] = quotaUsageMe !== null
+    ? 'quota-usage-me'
+    : quotaUsageFallback !== null
+      ? 'quota-usage-fallback'
+      : totalQuota !== null
+        ? 'quotas'
+        : 'unknown'
 
   return [
     {
@@ -276,7 +330,9 @@ function buildDailyQuotaWindow(quotas: QuotaEntry[], quotaUsage: QuotaUsageSumma
       limit,
       remaining,
       percentUsed: computePercent(used, limit),
-      resetLabel: null
+      resetLabel: isStale ? 'Possible sync delay' : null,
+      status,
+      dataSource
     }
   ]
 }
@@ -354,7 +410,8 @@ function formatWindowSummary(window: UsageWindow, prefix: string, includePrefix 
   const limit = window.limit
 
   if (window.unit === 'requests') {
-    return `${used === null ? '--' : Math.round(used)}/${limit === null ? '--' : Math.round(limit)}`
+    const formattedLimit = limit === null ? '--' : limit === 0 ? 'Unlimited' : `${Math.round(limit)}`
+    return `${used === null ? '--' : Math.round(used)}/${formattedLimit}`
   }
 
   const safeUsed = used ?? 0

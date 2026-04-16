@@ -33,15 +33,18 @@ The extension reads only user-scoped Chutes endpoints tied to your API key:
 
 - `GET /users/me/subscription_usage`
 - `GET /users/me/quotas`
+- `GET /users/me/quota_usage/me`
 - `GET /users/me/quota_usage/{chute_id}`
+- `GET /invocations/stats/llm`
 - `GET /users/me/discounts`
 - `GET /users/me/price_overrides`
 
 Notes:
 
 - Monthly and 4-hour windows come from `subscription_usage`.
-- Daily request usage comes from live `quota_usage/{chute_id}` responses and is aggregated when multiple quota rows are returned.
-- Daily request limits come from `quotas`.
+- Daily request usage comes primarily from `quota_usage/me` and falls back to per-chute aggregation only when needed.
+- `invocations/stats/llm` is used as a live cross-check to detect delayed quota sync.
+- Daily request limits come from `quotas`, and `quota: 0` is treated as `Unlimited`.
 - The public `GET /pricing` endpoint is not used to infer user usage windows.
 
 ## Plan Name Behavior
@@ -73,6 +76,7 @@ The extension is designed to be easy to use:
 1. Open the Command Palette.
 2. Run `Chutes Usage: Set API Key`.
 3. Open the `Chutes Usage` sidebar.
+4. If you need diagnostics, enable `Chutes Usage: Debug Logging` and run `Chutes Usage: Open Debug Logs`.
 
 ## Notes
 
@@ -80,6 +84,7 @@ The extension is designed to be easy to use:
 - The key is stored using VS Code `SecretStorage`.
 - The extension is built as a practical unofficial utility for Chutes users.
 - When `Chutes Usage: Debug Logging` is enabled, open logs with `Chutes Usage: Open Debug Logs` or from the `Output` panel under `Chutes Usage`.
+- If Chutes quota metering is delayed, the daily card shows `--` with a `Possible sync delay` hint instead of a misleading `0`.
 
 ## Data Retention
 

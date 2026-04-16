@@ -10,6 +10,8 @@ type UsageWindow = {
   remaining: number | null
   percentUsed: number | null
   resetLabel: string | null
+  status?: 'trusted' | 'stale' | 'unknown'
+  dataSource?: 'quota-usage-me' | 'quota-usage-fallback' | 'subscription-usage' | 'quotas' | 'unknown'
 }
 
 type QuotaEntry = {
@@ -270,7 +272,7 @@ function buildPlanSummary(plan: PlanInfo | null, windows: UsageWindow[]): HTMLEl
     buildPlanStat('Monthly Price', formatValue(plan?.monthlyPriceUsd ?? null, 'usd')),
     buildPlanStat('Monthly Left', formatValue(billing?.remaining ?? null, 'usd')),
     buildPlanStat('4H Limit', formatValue(plan?.fourHourCapUsd ?? rolling?.limit ?? null, 'usd')),
-    buildPlanStat('Daily Limit', formatValue(plan?.dailyRequestLimit ?? daily?.limit ?? null, 'requests'))
+    buildPlanStat('Daily Limit', formatRequestsLimitValue(plan?.dailyRequestLimit ?? daily?.limit ?? null))
   )
 
   grid.classList.add('plan-grid-wide')
@@ -320,7 +322,7 @@ function buildPlanStat(label: string, value: string): HTMLElement {
 }
 
 function buildWindowSubline(window: UsageWindow): string {
-  const parts = [`of ${formatValue(window.limit, window.unit)}`]
+  const parts = [`of ${window.unit === 'requests' ? formatRequestsLimitValue(window.limit) : formatValue(window.limit, window.unit)}`]
 
   if (window.remaining !== null) {
     parts.push(`${formatValue(window.remaining, window.unit)} left`)
@@ -401,4 +403,10 @@ function formatValue(value: number | null, unit: 'usd' | 'requests'): string {
   if (value === null) return '--'
   if (unit === 'requests') return `${Math.round(value).toLocaleString()}`
   return `$${value.toFixed(2)}`
+}
+
+function formatRequestsLimitValue(value: number | null): string {
+  if (value === null) return '--'
+  if (value === 0) return 'Unlimited'
+  return `${Math.round(value).toLocaleString()}`
 }

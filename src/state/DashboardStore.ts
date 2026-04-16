@@ -65,7 +65,13 @@ export class DashboardStore {
         }
       })
       const payload = await client.getDashboardPayload()
-      const data = normalizeDashboardData(payload.subscriptionUsage, payload.quotas, payload.quotaUsage)
+      const data = normalizeDashboardData(
+        payload.subscriptionUsage,
+        payload.quotas,
+        payload.quotaUsageFallback,
+        payload.quotaUsageMe,
+        payload.invocationStatsLlm
+      )
 
       this.setState({
         connectionState: 'ready',

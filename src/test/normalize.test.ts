@@ -399,6 +399,60 @@ test('does not show a stale zero daily usage when live quota usage is unavailabl
   assert.equal(dailyWindow?.remaining, null)
 })
 
+test('marks the daily quota as stale when quota usage me is zero but llm stats show activity', () => {
+  const subscriptionUsage: JsonObject = {
+    subscription: true,
+    custom: false,
+    monthly_price: 20
+  }
+
+  const quotas = [
+    {
+      chute_id: '*',
+      quota: 2000,
+      updated_at: '2026-04-16T10:00:00.000000'
+    }
+  ]
+
+  const quotaUsageMe: JsonObject = {
+    used: 0,
+    quota: 2000
+  }
+
+  const invocationStats = [
+    {
+      chute_id: 'model-a',
+      total_requests: 11
+    }
+  ]
+
+  const result = normalizeDashboardData(subscriptionUsage, quotas, null, quotaUsageMe, invocationStats)
+  const dailyWindow = result.windows.find((window) => window.kind === 'daily-requests')
+
+  assert.equal(dailyWindow?.used, null)
+  assert.equal(dailyWindow?.limit, 2000)
+  assert.equal(dailyWindow?.remaining, null)
+  assert.equal(dailyWindow?.resetLabel, 'Possible sync delay')
+})
+
+test('treats zero quota as unlimited for the daily window', () => {
+  const result = normalizeDashboardData({}, [
+    {
+      chute_id: '*',
+      quota: 0,
+      updated_at: '2026-04-16T10:00:00.000000'
+    }
+  ], null, {
+    used: 380,
+    quota: 0
+  }, [])
+  const dailyWindow = result.windows.find((window) => window.kind === 'daily-requests')
+
+  assert.equal(dailyWindow?.used, 380)
+  assert.equal(dailyWindow?.limit, 0)
+  assert.equal(dailyWindow?.remaining, null)
+})
+
 test('defaults quota label to All Models when the API omits a model name', () => {
   const result = normalizeDashboardData({}, [
     {
@@ -482,4 +536,26 @@ test('summarizes unknown daily request usage without coercing it to zero', () =>
   })
 
   assert.equal(summary, 'Chutes | --/5000')
+})
+
+test('summarizes unlimited daily quota and stale sync states clearly', () => {
+  const summary = summarizeStatusBar({
+    windows: [
+      {
+        id: 'daily',
+        kind: 'daily-requests',
+        label: 'Daily Quota',
+        unit: 'requests',
+        used: null,
+        limit: 0,
+        remaining: null,
+        percentUsed: null,
+        resetLabel: 'Possible sync delay'
+      }
+    ],
+    quotas: [],
+    plan: null
+  })
+
+  assert.equal(summary, 'Chutes | --/Unlimited')
 })

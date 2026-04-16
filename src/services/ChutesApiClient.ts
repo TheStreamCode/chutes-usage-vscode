@@ -13,22 +13,34 @@ export class ChutesApiClient {
   ) {}
 
   // Fetch all user-facing dashboard endpoints needed for the first extension version.
-  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsage: JsonContainer | null; pricing: JsonContainer | null }> {
-    const [subscriptionUsage, quotas, pricing] = await Promise.all([
+  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; pricing: JsonContainer | null }> {
+    const [subscriptionUsage, quotas, pricing, quotaUsageMe, invocationStatsLlm] = await Promise.all([
       this.getJsonContainer('/users/me/subscription_usage'),
       this.getJsonContainer('/users/me/quotas'),
-      this.getJsonContainer('/pricing').catch(() => null)
+      this.getJsonContainer('/pricing').catch(() => null),
+      this.getJsonContainer('/users/me/quota_usage/me').catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        this.debugLog(`quota usage me fetch failed: ${message}`)
+        return null
+      }),
+      this.getJsonContainer('/invocations/stats/llm').catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        this.debugLog(`invocation stats llm fetch failed: ${message}`)
+        return null
+      })
     ])
     this.debugLog(`subscription usage shape: ${describeJsonContainer(subscriptionUsage)}`)
     this.debugLog(`quotas shape: ${describeJsonContainer(quotas)}`)
-    const quotaUsage = await this.getQuotaUsagePayload(quotas)
-    this.debugLog(`quota usage shape: ${describeJsonContainer(quotaUsage)}`)
+    this.debugLog(`quota usage me shape: ${describeJsonContainer(quotaUsageMe)}`)
+    this.debugLog(`invocation stats llm shape: ${describeJsonContainer(invocationStatsLlm)}`)
+    const quotaUsageFallback = await this.getQuotaUsagePayload(quotas)
+    this.debugLog(`quota usage fallback shape: ${describeJsonContainer(quotaUsageFallback)}`)
 
     if (!isJsonObject(subscriptionUsage)) {
       throw new Error('Unexpected API response shape for /users/me/subscription_usage')
     }
 
-    return { subscriptionUsage, quotas, quotaUsage, pricing }
+    return { subscriptionUsage, quotas, quotaUsageMe, quotaUsageFallback, invocationStatsLlm, pricing }
   }
 
   // Execute one authenticated GET request and return a JSON object or array payload.
