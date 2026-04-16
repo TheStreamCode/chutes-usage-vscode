@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(registerChutesWebviewProvider(context, provider))
 
   context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.openDashboard', async () => {
-    await vscode.commands.executeCommand(`${VIEW_CONTAINER_ID}.focus`)
+    await vscode.commands.executeCommand(`workbench.view.extension.${VIEW_CONTAINER_ID}`)
     await vscode.commands.executeCommand(`${DASHBOARD_VIEW_ID}.focus`)
   }))
 
