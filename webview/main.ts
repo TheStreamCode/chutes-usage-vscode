@@ -1,3 +1,5 @@
+import { getHeaderPresentation } from './presentation'
+
 type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
 
 type UsageWindow = {
@@ -112,6 +114,7 @@ function render(state: DashboardState): void {
 function buildHeader(state: DashboardState): HTMLElement {
   const header = document.createElement('header')
   header.className = 'header'
+  const presentation = getHeaderPresentation(state)
 
   const brand = document.createElement('div')
   brand.className = 'header-brand'
@@ -122,17 +125,13 @@ function buildHeader(state: DashboardState): HTMLElement {
   const statusLine = document.createElement('div')
   statusLine.className = 'status-line'
 
-  if (state.connected) {
-    const planName = state.data?.plan?.planName
-    const monthlyPrice = state.data?.plan?.monthlyPriceUsd
-    const updated = state.lastUpdatedAt
-      ? `SYNCED ${new Date(state.lastUpdatedAt).toLocaleTimeString()}`
-      : 'CONNECTED'
-    const prefix = planName ? `${planName.toUpperCase()} // ` : monthlyPrice !== null && monthlyPrice !== undefined ? `$${monthlyPrice.toFixed(0)}/MO // ` : ''
-    statusLine.innerHTML = `<span class="dot"></span>${prefix}${updated}`
-  } else {
-    statusLine.textContent = '// AWAITING API KEY'
+  if (presentation.showDot) {
+    const dot = document.createElement('span')
+    dot.className = 'dot'
+    statusLine.append(dot)
   }
+
+  statusLine.append(document.createTextNode(presentation.statusText))
 
   brand.append(title, statusLine)
 
@@ -140,8 +139,8 @@ function buildHeader(state: DashboardState): HTMLElement {
   actions.className = 'actions'
   actions.append(
     actionButton('Refresh', 'refresh'),
-    actionButton(state.connected ? 'Replace Key' : 'Set Key', 'setApiKey', true),
-    actionButton('Remove', 'removeApiKey', !state.connected)
+    actionButton(presentation.keyActionLabel, 'setApiKey', true),
+    actionButton('Remove', 'removeApiKey', presentation.removeDisabled)
   )
 
   header.append(brand, actions)

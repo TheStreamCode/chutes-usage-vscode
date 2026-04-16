@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Fixed overlapping refreshes so stale responses and removed API keys can no longer overwrite the latest dashboard state.
+- Fixed the sidebar to receive the current snapshot as soon as it opens, refresh again when the view becomes visible, and keep stale data visible during temporary refresh errors.
+- Restored the status bar click action and made runtime settings updates apply immediately without reloading the extension.
+
 ## 0.2.3
 
 - Reworked the public documentation into a cleaner user-facing structure.

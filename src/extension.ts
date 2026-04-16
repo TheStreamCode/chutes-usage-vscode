@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import { DASHBOARD_VIEW_ID, DEFAULT_REFRESH_INTERVAL_SECONDS, VIEW_CONTAINER_ID } from './constants'
+import { DASHBOARD_VIEW_ID, DEFAULT_REFRESH_INTERVAL_SECONDS, MAX_REFRESH_INTERVAL_SECONDS, MIN_REFRESH_INTERVAL_SECONDS, VIEW_CONTAINER_ID } from './constants'
 import { SecretStore } from './services/SecretStore'
 import { DashboardStore } from './state/DashboardStore'
 import { StatusBarController } from './status/StatusBarController'
@@ -10,6 +10,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const secretStore = new SecretStore(context.secrets)
   const dashboardStore = new DashboardStore(secretStore)
   const statusBarController = new StatusBarController()
+  let refreshTimer: NodeJS.Timeout | undefined
 
   const provider = new ChutesWebviewProvider(context.extensionUri, {
     onRefresh: () => {
@@ -23,6 +24,32 @@ export function activate(context: vscode.ExtensionContext): void {
     },
     onOpenExternal: (href: string) => {
       void vscode.env.openExternal(vscode.Uri.parse(href))
+    },
+    getState: () => dashboardStore.getState()
+  })
+
+  const syncPresentation = (): void => {
+    const state = dashboardStore.getState()
+    const visible = vscode.workspace.getConfiguration('chutesUsageVscode').get<boolean>('showStatusBar', true)
+    statusBarController.render(state, visible)
+    provider.postState(state)
+  }
+
+  const restartRefreshTimer = (): void => {
+    if (refreshTimer) {
+      clearInterval(refreshTimer)
+    }
+
+    refreshTimer = setInterval(() => {
+      void dashboardStore.refresh()
+    }, getRefreshInterval() * 1000)
+  }
+
+  context.subscriptions.push({
+    dispose: () => {
+      if (refreshTimer) {
+        clearInterval(refreshTimer)
+      }
     }
   })
 
@@ -53,15 +80,19 @@ export function activate(context: vscode.ExtensionContext): void {
   })
   context.subscriptions.push({ dispose: unsubscribe })
 
-  const interval = getRefreshInterval()
-  const timer = setInterval(() => {
-    void dashboardStore.refresh()
-  }, interval * 1000)
-
-  context.subscriptions.push({ dispose: () => clearInterval(timer) })
+  restartRefreshTimer()
   context.subscriptions.push(vscode.window.onDidChangeWindowState((event) => {
     if (event.focused) {
       void dashboardStore.refresh()
+    }
+  }))
+  context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration('chutesUsageVscode.refreshIntervalSeconds')) {
+      restartRefreshTimer()
+    }
+
+    if (event.affectsConfiguration('chutesUsageVscode.showStatusBar')) {
+      syncPresentation()
     }
   }))
 
@@ -104,5 +135,6 @@ async function removeApiKey(secretStore: SecretStore, dashboardStore: DashboardS
 }
 
 function getRefreshInterval(): number {
-  return vscode.workspace.getConfiguration('chutesUsageVscode').get<number>('refreshIntervalSeconds', DEFAULT_REFRESH_INTERVAL_SECONDS)
+  const configuredValue = vscode.workspace.getConfiguration('chutesUsageVscode').get<number>('refreshIntervalSeconds', DEFAULT_REFRESH_INTERVAL_SECONDS)
+  return Math.min(Math.max(configuredValue, MIN_REFRESH_INTERVAL_SECONDS), MAX_REFRESH_INTERVAL_SECONDS)
 }

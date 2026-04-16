@@ -5,7 +5,7 @@ This directory contains the public project documentation for `Chutes Usage for V
 ## Index
 
 - `user-guide.md`: end-user setup, commands, settings, and day-to-day usage
-- `troubleshooting.md`: common issues, API behavior notes, and support guidance
+- `troubleshooting.md`: common issues, refresh behavior notes, API behavior notes, and support guidance
 
 ## Related Files
 

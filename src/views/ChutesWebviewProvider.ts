@@ -8,6 +8,7 @@ type Actions = {
   onSetApiKey: () => void
   onRemoveApiKey: () => void
   onOpenExternal: (href: string) => void
+  getState: () => DashboardState
 }
 
 export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
@@ -26,6 +27,14 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     webviewView.webview.html = this.getHtml(webviewView.webview)
+    this.postState(this.actions.getState())
+
+    webviewView.onDidChangeVisibility(() => {
+      if (webviewView.visible) {
+        this.actions.onRefresh()
+      }
+    })
+
     webviewView.webview.onDidReceiveMessage((message: WebviewActionMessage) => {
       switch (message.type) {
         case 'refresh':

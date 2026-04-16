@@ -22,7 +22,8 @@ After installation:
 - Optional status bar summary for quick usage visibility
 - Secure API key storage through VS Code `SecretStorage`
 - Manual refresh command for immediate sync
-- Automatic refresh on a timer and when the VS Code window regains focus
+- Automatic refresh on a timer, when the dashboard becomes visible again, and when the VS Code window regains focus
+- Immediate sidebar snapshot restore when the dashboard is opened after a background refresh
 
 ## Commands
 
@@ -41,15 +42,18 @@ After installation:
 The extension shows your current Chutes usage in two places:
 
 - the `Chutes Usage` sidebar dashboard for full details
-- the optional status bar item for a compact summary
+- the optional status bar item for a compact summary and quick access back to the dashboard
 
-The dashboard refreshes when you run the refresh command, on the configured refresh interval, and when VS Code regains window focus.
+The dashboard refreshes when you run the refresh command, on the configured refresh interval, when the dashboard becomes visible again, and when VS Code regains window focus.
+
+Settings changes for refresh interval and status bar visibility apply immediately without reloading the extension.
 
 ## Known Limitations
 
 - Chutes quota metering may lag behind live requests.
 - When daily quota data cannot be verified reliably, the extension shows `--` instead of a potentially misleading `0`.
 - Some API responses are normalized defensively because endpoint shapes may evolve over time.
+- Temporary refresh errors keep the last successful dashboard snapshot visible when possible.
 
 ## Privacy And Storage
 

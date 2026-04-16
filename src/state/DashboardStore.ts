@@ -15,6 +15,7 @@ export class DashboardStore {
   }
 
   private readonly listeners = new Set<DashboardListener>()
+  private refreshVersion = 0
 
   public constructor(private readonly secretStore: SecretStore) {}
 
@@ -30,9 +31,10 @@ export class DashboardStore {
 
   // Refresh dashboard data while preserving a simple user-facing state machine.
   public async refresh(): Promise<void> {
+    const refreshVersion = ++this.refreshVersion
     const apiKey = await this.secretStore.getApiKey()
     if (!apiKey) {
-      this.setState({
+      this.applyState(refreshVersion, {
         connectionState: 'missing-key',
         connected: false,
         lastUpdatedAt: null,
@@ -42,7 +44,7 @@ export class DashboardStore {
       return
     }
 
-    this.setState({
+    this.applyState(refreshVersion, {
       ...this.state,
       connectionState: 'loading',
       errorMessage: null
@@ -59,7 +61,13 @@ export class DashboardStore {
         payload.invocationStatsLlm
       )
 
-      this.setState({
+      const latestApiKey = await this.secretStore.getApiKey()
+      if (latestApiKey !== apiKey) {
+        this.applyMissingKeyState(refreshVersion)
+        return
+      }
+
+      this.applyState(refreshVersion, {
         connectionState: 'ready',
         connected: true,
         lastUpdatedAt: new Date().toISOString(),
@@ -67,7 +75,13 @@ export class DashboardStore {
         errorMessage: null
       })
     } catch (error) {
-      this.setState({
+      const latestApiKey = await this.secretStore.getApiKey()
+      if (latestApiKey !== apiKey) {
+        this.applyMissingKeyState(refreshVersion)
+        return
+      }
+
+      this.applyState(refreshVersion, {
         connectionState: 'error',
         connected: false,
         lastUpdatedAt: this.state.lastUpdatedAt,
@@ -75,6 +89,24 @@ export class DashboardStore {
         errorMessage: error instanceof Error ? error.message : 'Unknown error'
       })
     }
+  }
+
+  private applyMissingKeyState(refreshVersion: number): void {
+    this.applyState(refreshVersion, {
+      connectionState: 'missing-key',
+      connected: false,
+      lastUpdatedAt: null,
+      data: null,
+      errorMessage: null
+    })
+  }
+
+  private applyState(refreshVersion: number, state: DashboardState): void {
+    if (refreshVersion !== this.refreshVersion) {
+      return
+    }
+
+    this.setState(state)
   }
 
   private setState(state: DashboardState): void {

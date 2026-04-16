@@ -37,6 +37,8 @@ Depending on the current state, the dashboard shows onboarding, loading, ready, 
 
 The status bar item provides a compact summary of usage.
 
+Clicking it opens the `Chutes Usage` dashboard.
+
 It can be turned on or off with the `chutesUsageVscode.showStatusBar` setting.
 
 ## Commands
@@ -54,9 +56,12 @@ The extension refreshes data in three ways:
 
 - manual refresh through the command or dashboard action
 - automatic refresh on the configured interval
+- automatic refresh when the dashboard becomes visible again
 - automatic refresh when the VS Code window regains focus
 
 Use `chutesUsageVscode.refreshIntervalSeconds` to control the refresh interval.
+
+When you reopen the dashboard after a recent refresh, the latest snapshot is shown immediately and then refreshed again in the background.
 
 ## Usage Data Shown
 
@@ -81,6 +86,8 @@ If no API key is stored, the extension remains in an onboarding state until one 
 
 Controls how often the extension refreshes usage data automatically.
 
+Changes take effect immediately without reloading the extension.
+
 - Type: `number`
 - Default: `60`
 - Minimum: `15`
@@ -89,6 +96,8 @@ Controls how often the extension refreshes usage data automatically.
 ### `chutesUsageVscode.showStatusBar`
 
 Controls whether the status bar item is visible.
+
+Changes take effect immediately without reloading the extension.
 
 - Type: `boolean`
 - Default: `true`
