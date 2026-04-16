@@ -54,6 +54,46 @@ test('fetches quota usage through documented per-chute endpoints', async () => {
   }
 })
 
+test('emits debug logs when quota usage cannot be fetched from quota rows', async () => {
+  const originalFetch = globalThis.fetch
+  const logs: string[] = []
+
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+
+    if (url.endsWith('/users/me/subscription_usage')) {
+      return jsonResponse({ subscription: true, custom: false, monthly_price: 20, daily_quota_usage: { used: 0, limit: 5000 } })
+    }
+
+    if (url.endsWith('/users/me/quotas')) {
+      return jsonResponse({
+        items: [
+          { model: 'All Models', quota: 5000 }
+        ]
+      })
+    }
+
+    if (url.endsWith('/pricing')) {
+      return jsonResponse([])
+    }
+
+    throw new Error(`Unexpected URL ${url}`)
+  }) as typeof fetch
+
+  try {
+    await new ChutesApiClient('test-key', {
+      debug: true,
+      log: (message: string) => {
+        logs.push(message)
+      }
+    }).getDashboardPayload()
+
+    assert.ok(logs.some((message) => message.includes('quota usage skipped: no chute ids found in quotas payload')))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
 // Build a minimal JSON response for fetch-based client tests.
 function jsonResponse(body: unknown): Response {
   return new Response(JSON.stringify(body), {

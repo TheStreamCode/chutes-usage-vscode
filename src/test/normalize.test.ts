@@ -370,6 +370,35 @@ test('aggregates multiple live quota usage entries into one daily window', () =>
   assert.equal(dailyWindow?.remaining, 5237)
 })
 
+test('does not show a stale zero daily usage when live quota usage is unavailable', () => {
+  const subscriptionUsage: JsonObject = {
+    subscription: true,
+    custom: false,
+    monthly_price: 20,
+    daily_quota_usage: {
+      used: 0,
+      limit: 5000,
+      remaining: 5000,
+      label: 'Daily Quota'
+    }
+  }
+
+  const quotas = [
+    {
+      chute_id: '*',
+      quota: 5000,
+      updated_at: '2026-04-09T12:41:04.480688'
+    }
+  ]
+
+  const result = normalizeDashboardData(subscriptionUsage, quotas, null)
+  const dailyWindow = result.windows.find((window) => window.kind === 'daily-requests')
+
+  assert.equal(dailyWindow?.used, null)
+  assert.equal(dailyWindow?.limit, 5000)
+  assert.equal(dailyWindow?.remaining, null)
+})
+
 test('defaults quota label to All Models when the API omits a model name', () => {
   const result = normalizeDashboardData({}, [
     {
@@ -431,4 +460,26 @@ test('summarizes status bar text in a compact and user friendly format', () => {
   })
 
   assert.equal(summary, 'Chutes $55.34/$100 | 4h $0.00/$8.33 | 0/5000')
+})
+
+test('summarizes unknown daily request usage without coercing it to zero', () => {
+  const summary = summarizeStatusBar({
+    windows: [
+      {
+        id: 'daily',
+        kind: 'daily-requests',
+        label: 'Daily Quota',
+        unit: 'requests',
+        used: null,
+        limit: 5000,
+        remaining: null,
+        percentUsed: null,
+        resetLabel: null
+      }
+    ],
+    quotas: [],
+    plan: null
+  })
+
+  assert.equal(summary, 'Chutes | --/5000')
 })

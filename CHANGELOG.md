@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.6
+
+- Added runtime debug logging for quota usage diagnostics.
+- Avoid showing a stale `0` daily usage value when live quota usage cannot be verified.
+
 ## 1.2.5
 
 - Fixed daily quota usage so live request counts override stale daily values from subscription payloads.

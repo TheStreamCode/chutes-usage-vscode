@@ -45,6 +45,7 @@ export interface DashboardData {
 export interface QuotaUsageSummary {
   used: number | null
   quota: number | null
+  trusted: boolean
 }
 
 export type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'

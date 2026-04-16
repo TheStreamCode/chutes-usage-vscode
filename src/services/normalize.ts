@@ -161,7 +161,8 @@ export function normalizeQuotaUsage(payload: JsonContainer | null): QuotaUsageSu
   if (directUsed !== null || directQuota !== null) {
     return {
       used: directUsed,
-      quota: directQuota
+      quota: directQuota,
+      trusted: true
     }
   }
 
@@ -187,7 +188,8 @@ export function normalizeQuotaUsage(payload: JsonContainer | null): QuotaUsageSu
   if (usedTotal !== null || quotaTotal !== null) {
     return {
       used: usedTotal,
-      quota: quotaTotal
+      quota: quotaTotal,
+      trusted: true
     }
   }
 
@@ -260,7 +262,7 @@ function buildDailyQuotaWindow(quotas: QuotaEntry[], quotaUsage: QuotaUsageSumma
     return []
   }
 
-  const used = quotaUsage?.used ?? null
+  const used = quotaUsage?.trusted ? quotaUsage.used : null
   const limit = quotaUsage?.quota ?? totalQuota
   const remaining = used !== null && limit !== null ? computeRemaining(used, limit) : null
 
@@ -348,14 +350,17 @@ export function summarizeStatusBar(data: DashboardData): string {
 }
 
 function formatWindowSummary(window: UsageWindow, prefix: string, includePrefix = true): string {
-  const used = window.used ?? 0
-  const limit = window.limit ?? 0
+  const used = window.used
+  const limit = window.limit
 
   if (window.unit === 'requests') {
-    return `${Math.round(used)}/${Math.round(limit)}`
+    return `${used === null ? '--' : Math.round(used)}/${limit === null ? '--' : Math.round(limit)}`
   }
 
-  const formatted = `${prefix}${used.toFixed(2)}/${prefix}${limit.toFixed(2).replace(/\.00$/, '')}`
+  const safeUsed = used ?? 0
+  const safeLimit = limit ?? 0
+
+  const formatted = `${prefix}${safeUsed.toFixed(2)}/${prefix}${safeLimit.toFixed(2).replace(/\.00$/, '')}`
   return includePrefix ? formatted : formatted
 }
 

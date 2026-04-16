@@ -2,6 +2,7 @@ import { normalizeDashboardData } from '../services/normalize'
 import { ChutesApiClient } from '../services/ChutesApiClient'
 import { SecretStore } from '../services/SecretStore'
 import type { DashboardState } from '../types'
+import * as vscode from 'vscode'
 
 export type DashboardListener = (state: DashboardState) => void
 
@@ -49,7 +50,13 @@ export class DashboardStore {
     })
 
     try {
-      const client = new ChutesApiClient(apiKey)
+      const debugLogging = vscode.workspace.getConfiguration('chutesUsage').get<boolean>('debugLogging', false)
+      const client = new ChutesApiClient(apiKey, {
+        debug: debugLogging,
+        log: (message: string) => {
+          console.log(message)
+        }
+      })
       const payload = await client.getDashboardPayload()
       const data = normalizeDashboardData(payload.subscriptionUsage, payload.quotas, payload.quotaUsage)
 
