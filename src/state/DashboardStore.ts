@@ -2,7 +2,11 @@ import { normalizeDashboardData } from '../services/normalize'
 import { ChutesApiClient } from '../services/ChutesApiClient'
 import { SecretStore } from '../services/SecretStore'
 import type { DashboardState } from '../types'
-import * as vscode from 'vscode'
+
+type DashboardStoreOptions = {
+  debugLoggingEnabled?: () => boolean
+  log?: (message: string) => void
+}
 
 export type DashboardListener = (state: DashboardState) => void
 
@@ -17,7 +21,10 @@ export class DashboardStore {
 
   private readonly listeners = new Set<DashboardListener>()
 
-  public constructor(private readonly secretStore: SecretStore) {}
+  public constructor(
+    private readonly secretStore: SecretStore,
+    private readonly options: DashboardStoreOptions = {}
+  ) {}
 
   public getState(): DashboardState {
     return this.state
@@ -50,11 +57,11 @@ export class DashboardStore {
     })
 
     try {
-      const debugLogging = vscode.workspace.getConfiguration('chutesUsage').get<boolean>('debugLogging', false)
+      const debugLogging = this.debugLoggingEnabled()
       const client = new ChutesApiClient(apiKey, {
         debug: debugLogging,
         log: (message: string) => {
-          console.log(message)
+          this.debugLog(message)
         }
       })
       const payload = await client.getDashboardPayload()
@@ -76,6 +83,18 @@ export class DashboardStore {
         errorMessage: error instanceof Error ? error.message : 'Unknown error'
       })
     }
+  }
+
+  protected debugLoggingEnabled(): boolean {
+    return this.options.debugLoggingEnabled?.() ?? false
+  }
+
+  protected debugLog(message: string): void {
+    if (!this.debugLoggingEnabled()) {
+      return
+    }
+
+    this.options.log?.(message)
   }
 
   private setState(state: DashboardState): void {

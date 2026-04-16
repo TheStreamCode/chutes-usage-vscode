@@ -79,6 +79,7 @@ The extension is designed to be easy to use:
 - This extension uses your Chutes API key only to request your own usage data.
 - The key is stored using VS Code `SecretStorage`.
 - The extension is built as a practical unofficial utility for Chutes users.
+- When `Chutes Usage: Debug Logging` is enabled, open logs with `Chutes Usage: Open Debug Logs` or from the `Output` panel under `Chutes Usage`.
 
 ## Data Retention
 

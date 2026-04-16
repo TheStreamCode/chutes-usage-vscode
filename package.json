@@ -2,7 +2,7 @@
   "name": "chutes-usage",
   "displayName": "Chutes Usage",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "1.2.6",
+  "version": "0.1.7",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -65,6 +65,12 @@
         "title": "Remove API Key",
         "category": "Chutes Usage",
         "icon": "$(trash)"
+      },
+      {
+        "command": "chutesUsage.openLogs",
+        "title": "Open Debug Logs",
+        "category": "Chutes Usage",
+        "icon": "$(output)"
       }
     ],
     "viewsContainers": {

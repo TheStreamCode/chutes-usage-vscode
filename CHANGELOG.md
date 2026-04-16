@@ -1,37 +1,37 @@
 # Changelog
 
-## 1.2.6
+## 0.1.7
 
 - Added runtime debug logging for quota usage diagnostics.
 - Avoid showing a stale `0` daily usage value when live quota usage cannot be verified.
 
-## 1.2.5
+## 0.1.6
 
 - Fixed daily quota usage so live request counts override stale daily values from subscription payloads.
 - Switched quota usage fetching to documented per-chute endpoints and aggregate multi-entry responses correctly.
 
-## 1.2.4
+## 0.1.5
 
 - Fixed publisher identity alignment for marketplace publishing.
 - Refreshed the packaged extension icon colors.
 
-## 1.2.3
+## 0.1.4
 
 - Improved packaging and marketplace metadata.
 
-## 0.1.1
+## 0.1.3
 
 - Minor UI refinements.
 
-## 0.1.0
+## 0.1.2
 
 - First public-ready release with stabilized usage parsing, daily quota usage support, improved sidebar UI, and repository polish for open-source publishing.
 
-## 0.0.11
+## 0.1.1
 
 - Documentation and repository metadata updates.
 
-## 0.0.10
+## 0.1.0
 
 - Repository and release process improvements.
 
