@@ -3,7 +3,8 @@ webview/
 docs/
 *.ts
 tsconfig.json
-pnpm-lock.yaml
+tsconfig.webview.json
+package-lock.json
 .playwright-mcp/
 Screenshot_*.jpeg
 out/src/test/

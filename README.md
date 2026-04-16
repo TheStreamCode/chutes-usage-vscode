@@ -25,6 +25,11 @@ After installation:
 - Automatic refresh on a timer, when the dashboard becomes visible again, and when the VS Code window regains focus
 - Immediate sidebar snapshot restore when the dashboard is opened after a background refresh
 
+## Latest Fixes
+
+- `0.2.5` fixes a dashboard regression where the sidebar could render only the background after activation.
+- The dashboard bootstrap is now packaged as browser-safe ES modules to match the VS Code webview runtime.
+
 ## Commands
 
 - `Chutes Usage for VS Code: Open Dashboard`

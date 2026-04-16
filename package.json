@@ -2,7 +2,7 @@
   "name": "chutes-usage-vscode",
   "displayName": "Chutes Usage for VS Code",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -125,7 +125,7 @@
     }
   },
   "scripts": {
-    "compile": "tsc -p ./ && powershell -NoProfile -Command \"New-Item -ItemType Directory -Force -Path 'out/webview' | Out-Null; Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force\"",
+    "compile": "tsc -p ./ && tsc -p ./tsconfig.webview.json && powershell -NoProfile -Command \"Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force\"",
     "watch": "tsc -w -p ./",
     "test": "npm run compile && node --test out/src/test/**/*.test.js",
     "package": "vsce package",

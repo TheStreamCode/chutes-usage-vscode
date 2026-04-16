@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5
+
+- Fixed a webview bootstrap regression that could leave the sidebar blank with only the background visible.
+- Switched the dashboard webview bootstrap to browser-safe ES modules and added regression tests to prevent CommonJS output from breaking the UI again.
+
 ## 0.2.4
 
 - Fixed overlapping refreshes so stale responses and removed API keys can no longer overwrite the latest dashboard state.

@@ -10,6 +10,16 @@ If the dashboard asks for an API key or stays in its initial onboarding state:
 2. Paste a valid Chutes API key.
 3. Run `Chutes Usage for VS Code: Refresh`.
 
+### Blank Sidebar With Only The Background Visible
+
+If the Activity Bar view opens but the dashboard content is blank:
+
+- update to version `0.2.5` or newer
+- reload the VS Code window after updating the extension
+- reopen the `Chutes Usage` view from the Activity Bar
+
+Version `0.2.5` fixes a webview bootstrap issue that could prevent the dashboard UI from rendering at all.
+
 ### Refresh Errors
 
 If the extension shows an error state:

@@ -1,4 +1,4 @@
-import { getHeaderPresentation } from './presentation'
+import { getHeaderPresentation } from './presentation.js'
 
 type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
 
