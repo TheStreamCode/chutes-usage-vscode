@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.5
+
+- Fixed daily quota usage so live request counts override stale daily values from subscription payloads.
+- Switched quota usage fetching to documented per-chute endpoints and aggregate multi-entry responses correctly.
+
 ## 1.2.4
 
 - Fixed publisher identity alignment for marketplace publishing.

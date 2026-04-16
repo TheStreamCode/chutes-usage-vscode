@@ -33,14 +33,14 @@ The extension reads only user-scoped Chutes endpoints tied to your API key:
 
 - `GET /users/me/subscription_usage`
 - `GET /users/me/quotas`
-- `GET /users/me/quota_usage/*`
+- `GET /users/me/quota_usage/{chute_id}`
 - `GET /users/me/discounts`
 - `GET /users/me/price_overrides`
 
 Notes:
 
 - Monthly and 4-hour windows come from `subscription_usage`.
-- Daily request usage comes from `quota_usage/*`.
+- Daily request usage comes from live `quota_usage/{chute_id}` responses and is aggregated when multiple quota rows are returned.
 - Daily request limits come from `quotas`.
 - The public `GET /pricing` endpoint is not used to infer user usage windows.
 

@@ -83,6 +83,8 @@ export function normalizeUsageWindows(payload: JsonObject, quotas: QuotaEntry[] 
     }
   ]
 
+  const liveDailyQuotaWindow = buildDailyQuotaWindow(quotas, quotaUsage)
+
   return candidates
     .map((candidate) => {
       const rawMatch = pickObject(payload, candidate.keys)
@@ -110,7 +112,8 @@ export function normalizeUsageWindows(payload: JsonObject, quotas: QuotaEntry[] 
       } satisfies UsageWindow
     })
     .filter((item): item is UsageWindow => item !== null)
-    .concat(buildDailyQuotaWindow(quotas, quotaUsage))
+    .filter((window) => !(window.kind === 'daily-requests' && liveDailyQuotaWindow.length > 0))
+    .concat(liveDailyQuotaWindow)
     .filter((window, index, items) => items.findIndex((item) => item.kind === window.kind) === index)
 }
 
@@ -162,6 +165,9 @@ export function normalizeQuotaUsage(payload: JsonContainer | null): QuotaUsageSu
     }
   }
 
+  let usedTotal: number | null = null
+  let quotaTotal: number | null = null
+
   for (const value of Object.values(payload)) {
     const item = asObject(value)
     if (!item) {
@@ -170,11 +176,18 @@ export function normalizeQuotaUsage(payload: JsonContainer | null): QuotaUsageSu
 
     const used = asNumber(item.used)
     const quota = asNumber(item.quota)
-    if (used !== null || quota !== null) {
-      return {
-        used,
-        quota
-      }
+    if (used !== null) {
+      usedTotal = (usedTotal ?? 0) + used
+    }
+    if (quota !== null) {
+      quotaTotal = (quotaTotal ?? 0) + quota
+    }
+  }
+
+  if (usedTotal !== null || quotaTotal !== null) {
+    return {
+      used: usedTotal,
+      quota: quotaTotal
     }
   }
 

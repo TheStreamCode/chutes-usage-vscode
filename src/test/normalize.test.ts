@@ -285,6 +285,91 @@ test('uses live quota usage data so the daily window shows 0 instead of unknown'
   assert.equal(dailyWindow?.remaining, 5000)
 })
 
+test('prefers live quota usage over stale subscription daily usage', () => {
+  const subscriptionUsage: JsonObject = {
+    subscription: true,
+    custom: false,
+    monthly_price: 20,
+    daily_quota_usage: {
+      used: 0,
+      limit: 5000,
+      remaining: 5000,
+      label: 'Daily Quota'
+    },
+    four_hour: {
+      usage: 0,
+      cap: 8.333333333333332,
+      remaining: 8.333333333333332
+    },
+    monthly: {
+      usage: 55.33878851910001,
+      cap: 100,
+      remaining: 44.66121148089999
+    }
+  }
+
+  const quotas = [
+    {
+      chute_id: '*',
+      quota: 5000,
+      updated_at: '2026-04-09T12:41:04.480688'
+    }
+  ]
+
+  const quotaUsage: JsonObject = {
+    '*': {
+      quota: 5000,
+      used: 11
+    }
+  }
+
+  const result = normalizeDashboardData(subscriptionUsage, quotas, quotaUsage)
+  const dailyWindow = result.windows.find((window) => window.kind === 'daily-requests')
+
+  assert.equal(dailyWindow?.used, 11)
+  assert.equal(dailyWindow?.limit, 5000)
+  assert.equal(dailyWindow?.remaining, 4989)
+})
+
+test('aggregates multiple live quota usage entries into one daily window', () => {
+  const subscriptionUsage: JsonObject = {
+    subscription: true,
+    custom: false,
+    monthly_price: 20
+  }
+
+  const quotas = [
+    {
+      chute_id: '*',
+      quota: 5000,
+      updated_at: '2026-04-09T12:41:04.480688'
+    },
+    {
+      chute_id: 'my-chute',
+      quota: 250,
+      updated_at: '2026-04-09T12:41:04.480688'
+    }
+  ]
+
+  const quotaUsage: JsonObject = {
+    '*': {
+      quota: 5000,
+      used: 11
+    },
+    'my-chute': {
+      quota: 250,
+      used: 2
+    }
+  }
+
+  const result = normalizeDashboardData(subscriptionUsage, quotas, quotaUsage)
+  const dailyWindow = result.windows.find((window) => window.kind === 'daily-requests')
+
+  assert.equal(dailyWindow?.used, 13)
+  assert.equal(dailyWindow?.limit, 5250)
+  assert.equal(dailyWindow?.remaining, 5237)
+})
+
 test('defaults quota label to All Models when the API omits a model name', () => {
   const result = normalizeDashboardData({}, [
     {
