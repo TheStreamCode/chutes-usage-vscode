@@ -6,7 +6,7 @@
 
 **Architecture:** The extension host manages authentication, API calls, state, commands, and status bar updates. A single sidebar webview renders normalized data snapshots received through message passing.
 
-**Tech Stack:** TypeScript, VS Code Extension API, SecretStorage, WebviewView, pnpm, unit tests.
+**Tech Stack:** TypeScript, VS Code Extension API, SecretStorage, WebviewView, npm, unit tests.
 
 ---
 
@@ -22,7 +22,7 @@
 - Create: `LICENSE`
 
 - [ ] Create the base extension manifest with commands, one custom view container, one sidebar view, and three settings.
-- [ ] Add TypeScript compilation and test scripts using `pnpm`.
+- [ ] Add TypeScript compilation and test scripts using `npm`.
 - [ ] Add packaging ignore rules and repository metadata.
 
 ### Task 2: Domain types and tests
@@ -85,7 +85,7 @@
 **Files:**
 - Modify as needed
 
-- [ ] Run `pnpm install`.
-- [ ] Run `pnpm run compile`.
-- [ ] Run `pnpm run test`.
+- [ ] Run `npm install`.
+- [ ] Run `npm run compile`.
+- [ ] Run `npm test`.
 - [ ] Fix any build or test issues.

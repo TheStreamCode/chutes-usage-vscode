@@ -4,8 +4,8 @@
 
 ## Testing
 
-- [ ] `pnpm test`
-- [ ] `pnpm package`
+- [ ] `npm test`
+- [ ] `npm run package`
 
 ## Notes
 

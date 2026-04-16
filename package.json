@@ -127,9 +127,9 @@
   "scripts": {
     "compile": "tsc -p ./ && powershell -NoProfile -Command \"New-Item -ItemType Directory -Force -Path 'out/webview' | Out-Null; Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force\"",
     "watch": "tsc -w -p ./",
-    "test": "pnpm run compile && node --test out/src/test/**/*.test.js",
-    "package": "pnpm exec vsce package",
-    "vscode:prepublish": "pnpm run compile",
+    "test": "npm run compile && node --test out/src/test/**/*.test.js",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile",
     "vscode:uninstall": "node ./out/src/lifecycle.js"
   },
   "devDependencies": {
