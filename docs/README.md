@@ -1,29 +1,15 @@
-# Chutes Usage Docs
+# Documentation
 
-This folder contains the project documentation, design specification, and implementation plan for the `Chutes Usage` VS Code extension.
+This directory contains the public project documentation for `Chutes Usage for VS Code`.
 
-## Project Summary
+## Index
 
-`Chutes Usage` is a third-party Visual Studio Code extension designed to help users monitor Chutes account usage directly inside VS Code.
+- `user-guide.md`: end-user setup, commands, settings, and day-to-day usage
+- `troubleshooting.md`: common issues, API behavior notes, and support guidance
 
-It is:
-- inspired by the Chutes product experience
-- adapted to fit VS Code conventions better
-- focused on simplicity, speed, and clarity
+## Related Files
 
-## Ownership
-
-This project is not official and is not affiliated with or endorsed by Chutes.
-
-Creator:
-- Michael Gasperini
-- `mikesoft.it`
-
-Planned distribution:
-- Visual Studio Code Marketplace
-- public GitHub repository
-
-## Documentation Index
-
-- `superpowers/specs/2026-04-15-chutes-usage-design.md`
-- `superpowers/plans/2026-04-15-chutes-usage-implementation.md`
+- `../README.md`: repository overview and quick start
+- `../CONTRIBUTING.md`: development workflow and pull request expectations
+- `../SUPPORT.md`: support and issue reporting
+- `../SECURITY.md`: vulnerability reporting and data handling guidance

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Reworked the public documentation into a cleaner user-facing structure.
+- Added dedicated user guide and troubleshooting docs, and streamlined support, security, and contributing guidance.
+
 ## 0.2.2
 
 - Reorganized the public documentation for a cleaner Marketplace and repository presentation.

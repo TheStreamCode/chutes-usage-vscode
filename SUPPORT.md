@@ -4,7 +4,15 @@ Use GitHub Issues for bug reports, feature requests, and support questions:
 
 - `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
 
-## What To Include In An Issue
+## Before Opening An Issue
+
+Check the public documentation first:
+
+- `README.md`
+- `docs/user-guide.md`
+- `docs/troubleshooting.md`
+
+## What To Include
 
 Please include:
 
@@ -15,4 +23,4 @@ Please include:
 - expected behavior
 - actual behavior
 
-If the issue is related to API parsing or quota behavior, include a redacted payload when possible. Remove secrets and personal identifiers, but keep field names and numeric values intact.
+If the problem is related to API parsing or quota behavior, include a redacted payload when possible.

@@ -4,16 +4,16 @@
 
 Security fixes are applied to the latest published version of the extension.
 
-## Reporting a Vulnerability
+## Reporting A Vulnerability
 
-Please do not open public GitHub issues for sensitive vulnerabilities.
+Do not open public GitHub issues for sensitive vulnerabilities.
 
-Instead, report security problems privately through one of these channels:
+Report security issues privately through one of these channels:
 
-- GitHub security advisories for the repository
+- GitHub security advisories for this repository
 - the maintainer contact listed on `https://mikesoft.it`
 
-When reporting a vulnerability, include:
+Include:
 
 - affected version
 - reproduction steps
@@ -22,12 +22,6 @@ When reporting a vulnerability, include:
 
 ## Sensitive Data Handling
 
-This extension should never print or persist user API keys in logs, issues, or screenshots.
+Never include API keys, account secrets, or unredacted private payloads in public reports.
 
-If you share payloads for debugging, redact:
-
-- API keys
-- user identifiers if desired
-- any account-specific secrets
-
-Keep field names and numeric values when possible so response-shape debugging remains useful.
+When sharing payloads for debugging, redact sensitive values while keeping field names and numeric values when possible.

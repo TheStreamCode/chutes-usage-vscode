@@ -4,72 +4,68 @@ Monitor Chutes subscription usage, rolling limits, and request quotas directly i
 
 This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
 
-## Features
-
-- Monthly usage and remaining subscription credit
-- 4-hour rolling window usage and remaining credit
-- Daily request quota usage and remaining requests
-- Quotas table for the authenticated user
-- Sidebar dashboard with plan snapshot and usage cards
-- Compact status bar summary
-
 ## Installation
+
+Install the extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode):
+
+- `mikesoft.chutes-usage-vscode`
+
+After installation:
 
 1. Open the Command Palette.
 2. Run `Chutes Usage for VS Code: Set API Key`.
-3. Open the `Chutes Usage` sidebar.
+3. Open the `Chutes Usage` view from the Activity Bar.
 
-If you previously installed the removed Marketplace package, install this extension as a fresh package and set the API key again.
+## Features
 
-## Usage
+- Sidebar dashboard with plan snapshot, usage cards, and quota table
+- Optional status bar summary for quick usage visibility
+- Secure API key storage through VS Code `SecretStorage`
+- Manual refresh command for immediate sync
+- Automatic refresh on a timer and when the VS Code window regains focus
+
+## Commands
+
+- `Chutes Usage for VS Code: Open Dashboard`
+- `Chutes Usage for VS Code: Refresh`
+- `Chutes Usage for VS Code: Set API Key`
+- `Chutes Usage for VS Code: Remove API Key`
+
+## Settings
+
+- `chutesUsageVscode.refreshIntervalSeconds`: Refresh interval in seconds. Default: `60`
+- `chutesUsageVscode.showStatusBar`: Show or hide the status bar item. Default: `true`
+
+## How It Works
 
 The extension shows your current Chutes usage in two places:
 
-- a sidebar dashboard with plan and quota details
-- an optional status bar summary
+- the `Chutes Usage` sidebar dashboard for full details
+- the optional status bar item for a compact summary
 
-Use the built-in refresh command whenever you want to request fresh data immediately.
-
-## Data Sources
-
-The extension reads only user-scoped Chutes endpoints tied to your API key:
-
-- `GET /users/me/subscription_usage`
-- `GET /users/me/quotas`
-- `GET /users/me/quota_usage/me`
-- `GET /users/me/quota_usage/{chute_id}`
-- `GET /invocations/stats/llm`
-
-Behavior summary:
-
-- Monthly and 4-hour windows come from `subscription_usage`.
-- Daily request usage comes primarily from `quota_usage/me`.
-- `invocations/stats/llm` is used as a live cross-check when quota metering appears delayed.
-- Daily request limits come from `quotas`.
-- `quota: 0` is treated as `Unlimited`.
+The dashboard refreshes when you run the refresh command, on the configured refresh interval, and when VS Code regains window focus.
 
 ## Known Limitations
 
 - Chutes quota metering may lag behind live requests.
-- When daily quota data cannot be verified, the extension shows `--` instead of a potentially misleading `0`.
-- The extension does not migrate settings or secrets from the removed Marketplace package.
+- When daily quota data cannot be verified reliably, the extension shows `--` instead of a potentially misleading `0`.
+- Some API responses are normalized defensively because endpoint shapes may evolve over time.
 
-## Privacy and Storage
+## Privacy And Storage
 
 - Your Chutes API key is stored using VS Code `SecretStorage`.
 - The extension uses the key only to request your own usage data.
 - The extension does not keep a local history of usage data.
-- The sidebar webview state is not persisted between sessions.
+- On uninstall, the extension performs best-effort cleanup of its local extension storage.
 
-Before uninstalling, use `Chutes Usage for VS Code: Remove API Key` if you want to explicitly clear stored secrets.
+## Documentation
 
-## Support
-
-Use GitHub Issues for bug reports and feature requests:
-
-- `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
-
-For API parsing issues, include a redacted payload when possible. Remove secrets and personal identifiers, but keep field names and numeric values intact.
+- [User guide](docs/user-guide.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Documentation index](docs/README.md)
+- [Contributing](CONTRIBUTING.md)
+- [Support](SUPPORT.md)
+- [Security](SECURITY.md)
 
 ## License
 
