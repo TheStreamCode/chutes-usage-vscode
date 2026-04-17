@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.7
+
+- Refreshed the Marketplace PNG icon artwork while keeping the dedicated single-color sidebar icon unchanged.
+
 ## 0.2.6
 
 - Refreshed the extension branding with a new Marketplace icon and a dedicated single-color Activity Bar/sidebar icon.
