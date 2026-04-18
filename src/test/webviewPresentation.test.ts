@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { getHeaderPresentation } from '../../webview/presentation'
+import { formatResetLabel, getHeaderPresentation } from '../../webview/presentation'
 import type { DashboardState } from '../types'
 
 test('keeps key management actions available when the dashboard is in error with stale data', () => {
@@ -59,6 +59,24 @@ test('shows the last synced time when the dashboard is ready', () => {
 
   assert.equal(presentation.statusText, '$20/MO // updated 10:11:12')
   assert.equal(presentation.showDot, true)
+})
+
+test('formats reset timestamps into clearer short labels', () => {
+  const formatted = formatResetLabel('2026-04-16T02:00:00+02:00', (value: string) => {
+    const date = new Date(value)
+    return `16 Apr, ${date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC'
+    })}`
+  })
+
+  assert.equal(formatted, 'resets 16 Apr, 00:00')
+})
+
+test('keeps explanatory reset labels readable', () => {
+  assert.equal(formatResetLabel('Possible sync delay'), 'Possible sync delay')
 })
 
 // Build a minimal dashboard state for presentation tests.

@@ -26,6 +26,22 @@ export type HeaderPresentation = {
   removeDisabled: boolean
 }
 
+export function formatResetLabel(
+  value: string | null,
+  formatAbsoluteTime: (value: string) => string = defaultFormatResetTime
+): string | null {
+  if (!value) {
+    return null
+  }
+
+  const parsed = Date.parse(value)
+  if (Number.isNaN(parsed)) {
+    return value
+  }
+
+  return `resets ${formatAbsoluteTime(value)}`
+}
+
 export function getHeaderPresentation(state: DashboardState, formatTime: (value: string) => string = defaultFormatTime): HeaderPresentation {
   const hasStoredCredentials = state.connectionState !== 'missing-key'
   const planName = state.data?.plan?.planName
@@ -85,4 +101,14 @@ function buildPrefix(planName: string | null | undefined, monthlyPrice: number |
 
 function defaultFormatTime(value: string): string {
   return new Date(value).toLocaleTimeString()
+}
+
+function defaultFormatResetTime(value: string): string {
+  return new Date(value).toLocaleString([], {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
 }

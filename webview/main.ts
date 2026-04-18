@@ -1,4 +1,4 @@
-import { getHeaderPresentation } from './presentation.js'
+import { formatResetLabel, getHeaderPresentation } from './presentation.js'
 
 type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
 
@@ -365,7 +365,7 @@ function buildWindowSubline(window: UsageWindow): string {
   }
 
   if (window.resetLabel) {
-    parts.push(`resets ${window.resetLabel.toLowerCase()}`)
+    parts.push(formatResetLabel(window.resetLabel) ?? window.resetLabel)
   }
 
   return parts.join(' \u00B7 ')
