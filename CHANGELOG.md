@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.8
+
+- Refined the dashboard UI with cleaner hierarchy, better narrow-sidebar behavior, and clearer onboarding/error states while keeping the existing cyber visual effects.
+- Replaced the raw quotas table with a curated `Plan Limits` reference section for Base, Plus, and Pro subscription limits.
+- Fixed dashboard action behavior so destructive key removal is presented more safely and stale refresh failures are surfaced inline.
+
 ## 0.2.7
 
 - Refreshed the Marketplace PNG icon artwork while keeping the dedicated single-color sidebar icon unchanged.

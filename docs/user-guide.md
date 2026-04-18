@@ -28,10 +28,12 @@ It includes:
 
 - a header with connection status and actions
 - a plan snapshot with key subscription details
-- usage cards for the main billing windows
-- a quotas table for returned model quota rows
+- stacked usage cards for the main billing windows
+- a `Plan Limits` section with Base, Plus, and Pro monthly cap, daily request, burst, and PAYG discount references
 
 Depending on the current state, the dashboard shows onboarding, loading, ready, or error content.
+
+The dashboard is optimized for the narrow sidebar widths common in VS Code, so cards stack vertically and supporting content collapses more gracefully on smaller layouts.
 
 If the sidebar ever appears blank after an update, make sure you are on version `0.2.5` or newer, which fixes a webview bootstrap regression from `0.2.4`.
 
@@ -74,8 +76,8 @@ Depending on the API responses available for your account, the extension can dis
 - billing cycle usage
 - 4-hour rolling window usage
 - daily request usage
-- model quota rows
 - plan information such as subscription price or caps when available
+- a built-in subscription limits reference for Base, Plus, and Pro tiers
 
 ## Managing Your API Key
 

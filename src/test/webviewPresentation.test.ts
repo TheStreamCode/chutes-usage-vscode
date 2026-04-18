@@ -24,7 +24,7 @@ test('keeps key management actions available when the dashboard is in error with
     errorMessage: 'Request failed with status 401'
   }), () => '10:11:12')
 
-  assert.equal(presentation.statusText, 'PRO // LAST SYNC FAILED')
+  assert.equal(presentation.statusText, 'PRO // SYNC FAILED')
   assert.equal(presentation.keyActionLabel, 'Replace Key')
   assert.equal(presentation.removeDisabled, false)
 })
@@ -57,7 +57,7 @@ test('shows the last synced time when the dashboard is ready', () => {
     errorMessage: null
   }), () => '10:11:12')
 
-  assert.equal(presentation.statusText, '$20/MO // SYNCED 10:11:12')
+  assert.equal(presentation.statusText, '$20/MO // updated 10:11:12')
   assert.equal(presentation.showDot, true)
 })
 

@@ -16,12 +16,6 @@ type UsageWindow = {
   dataSource?: 'quota-usage-me' | 'quota-usage-fallback' | 'subscription-usage' | 'quotas' | 'unknown'
 }
 
-type QuotaEntry = {
-  modelLabel: string
-  quota: number | null
-  lastUpdated: string | null
-}
-
 type PlanInfo = {
   planName: string | null
   monthlyPriceUsd: number | null
@@ -37,7 +31,6 @@ type DashboardState = {
   lastUpdatedAt: string | null
   data: {
     windows: UsageWindow[]
-    quotas: QuotaEntry[]
     plan: PlanInfo | null
   } | null
   errorMessage: string | null
@@ -80,22 +73,30 @@ function render(state: DashboardState): void {
 
   if (state.connectionState === 'missing-key') {
     app.append(buildMissingKey())
+    app.append(buildFooter(state))
     return
   }
 
   if (state.connectionState === 'loading' && !state.data) {
     app.append(buildLoadingState())
+    app.append(buildFooter(state))
     return
   }
 
   if (state.connectionState === 'error' && !state.data) {
     app.append(buildErrorState(state.errorMessage ?? 'Unable to load your Chutes usage.'))
+    app.append(buildFooter(state))
     return
   }
 
   if (!state.data) {
     app.append(buildEmptyState('No usage data available yet.'))
+    app.append(buildFooter(state))
     return
+  }
+
+  if (state.connectionState === 'error' && state.data) {
+    app.append(buildStaleWarning(state.errorMessage ?? 'Last sync failed. Showing cached data.'))
   }
 
   app.append(buildPlanSummary(state.data.plan, state.data.windows))
@@ -108,7 +109,10 @@ function render(state: DashboardState): void {
   }
 
   app.append(metricsGrid)
-  app.append(buildQuotasSection(state.data.quotas))
+
+  app.append(buildPlanLimits())
+
+  app.append(buildFooter(state))
 }
 
 function buildHeader(state: DashboardState): HTMLElement {
@@ -137,11 +141,15 @@ function buildHeader(state: DashboardState): HTMLElement {
 
   const actions = document.createElement('div')
   actions.className = 'actions'
-  actions.append(
-    actionButton('Refresh', 'refresh'),
-    actionButton(presentation.keyActionLabel, 'setApiKey', true),
-    actionButton('Remove', 'removeApiKey', presentation.removeDisabled)
-  )
+
+  actions.append(actionButton('Refresh', 'refresh'))
+
+  if (state.connectionState === 'missing-key') {
+    actions.append(actionButton('Set Key', 'setApiKey', 'primary'))
+  } else {
+    actions.append(actionButton('Key', 'setApiKey', 'default'))
+    actions.append(actionButton('Remove', 'removeApiKey', presentation.removeDisabled ? 'disabled' : 'danger'))
+  }
 
   header.append(brand, actions)
   return header
@@ -152,15 +160,20 @@ function buildMissingKey(): HTMLElement {
   container.className = 'empty-state'
 
   const title = document.createElement('h2')
-  title.textContent = '// API Key Required'
+  title.textContent = '// Connect Your API Key'
 
   const text = document.createElement('p')
-  text.textContent = 'Enter your Chutes API key to begin monitoring usage and quotas.'
+  text.textContent = 'Enter your Chutes API key to start monitoring usage and quotas in real time.'
 
-  const button = actionButton('Set API Key', 'setApiKey', true)
-  button.classList.add('primary')
+  const button = actionButton('Set API Key', 'setApiKey', 'primary')
+  button.style.fontSize = '11px'
+  button.style.padding = '8px 18px'
 
-  container.append(title, text, button)
+  const hint = document.createElement('div')
+  hint.className = 'empty-hint'
+  hint.textContent = 'Your key is stored securely in VS Code SecretStorage'
+
+  container.append(title, text, button, hint)
   return container
 }
 
@@ -170,7 +183,7 @@ function buildLoadingState(): HTMLElement {
 
   const title = document.createElement('h2')
   title.className = 'text-mint'
-  title.textContent = '// Loading...'
+  title.textContent = '// Loading Usage...'
 
   const text = document.createElement('p')
   text.textContent = 'Fetching your Chutes usage data.'
@@ -184,15 +197,30 @@ function buildErrorState(message: string): HTMLElement {
   container.className = 'empty-state'
 
   const title = document.createElement('h2')
-  title.textContent = '// Error'
+  title.textContent = '// Connection Error'
 
   const text = document.createElement('p')
   text.textContent = message
 
-  const button = actionButton('Retry', 'refresh')
+  const button = actionButton('Retry', 'refresh', 'primary')
 
   container.append(title, text, button)
   return container
+}
+
+function buildStaleWarning(message: string): HTMLElement {
+  const banner = document.createElement('div')
+  banner.className = 'status-banner stale'
+
+  const icon = document.createElement('span')
+  icon.className = 'banner-icon'
+  icon.textContent = '\u26A0'
+
+  const text = document.createElement('span')
+  text.textContent = message
+
+  banner.append(icon, text)
+  return banner
 }
 
 function buildEmptyState(textValue: string): HTMLElement {
@@ -221,7 +249,7 @@ function buildMetricCard(win: UsageWindow): HTMLElement {
   label.textContent = win.label
 
   const unit = document.createElement('div')
-  unit.className = 'metric-sub'
+  unit.className = 'metric-unit'
   unit.textContent = win.unit === 'usd' ? 'USD' : 'REQ'
 
   header.append(label, unit)
@@ -241,8 +269,17 @@ function buildMetricCard(win: UsageWindow): HTMLElement {
   track.className = 'progress-track'
 
   const fill = document.createElement('div')
-  fill.className = `progress-fill ${win.kind === 'rolling-4h' ? 'violet' : ''}`
-  fill.style.width = `${Math.max(0, Math.min(win.percentUsed ?? 0, 100))}%`
+  const pct = Math.max(0, Math.min(win.percentUsed ?? 0, 100))
+  let fillClass = 'progress-fill'
+  if (win.kind === 'rolling-4h') {
+    fillClass += ' violet'
+  } else if (pct >= 90) {
+    fillClass += ' critical-usage'
+  } else if (pct >= 75) {
+    fillClass += ' high-usage'
+  }
+  fill.className = fillClass
+  fill.style.width = `${pct}%`
 
   track.append(fill)
   progressContainer.append(track)
@@ -286,16 +323,16 @@ function buildPlanSummary(plan: PlanInfo | null, windows: UsageWindow[]): HTMLEl
 
     const parts: string[] = []
     if (monthlyPriceUsd !== null) {
-      parts.push(`Subscription ${formatValue(monthlyPriceUsd, 'usd')} / month`)
+      parts.push(`Subscription ${formatValue(monthlyPriceUsd, 'usd')}/mo`)
     }
     if (monthlyCapUsd !== null) {
       parts.push(`Monthly cap ${formatValue(monthlyCapUsd, 'usd')}`)
     }
     if (paygDiscountPercent !== null) {
-      parts.push(`PAYG discount ${Math.round(paygDiscountPercent)}%`)
+      parts.push(`PAYG ${Math.round(paygDiscountPercent)}% off`)
     }
 
-    meta.textContent = parts.join(' // ')
+    meta.textContent = parts.join(' \u00B7 ')
     panel.append(title, grid, meta)
     return panel
   }
@@ -328,70 +365,150 @@ function buildWindowSubline(window: UsageWindow): string {
   }
 
   if (window.resetLabel) {
-    parts.push(window.resetLabel)
+    parts.push(`resets ${window.resetLabel.toLowerCase()}`)
   }
 
-  return parts.join(' // ')
+  return parts.join(' \u00B7 ')
 }
 
-function buildQuotasSection(quotas: QuotaEntry[]): HTMLElement {
+function buildPlanLimits(): HTMLElement {
   const section = document.createElement('section')
-  section.className = 'section'
+  section.className = 'plan-limits-section'
 
   const title = document.createElement('div')
   title.className = 'section-title'
-  title.textContent = 'Quotas'
+  title.textContent = 'Plan Limits'
 
-  const container = document.createElement('div')
-  container.className = 'quota-container'
+  const intro = document.createElement('p')
+  intro.className = 'plan-limits-intro'
+  intro.textContent = 'All subscription usage is measured in pay-as-you-go equivalent dollars.'
 
-  if (quotas.length === 0) {
-    const empty = document.createElement('p')
-    empty.className = 'muted'
-    empty.style.padding = '16px'
-    empty.style.textAlign = 'center'
-    empty.textContent = 'No model quota rows were returned by the API.'
-    container.append(empty)
-    section.append(title, container)
-    return section
-  }
+  const fiveXNote = document.createElement('div')
+  fiveXNote.className = 'plan-limits-five-x'
+  fiveXNote.innerHTML = '5\u00D7 the value of pay-as-you-go'
+  const fiveXDesc = document.createElement('p')
+  fiveXDesc.className = 'plan-limits-five-x-desc'
+  fiveXDesc.textContent = 'Every subscription includes up to 5 times the monthly price in equivalent pay-as-you-go usage. A $3 plan gets $15 of usage, $10 gets $50, and $20 gets $100.'
 
-  const table = document.createElement('table')
-  table.className = 'quota-table'
+  const tiersGrid = document.createElement('div')
+  tiersGrid.className = 'plan-limits-tiers'
 
-  const thead = document.createElement('thead')
-  thead.innerHTML = '<tr><th>Model</th><th>Quota</th><th>Last Updated</th></tr>'
+  const baseData = { name: 'Base', price: '$3/mo', cap: '$15', daily: '300', burst: '$1.25', discount: '3%' }
+  const plusData = { name: 'Plus', price: '$10/mo', cap: '$50', daily: '2,000', burst: '$4.17', discount: '6%' }
+  const proData = { name: 'Pro', price: '$20/mo', cap: '$100', daily: '5,000', burst: '$8.33', discount: '10%' }
 
-  const tbody = document.createElement('tbody')
-  for (const quota of quotas) {
-    const row = document.createElement('tr')
+  tiersGrid.append(buildTierCard(baseData, 'base'))
+  tiersGrid.append(buildTierCard(plusData, 'plus'))
+  tiersGrid.append(buildTierCard(proData, 'pro'))
 
-    const modelCell = document.createElement('td')
-    modelCell.textContent = quota.modelLabel
+  const tiersWrap = document.createElement('div')
+  tiersWrap.className = 'plan-limits-tiers-wrap'
+  tiersWrap.append(tiersGrid)
 
-    const quotaCell = document.createElement('td')
-    quotaCell.className = 'quota-value'
-    quotaCell.textContent = quota.quota !== null ? `${quota.quota}` : '-'
+  const footnotes = document.createElement('div')
+  footnotes.className = 'plan-limits-footnotes'
 
-    const updatedCell = document.createElement('td')
-    updatedCell.className = 'muted'
-    updatedCell.textContent = quota.lastUpdated ?? '-'
+  footnotes.append(buildFootnote('The max API requests per day limit does not guarantee full usage \u2014 the monthly cap and 4-hour burst limit may be reached first.'))
+  footnotes.append(buildFootnote('4-hour burst limit prevents concentrated usage spikes. It resets on a rolling window (~180 windows per month).'))
+  footnotes.append(buildFootnote('Beyond your limits? Requests fall back to pay-as-you-go billing automatically. Your PAYG discount still applies.'))
 
-    row.append(modelCell, quotaCell, updatedCell)
-    tbody.append(row)
-  }
-
-  table.append(thead, tbody)
-  container.append(table)
-  section.append(title, container)
+  section.append(title, intro, fiveXNote, fiveXDesc, tiersWrap, footnotes)
   return section
 }
 
-function actionButton(label: string, type: 'refresh' | 'setApiKey' | 'removeApiKey', isPrimary = false): HTMLButtonElement {
+function buildTierCard(data: { name: string; price: string; cap: string; daily: string; burst: string; discount: string }, tier: string): HTMLElement {
+  const card = document.createElement('div')
+  card.className = `plan-limits-tier tier-${tier}`
+
+  const nameEl = document.createElement('div')
+  nameEl.className = 'tier-name'
+  nameEl.textContent = data.name
+
+  const priceEl = document.createElement('div')
+  priceEl.className = 'tier-price'
+  priceEl.textContent = data.price
+
+  const divider = document.createElement('div')
+  divider.className = 'tier-divider'
+
+  const rows = document.createElement('div')
+  rows.className = 'tier-rows'
+  rows.append(
+    buildTierRow('Monthly cap', data.cap, 'Max usage per cycle'),
+    buildTierRow('Daily reqs', data.daily, 'Max API reqs/day'),
+    buildTierRow('4H burst', data.burst, 'Rolling spend cap'),
+    buildTierRow('PAYG off', data.discount, 'Pay-as-you-go')
+  )
+
+  card.append(nameEl, priceEl, divider, rows)
+  return card
+}
+
+function buildTierRow(label: string, value: string, tooltip: string): HTMLElement {
+  const row = document.createElement('div')
+  row.className = 'tier-row'
+  row.title = tooltip
+
+  const labelEl = document.createElement('span')
+  labelEl.className = 'tier-row-label'
+  labelEl.textContent = label
+
+  const valueEl = document.createElement('span')
+  valueEl.className = 'tier-row-value'
+  valueEl.textContent = value
+
+  row.append(labelEl, valueEl)
+  return row
+}
+
+function buildFootnote(text: string): HTMLElement {
+  const note = document.createElement('p')
+  note.className = 'plan-limits-footnote'
+  note.textContent = text
+  return note
+}
+
+function buildFooter(state: DashboardState): HTMLElement {
+  const footer = document.createElement('div')
+  footer.className = 'dashboard-footer'
+
+  if (state.lastUpdatedAt) {
+    const time = document.createElement('span')
+    time.textContent = `Updated ${new Date(state.lastUpdatedAt).toLocaleTimeString()}`
+    footer.append(time)
+  } else {
+    const spacer = document.createElement('span')
+    spacer.textContent = ''
+    footer.append(spacer)
+  }
+
+  const link = document.createElement('a')
+  link.className = 'footer-link'
+  link.textContent = 'Chutes \u2197'
+  link.addEventListener('click', (e) => {
+    e.preventDefault()
+    vscode.postMessage({ type: 'openExternal', href: 'https://chutes.ai' })
+  })
+  footer.append(link)
+
+  return footer
+}
+
+type ButtonVariant = 'primary' | 'default' | 'danger' | 'disabled'
+
+function actionButton(label: string, type: 'refresh' | 'setApiKey' | 'removeApiKey', variant: ButtonVariant = 'default'): HTMLButtonElement {
   const button = document.createElement('button')
   button.type = 'button'
   button.textContent = label
-  if (isPrimary) button.classList.add('primary')
+
+  if (variant === 'primary') {
+    button.classList.add('primary')
+  } else if (variant === 'danger') {
+    button.classList.add('danger')
+  } else if (variant === 'disabled') {
+    button.disabled = true
+  }
+
   button.addEventListener('click', () => {
     vscode.postMessage({ type })
   })
@@ -399,13 +516,13 @@ function actionButton(label: string, type: 'refresh' | 'setApiKey' | 'removeApiK
 }
 
 function formatValue(value: number | null, unit: 'usd' | 'requests'): string {
-  if (value === null) return '--'
+  if (value === null) return '\u2014'
   if (unit === 'requests') return `${Math.round(value).toLocaleString()}`
   return `$${value.toFixed(2)}`
 }
 
 function formatRequestsLimitValue(value: number | null): string {
-  if (value === null) return '--'
+  if (value === null) return '\u2014'
   if (value === 0) return 'Unlimited'
   return `${Math.round(value).toLocaleString()}`
 }

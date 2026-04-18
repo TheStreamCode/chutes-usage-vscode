@@ -18,7 +18,7 @@ After installation:
 
 ## Features
 
-- Sidebar dashboard with plan snapshot, usage cards, and quota table
+- Sidebar dashboard with plan snapshot, stacked usage cards, and a built-in plan limits reference
 - Optional status bar summary for quick usage visibility
 - Secure API key storage through VS Code `SecretStorage`
 - Manual refresh command for immediate sync
@@ -27,6 +27,7 @@ After installation:
 
 ## Latest Fixes
 
+- `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.
 - `0.2.7` refreshes the Marketplace PNG icon artwork while keeping the dedicated single-color icon used in the VS Code Activity Bar/sidebar.
 - `0.2.6` refreshes the extension branding with a dedicated single-color icon for the VS Code Activity Bar/sidebar and an updated Marketplace icon.
 - `0.2.5` fixes a dashboard regression where the sidebar could render only the background after activation.
@@ -50,6 +51,13 @@ The extension shows your current Chutes usage in two places:
 
 - the `Chutes Usage` sidebar dashboard for full details
 - the optional status bar item for a compact summary and quick access back to the dashboard
+
+The sidebar dashboard includes:
+
+- a compact header with sync state and actions
+- a plan snapshot with the most relevant subscription figures
+- stacked usage cards optimized for narrow Activity Bar layouts
+- a `Plan Limits` reference section that explains Base, Plus, and Pro limits without exposing a raw quota payload table
 
 The dashboard refreshes when you run the refresh command, on the configured refresh interval, when the dashboard becomes visible again, and when VS Code regains window focus.
 

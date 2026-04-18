@@ -26,7 +26,6 @@ export type HeaderPresentation = {
   removeDisabled: boolean
 }
 
-// Derive the webview header text and actions from the authoritative dashboard state.
 export function getHeaderPresentation(state: DashboardState, formatTime: (value: string) => string = defaultFormatTime): HeaderPresentation {
   const hasStoredCredentials = state.connectionState !== 'missing-key'
   const planName = state.data?.plan?.planName
@@ -53,7 +52,7 @@ export function getHeaderPresentation(state: DashboardState, formatTime: (value:
     case 'error': {
       const prefix = buildPrefix(planName, monthlyPrice)
       return {
-        statusText: prefix ? `${prefix} // LAST SYNC FAILED` : '// LAST SYNC FAILED',
+        statusText: prefix ? `${prefix} // SYNC FAILED` : '// SYNC FAILED',
         showDot: hasStoredCredentials,
         keyActionLabel: 'Replace Key',
         removeDisabled: false
@@ -61,7 +60,7 @@ export function getHeaderPresentation(state: DashboardState, formatTime: (value:
     }
     case 'ready': {
       const prefix = buildPrefix(planName, monthlyPrice)
-      const suffix = timeText ? `SYNCED ${timeText}` : 'CONNECTED'
+      const suffix = timeText ? `updated ${timeText}` : 'connected'
       return {
         statusText: prefix ? `${prefix} // ${suffix}` : `// ${suffix}`,
         showDot: true,
