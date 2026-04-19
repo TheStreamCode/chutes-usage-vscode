@@ -2,7 +2,7 @@
   "name": "chutes-usage-vscode",
   "displayName": "Chutes Usage for VS Code",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",

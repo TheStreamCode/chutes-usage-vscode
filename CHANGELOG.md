@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.9
+
+- Clarified dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
+- Kept the refreshed dashboard UI and `Plan Limits` guidance from `0.2.8` while polishing the last confusing action copy in the current release.
+
 ## 0.2.8
 
 - Refined the dashboard UI with cleaner hierarchy, better narrow-sidebar behavior, and clearer onboarding/error states while keeping the existing cyber visual effects.

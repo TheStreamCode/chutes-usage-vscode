@@ -27,6 +27,7 @@ After installation:
 
 ## Latest Fixes
 
+- `0.2.9` clarifies dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
 - `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.
 - `0.2.7` refreshes the Marketplace PNG icon artwork while keeping the dedicated single-color icon used in the VS Code Activity Bar/sidebar.
 - `0.2.6` refreshes the extension branding with a dedicated single-color icon for the VS Code Activity Bar/sidebar and an updated Marketplace icon.
