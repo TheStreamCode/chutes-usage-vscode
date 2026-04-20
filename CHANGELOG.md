@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Renamed the extension display name to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
+- Updated all user-facing references, command categories, view titles, and documentation to reflect the new name.
+
 ## 0.2.9
 
 - Clarified dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.

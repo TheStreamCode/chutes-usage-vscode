@@ -1,8 +1,8 @@
 {
   "name": "chutes-usage-vscode",
-  "displayName": "Chutes Usage for VS Code",
+  "displayName": "Chutes Usage Monitor",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -45,25 +45,25 @@
       {
         "command": "chutesUsageVscode.openDashboard",
         "title": "Open Dashboard",
-        "category": "Chutes Usage for VS Code",
+        "category": "Chutes Usage Monitor",
         "icon": "$(graph)"
       },
       {
         "command": "chutesUsageVscode.refresh",
         "title": "Refresh",
-        "category": "Chutes Usage for VS Code",
+        "category": "Chutes Usage Monitor",
         "icon": "$(refresh)"
       },
       {
         "command": "chutesUsageVscode.setApiKey",
         "title": "Set API Key",
-        "category": "Chutes Usage for VS Code",
+        "category": "Chutes Usage Monitor",
         "icon": "$(key)"
       },
       {
         "command": "chutesUsageVscode.removeApiKey",
         "title": "Remove API Key",
-        "category": "Chutes Usage for VS Code",
+        "category": "Chutes Usage Monitor",
         "icon": "$(trash)"
       }
     ],
@@ -71,7 +71,7 @@
       "activitybar": [
         {
           "id": "chutesUsageVscode",
-          "title": "Chutes Usage",
+          "title": "Chutes Usage Monitor",
           "icon": "media/icon.svg"
         }
       ]
@@ -107,7 +107,7 @@
       ]
     },
     "configuration": {
-      "title": "Chutes Usage",
+      "title": "Chutes Usage Monitor",
       "properties": {
         "chutesUsageVscode.refreshIntervalSeconds": {
           "type": "number",
@@ -119,7 +119,7 @@
         "chutesUsageVscode.showStatusBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show the Chutes Usage status bar item."
+          "description": "Show the Chutes Usage Monitor status bar item."
         }
       }
     }

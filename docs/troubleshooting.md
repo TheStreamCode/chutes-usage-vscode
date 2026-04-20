@@ -6,9 +6,9 @@
 
 If the dashboard asks for an API key or stays in its initial onboarding state:
 
-1. Run `Chutes Usage for VS Code: Set API Key`.
+1. Run `Chutes Usage Monitor: Set API Key`.
 2. Paste a valid Chutes API key.
-3. Run `Chutes Usage for VS Code: Refresh`.
+3. Run `Chutes Usage Monitor: Refresh`.
 
 ### Blank Sidebar With Only The Background Visible
 
@@ -16,7 +16,7 @@ If the Activity Bar view opens but the dashboard content is blank:
 
 - update to version `0.2.5` or newer
 - reload the VS Code window after updating the extension
-- reopen the `Chutes Usage` view from the Activity Bar
+- reopen the `Chutes Usage Monitor` view from the Activity Bar
 
 Version `0.2.5` fixes a webview bootstrap issue that could prevent the dashboard UI from rendering at all.
 
@@ -33,13 +33,13 @@ If the extension shows an error state:
 
 - verify that your API key is still valid
 - verify that the Chutes API is reachable
-- run `Chutes Usage for VS Code: Refresh`
+- run `Chutes Usage Monitor: Refresh`
 - reopen the dashboard to trigger a fresh visibility refresh
 - switch back to VS Code after changing network or account state to trigger a focus refresh
 
 The extension preserves the last successful snapshot when possible, so a temporary API failure may still leave previous data visible.
 
-If the dashboard still shows onboarding after replacing a key, run `Chutes Usage for VS Code: Refresh` once to confirm the new key is valid.
+If the dashboard still shows onboarding after replacing a key, run `Chutes Usage Monitor: Refresh` once to confirm the new key is valid.
 
 ### Daily Quota Looks Delayed
 

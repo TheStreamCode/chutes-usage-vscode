@@ -1,4 +1,4 @@
-# Chutes Usage for VS Code
+# Chutes Usage Monitor
 
 Monitor Chutes subscription usage, rolling limits, and request quotas directly inside VS Code.
 
@@ -13,8 +13,8 @@ Install the extension from the [Visual Studio Code Marketplace](https://marketpl
 After installation:
 
 1. Open the Command Palette.
-2. Run `Chutes Usage for VS Code: Set API Key`.
-3. Open the `Chutes Usage` view from the Activity Bar.
+2. Run `Chutes Usage Monitor: Set API Key`.
+3. Open the `Chutes Usage Monitor` view from the Activity Bar.
 
 ## Features
 
@@ -36,10 +36,10 @@ After installation:
 
 ## Commands
 
-- `Chutes Usage for VS Code: Open Dashboard`
-- `Chutes Usage for VS Code: Refresh`
-- `Chutes Usage for VS Code: Set API Key`
-- `Chutes Usage for VS Code: Remove API Key`
+- `Chutes Usage Monitor: Open Dashboard`
+- `Chutes Usage Monitor: Refresh`
+- `Chutes Usage Monitor: Set API Key`
+- `Chutes Usage Monitor: Remove API Key`
 
 ## Settings
 
@@ -50,7 +50,7 @@ After installation:
 
 The extension shows your current Chutes usage in two places:
 
-- the `Chutes Usage` sidebar dashboard for full details
+- the `Chutes Usage Monitor` sidebar dashboard for full details
 - the optional status bar item for a compact summary and quick access back to the dashboard
 
 The sidebar dashboard includes:

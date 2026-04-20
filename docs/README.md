@@ -1,6 +1,6 @@
 # Documentation
 
-This directory contains the public project documentation for `Chutes Usage for VS Code`.
+This directory contains the public project documentation for `Chutes Usage Monitor`.
 
 ## Index
 

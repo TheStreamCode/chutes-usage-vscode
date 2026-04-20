@@ -2,7 +2,7 @@
 
 ## Overview
 
-`Chutes Usage for VS Code` helps you monitor subscription usage and request quotas without leaving VS Code.
+`Chutes Usage Monitor` helps you monitor subscription usage and request quotas without leaving VS Code.
 
 The extension provides:
 
@@ -13,8 +13,8 @@ The extension provides:
 
 1. Install `mikesoft.chutes-usage-vscode` from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode).
 2. Open the Command Palette.
-3. Run `Chutes Usage for VS Code: Set API Key`.
-4. Open the `Chutes Usage` view from the Activity Bar.
+3. Run `Chutes Usage Monitor: Set API Key`.
+4. Open the `Chutes Usage Monitor` view from the Activity Bar.
 
 Your API key is stored securely using VS Code `SecretStorage`.
 
@@ -43,7 +43,7 @@ From version `0.2.6`, the Activity Bar/sidebar icon uses a dedicated single-colo
 
 The status bar item provides a compact summary of usage.
 
-Clicking it opens the `Chutes Usage` dashboard.
+Clicking it opens the `Chutes Usage Monitor` dashboard.
 
 It can be turned on or off with the `chutesUsageVscode.showStatusBar` setting.
 
@@ -51,10 +51,10 @@ It can be turned on or off with the `chutesUsageVscode.showStatusBar` setting.
 
 The extension contributes these commands:
 
-- `Chutes Usage for VS Code: Open Dashboard`
-- `Chutes Usage for VS Code: Refresh`
-- `Chutes Usage for VS Code: Set API Key`
-- `Chutes Usage for VS Code: Remove API Key`
+- `Chutes Usage Monitor: Open Dashboard`
+- `Chutes Usage Monitor: Refresh`
+- `Chutes Usage Monitor: Set API Key`
+- `Chutes Usage Monitor: Remove API Key`
 
 ## Refresh Behavior
 

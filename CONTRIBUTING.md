@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in improving `Chutes Usage for VS Code`.
+Thanks for your interest in improving `Chutes Usage Monitor`.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ npm test
 1. Open the repository in VS Code.
 2. Run `npm install` if dependencies are not installed yet.
 3. Press `F5` to launch an Extension Development Host window.
-4. In the new window, run `Chutes Usage for VS Code: Set API Key` to test the extension manually.
+4. In the new window, run `Chutes Usage Monitor: Set API Key` to test the extension manually.
 
 If you are editing both extension-host code and webview assets, run `npm run compile` again before reloading the Extension Development Host.
 

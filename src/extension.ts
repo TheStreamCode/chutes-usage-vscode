@@ -121,7 +121,7 @@ async function setApiKey(secretStore: SecretStore, dashboardStore: DashboardStor
 
 async function removeApiKey(secretStore: SecretStore, dashboardStore: DashboardStore): Promise<void> {
   const choice = await vscode.window.showWarningMessage(
-    'Remove all locally stored Chutes Usage secrets?',
+    'Remove all locally stored Chutes Usage Monitor secrets?',
     { modal: true },
     'Remove'
   )
