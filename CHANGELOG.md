@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Finalized naming consistency across all documentation, internal specs, and implementation plans.
+- Updated README latest changes section to highlight the 0.3.0 rename.
+
 ## 0.3.0
 
 - Renamed the extension display name to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
