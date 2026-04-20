@@ -25,8 +25,9 @@ After installation:
 - Automatic refresh on a timer, when the dashboard becomes visible again, and when the VS Code window regains focus
 - Immediate sidebar snapshot restore when the dashboard is opened after a background refresh
 
-## Latest Fixes
+## Latest Changes
 
+- `0.3.0` renames the extension to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
 - `0.2.9` clarifies dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
 - `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.
 - `0.2.7` refreshes the Marketplace PNG icon artwork while keeping the dedicated single-color icon used in the VS Code Activity Bar/sidebar.

@@ -1,4 +1,4 @@
-# Chutes Usage Design
+# Chutes Usage Monitor Design
 
 ## Goal
 
@@ -6,7 +6,7 @@ Build a user-friendly VS Code extension that shows Chutes subscription usage, ro
 
 ## Product Positioning
 
-`Chutes Usage` is a third-party utility for the Chutes service.
+`Chutes Usage Monitor` is a third-party utility for the Chutes service.
 
 It is not an official Chutes extension and must clearly state this in the README, Marketplace listing, and in-app onboarding copy.
 
