@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.3
+
+- Aligned packaged documentation and release metadata after the plan limits pricing-data clarification.
+- Rebuilt the VSIX so Marketplace and GitHub release assets include the latest docs.
+
 ## 0.3.2
 
 - Hardened webview-to-extension message handling and external link opening with an HTTPS allowlist.
