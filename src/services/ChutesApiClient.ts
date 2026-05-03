@@ -13,7 +13,7 @@ export class ChutesApiClient {
       this.getJsonContainer('/users/me/quota_usage/me').catch(() => null),
       this.getJsonContainer('/invocations/stats/llm').catch(() => null)
     ])
-    const quotaUsageFallback = await this.getQuotaUsagePayload(quotas)
+    const quotaUsageFallback = hasQuotaUsageData(quotaUsageMe) ? null : await this.getQuotaUsagePayload(quotas)
 
     if (!isJsonObject(subscriptionUsage)) {
       throw new Error('Unexpected API response shape for /users/me/subscription_usage')
@@ -80,6 +80,33 @@ function isJsonObject(value: unknown): value is JsonObject {
 
 function isJsonContainer(value: unknown): value is JsonContainer {
   return isJsonObject(value) || Array.isArray(value)
+}
+
+function hasQuotaUsageData(payload: JsonContainer | null): boolean {
+  if (payload === null || Array.isArray(payload)) {
+    return false
+  }
+
+  if (isFiniteNumberLike(payload.used) || isFiniteNumberLike(payload.quota)) {
+    return true
+  }
+
+  return Object.values(payload).some((value) => {
+    const object = isJsonObject(value) ? value : null
+    return isFiniteNumberLike(object?.used) || isFiniteNumberLike(object?.quota)
+  })
+}
+
+function isFiniteNumberLike(value: unknown): boolean {
+  if (typeof value === 'number') {
+    return Number.isFinite(value)
+  }
+
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return Number.isFinite(Number(value))
+  }
+
+  return false
 }
 
 // Collect chute ids from quota rows so quota usage can be fetched per documented path parameter.

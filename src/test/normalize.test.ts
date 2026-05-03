@@ -54,6 +54,30 @@ test('normalizes known subscription usage and quotas for a pro account', () => {
   assert.equal(result.quotas[0]?.quota, 5000)
 })
 
+test('normalizes plan limits from pricing payload when available', () => {
+  const result = normalizeDashboardData({}, [], null, null, null, [
+    {
+      name: 'Base',
+      monthly_price: 4,
+      monthly_cap_usd: 20,
+      daily_request_limit: 400,
+      four_hour_cap_usd: 1.67,
+      payg_discount_percent: 4
+    }
+  ])
+
+  assert.deepEqual(result.planLimits, [
+    {
+      name: 'Base',
+      priceLabel: '$4/mo',
+      monthlyCapLabel: '$20',
+      dailyRequestLimitLabel: '400',
+      fourHourCapLabel: '$1.67',
+      paygDiscountLabel: '4%'
+    }
+  ])
+})
+
 test('normalizes quotas when the API returns a top-level array', () => {
   const subscriptionUsage: JsonObject = {
     billing_cycle_cap: {
@@ -503,6 +527,7 @@ test('summarizes status bar text in a compact and user friendly format', () => {
       }
     ],
     quotas: [],
+    planLimits: [],
     plan: {
       planName: 'Pro',
       monthlyPriceUsd: 20,
@@ -532,6 +557,7 @@ test('summarizes unknown daily request usage without coercing it to zero', () =>
       }
     ],
     quotas: [],
+    planLimits: [],
     plan: null
   })
 
@@ -554,6 +580,7 @@ test('summarizes unlimited daily quota and stale sync states clearly', () => {
       }
     ],
     quotas: [],
+    planLimits: [],
     plan: null
   })
 

@@ -35,7 +35,11 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
       }
     })
 
-    webviewView.webview.onDidReceiveMessage((message: WebviewActionMessage) => {
+    webviewView.webview.onDidReceiveMessage((message: unknown) => {
+      if (!isWebviewActionMessage(message)) {
+        return
+      }
+
       switch (message.type) {
         case 'refresh':
           this.actions.onRefresh()
@@ -86,6 +90,24 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
   <script type="module" src="${scriptUri}"></script>
 </body>
 </html>`
+  }
+}
+
+function isWebviewActionMessage(message: unknown): message is WebviewActionMessage {
+  if (typeof message !== 'object' || message === null) {
+    return false
+  }
+
+  const candidate = message as Partial<WebviewActionMessage>
+  switch (candidate.type) {
+    case 'refresh':
+    case 'setApiKey':
+    case 'removeApiKey':
+      return true
+    case 'openExternal':
+      return typeof candidate.href === 'string'
+    default:
+      return false
   }
 }
 

@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 
 import { DASHBOARD_VIEW_ID, DEFAULT_REFRESH_INTERVAL_SECONDS, MAX_REFRESH_INTERVAL_SECONDS, MIN_REFRESH_INTERVAL_SECONDS, VIEW_CONTAINER_ID } from './constants'
 import { SecretStore } from './services/SecretStore'
+import { getAllowedExternalUri } from './services/externalLinks'
 import { DashboardStore } from './state/DashboardStore'
 import { StatusBarController } from './status/StatusBarController'
 import { ChutesWebviewProvider, registerChutesWebviewProvider } from './views/ChutesWebviewProvider'
@@ -23,7 +24,10 @@ export function activate(context: vscode.ExtensionContext): void {
       void removeApiKey(secretStore, dashboardStore)
     },
     onOpenExternal: (href: string) => {
-      void vscode.env.openExternal(vscode.Uri.parse(href))
+      const uri = getAllowedExternalUri(href)
+      if (uri) {
+        void vscode.env.openExternal(vscode.Uri.parse(uri.toString()))
+      }
     },
     getState: () => dashboardStore.getState()
   })

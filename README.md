@@ -27,6 +27,7 @@ After installation:
 
 ## Latest Changes
 
+- `0.3.2` hardens external link handling, reduces unnecessary quota fallback requests, and feeds pricing data into the plan limits reference.
 - `0.3.0` renames the extension to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
 - `0.2.9` clarifies dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
 - `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.

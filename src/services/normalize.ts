@@ -1,11 +1,12 @@
-import type { DashboardData, InvocationStatsSummary, JsonArray, JsonContainer, JsonObject, PlanInfo, QuotaEntry, QuotaUsageSummary, UsageUnit, UsageWindow, UsageWindowKind } from '../types'
+import type { DashboardData, InvocationStatsSummary, JsonArray, JsonContainer, JsonObject, PlanInfo, PlanLimitEntry, QuotaEntry, QuotaUsageSummary, UsageUnit, UsageWindow, UsageWindowKind } from '../types'
 
 export function normalizeDashboardData(
   subscriptionUsage: JsonObject,
   quotasPayload: JsonContainer,
   quotaUsagePayload: JsonContainer | null = null,
   quotaUsageMePayload: JsonContainer | null = null,
-  invocationStatsPayload: JsonContainer | null = null
+  invocationStatsPayload: JsonContainer | null = null,
+  pricingPayload: JsonContainer | null = null
 ): DashboardData {
   const usageSource = unwrapUsagePayload(subscriptionUsage)
   const quotas = normalizeQuotas(quotasPayload)
@@ -17,7 +18,8 @@ export function normalizeDashboardData(
   return {
     windows,
     quotas,
-    plan: normalizePlan(usageSource, windows)
+    plan: normalizePlan(usageSource, windows),
+    planLimits: normalizePlanLimits(pricingPayload)
   }
 }
 
@@ -378,6 +380,77 @@ function getPlanNameFromMonthlyPrice(monthlyPrice: number): string | null {
   }
 
   return null
+}
+
+function normalizePlanLimits(payload: JsonContainer | null): PlanLimitEntry[] {
+  const items = getPlanLimitItems(payload)
+  const normalized = items
+    .map((item) => asObject(item))
+    .filter((item): item is JsonObject => item !== null)
+    .map((item) => {
+      const name = asString(item.name) ?? asString(item.plan_name) ?? asString(item.label)
+      const monthlyPrice = asNumber(item.monthly_price) ?? asNumber(item.monthlyPriceUsd)
+      const monthlyCap = asNumber(item.monthly_cap_usd) ?? asNumber(item.monthlyCapUsd)
+      const dailyLimit = asNumber(item.daily_request_limit) ?? asNumber(item.dailyRequestLimit)
+      const fourHourCap = asNumber(item.four_hour_cap_usd) ?? asNumber(item.fourHourCapUsd)
+      const discount = asNumber(item.payg_discount_percent) ?? asNumber(item.paygDiscountPercent)
+
+      if (name === null || monthlyPrice === null || monthlyCap === null || dailyLimit === null || fourHourCap === null || discount === null) {
+        return null
+      }
+
+      return {
+        name,
+        priceLabel: `${formatUsd(monthlyPrice)}/mo`,
+        monthlyCapLabel: formatUsd(monthlyCap),
+        dailyRequestLimitLabel: formatInteger(dailyLimit),
+        fourHourCapLabel: formatUsd(fourHourCap),
+        paygDiscountLabel: `${Math.round(discount)}%`
+      } satisfies PlanLimitEntry
+    })
+    .filter((item): item is PlanLimitEntry => item !== null)
+
+  return normalized.length > 0 ? normalized : getDefaultPlanLimits()
+}
+
+function getPlanLimitItems(payload: JsonContainer | null): JsonArray {
+  if (payload === null) {
+    return []
+  }
+
+  if (Array.isArray(payload)) {
+    return payload
+  }
+
+  if (Array.isArray(payload.items)) {
+    return payload.items
+  }
+
+  if (Array.isArray(payload.plans)) {
+    return payload.plans
+  }
+
+  if (Array.isArray(payload.pricing)) {
+    return payload.pricing
+  }
+
+  return []
+}
+
+function getDefaultPlanLimits(): PlanLimitEntry[] {
+  return [
+    { name: 'Base', priceLabel: '$3/mo', monthlyCapLabel: '$15', dailyRequestLimitLabel: '300', fourHourCapLabel: '$1.25', paygDiscountLabel: '3%' },
+    { name: 'Plus', priceLabel: '$10/mo', monthlyCapLabel: '$50', dailyRequestLimitLabel: '2,000', fourHourCapLabel: '$4.17', paygDiscountLabel: '6%' },
+    { name: 'Pro', priceLabel: '$20/mo', monthlyCapLabel: '$100', dailyRequestLimitLabel: '5,000', fourHourCapLabel: '$8.33', paygDiscountLabel: '10%' }
+  ]
+}
+
+function formatUsd(value: number): string {
+  return `$${Number.isInteger(value) ? value.toFixed(0) : value.toFixed(2)}`
+}
+
+function formatInteger(value: number): string {
+  return Math.round(value).toLocaleString()
 }
 
 // Build a compact status bar summary that stays short and easy to scan.

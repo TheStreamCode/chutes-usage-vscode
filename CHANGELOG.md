@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+- Hardened webview-to-extension message handling and external link opening with an HTTPS allowlist.
+- Reduced quota refresh fan-out by using aggregate quota usage when available before falling back to per-chute requests.
+- Fed pricing data into the plan limits reference and added contributor guidance in `AGENTS.md`.
+
 ## 0.3.1
 
 - Finalized naming consistency across all documentation, internal specs, and implementation plans.

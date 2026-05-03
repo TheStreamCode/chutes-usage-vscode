@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 
 import { ChutesApiClient } from '../services/ChutesApiClient'
 
-test('fetches quota usage through documented per-chute endpoints', async () => {
+test('fetches fallback quota usage through documented per-chute endpoints when aggregate usage is unavailable', async () => {
   const originalFetch = globalThis.fetch
   const requestedUrls: string[] = []
 
@@ -33,7 +33,7 @@ test('fetches quota usage through documented per-chute endpoints', async () => {
     }
 
     if (url.endsWith('/users/me/quota_usage/me')) {
-      return jsonResponse({ used: 13, quota: 5250 })
+      return jsonResponse({})
     }
 
     if (url.endsWith('/invocations/stats/llm')) {
@@ -54,12 +54,94 @@ test('fetches quota usage through documented per-chute endpoints', async () => {
       '*': { used: 11, quota: 5000 },
       'my-chute': { used: 2, quota: 250 }
     })
-    assert.deepEqual(payload.quotaUsageMe, { used: 13, quota: 5250 })
+    assert.deepEqual(payload.quotaUsageMe, {})
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/%2A')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/my-chute')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/me')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/invocations/stats/llm')))
     assert.ok(!requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/*')))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('skips per-chute fallback quota usage when aggregate usage is available', async () => {
+  const originalFetch = globalThis.fetch
+  const requestedUrls: string[] = []
+
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    requestedUrls.push(url)
+
+    if (url.endsWith('/users/me/subscription_usage')) {
+      return jsonResponse({ subscription: true, custom: false, monthly_price: 20 })
+    }
+
+    if (url.endsWith('/users/me/quotas')) {
+      return jsonResponse([{ chute_id: '*', quota: 5000 }])
+    }
+
+    if (url.endsWith('/users/me/quota_usage/me')) {
+      return jsonResponse({ used: 13, quota: 5000 })
+    }
+
+    if (url.endsWith('/invocations/stats/llm')) {
+      return jsonResponse([])
+    }
+
+    if (url.endsWith('/pricing')) {
+      return jsonResponse([])
+    }
+
+    throw new Error(`Unexpected URL ${url}`)
+  }) as typeof fetch
+
+  try {
+    const payload = await new ChutesApiClient('test-key').getDashboardPayload()
+
+    assert.deepEqual(payload.quotaUsageMe, { used: 13, quota: 5000 })
+    assert.equal(payload.quotaUsageFallback, null)
+    assert.ok(!requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/%2A')))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('treats numeric string aggregate quota usage as available', async () => {
+  const originalFetch = globalThis.fetch
+  const requestedUrls: string[] = []
+
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    requestedUrls.push(url)
+
+    if (url.endsWith('/users/me/subscription_usage')) {
+      return jsonResponse({ subscription: true, custom: false, monthly_price: 20 })
+    }
+
+    if (url.endsWith('/users/me/quotas')) {
+      return jsonResponse([{ chute_id: '*', quota: 5000 }])
+    }
+
+    if (url.endsWith('/users/me/quota_usage/me')) {
+      return jsonResponse({ used: '13', quota: '5000' })
+    }
+
+    if (url.endsWith('/invocations/stats/llm')) {
+      return jsonResponse([])
+    }
+
+    if (url.endsWith('/pricing')) {
+      return jsonResponse([])
+    }
+
+    throw new Error(`Unexpected URL ${url}`)
+  }) as typeof fetch
+
+  try {
+    await new ChutesApiClient('test-key').getDashboardPayload()
+
+    assert.ok(!requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/%2A')))
   } finally {
     globalThis.fetch = originalFetch
   }

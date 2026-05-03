@@ -58,7 +58,8 @@ export class DashboardStore {
         payload.quotas,
         payload.quotaUsageFallback,
         payload.quotaUsageMe,
-        payload.invocationStatsLlm
+        payload.invocationStatsLlm,
+        payload.pricing
       )
 
       const latestApiKey = await this.secretStore.getApiKey()

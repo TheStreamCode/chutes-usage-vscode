@@ -25,6 +25,15 @@ type PlanInfo = {
   paygDiscountPercent: number | null
 }
 
+type PlanLimitEntry = {
+  name: string
+  priceLabel: string
+  monthlyCapLabel: string
+  dailyRequestLimitLabel: string
+  fourHourCapLabel: string
+  paygDiscountLabel: string
+}
+
 type DashboardState = {
   connectionState: ConnectionState
   connected: boolean
@@ -32,6 +41,7 @@ type DashboardState = {
   data: {
     windows: UsageWindow[]
     plan: PlanInfo | null
+    planLimits: PlanLimitEntry[]
   } | null
   errorMessage: string | null
 }
@@ -110,7 +120,7 @@ function render(state: DashboardState): void {
 
   app.append(metricsGrid)
 
-  app.append(buildPlanLimits())
+  app.append(buildPlanLimits(state.data.planLimits))
 
   app.append(buildFooter(state))
 }
@@ -147,7 +157,7 @@ function buildHeader(state: DashboardState): HTMLElement {
   if (state.connectionState === 'missing-key') {
     actions.append(actionButton('Set Key', 'setApiKey', 'primary'))
   } else {
-    actions.append(actionButton('Key', 'setApiKey', 'default'))
+    actions.append(actionButton(presentation.keyActionLabel, 'setApiKey', 'default'))
     actions.append(actionButton('Remove', 'removeApiKey', presentation.removeDisabled ? 'disabled' : 'danger'))
   }
 
@@ -371,7 +381,7 @@ function buildWindowSubline(window: UsageWindow): string {
   return parts.join(' \u00B7 ')
 }
 
-function buildPlanLimits(): HTMLElement {
+function buildPlanLimits(planLimits: PlanLimitEntry[]): HTMLElement {
   const section = document.createElement('section')
   section.className = 'plan-limits-section'
 
@@ -388,18 +398,15 @@ function buildPlanLimits(): HTMLElement {
   fiveXNote.innerHTML = '5\u00D7 the value of pay-as-you-go'
   const fiveXDesc = document.createElement('p')
   fiveXDesc.className = 'plan-limits-five-x-desc'
-  fiveXDesc.textContent = 'Every subscription includes up to 5 times the monthly price in equivalent pay-as-you-go usage. A $3 plan gets $15 of usage, $10 gets $50, and $20 gets $100.'
+  fiveXDesc.textContent = buildFiveXDescription(planLimits)
 
   const tiersGrid = document.createElement('div')
   tiersGrid.className = 'plan-limits-tiers'
 
-  const baseData = { name: 'Base', price: '$3/mo', cap: '$15', daily: '300', burst: '$1.25', discount: '3%' }
-  const plusData = { name: 'Plus', price: '$10/mo', cap: '$50', daily: '2,000', burst: '$4.17', discount: '6%' }
-  const proData = { name: 'Pro', price: '$20/mo', cap: '$100', daily: '5,000', burst: '$8.33', discount: '10%' }
-
-  tiersGrid.append(buildTierCard(baseData, 'base'))
-  tiersGrid.append(buildTierCard(plusData, 'plus'))
-  tiersGrid.append(buildTierCard(proData, 'pro'))
+  planLimits.forEach((planLimit, index) => {
+    const tier = index === 0 ? 'base' : index === 1 ? 'plus' : 'pro'
+    tiersGrid.append(buildTierCard(planLimit, tier))
+  })
 
   const tiersWrap = document.createElement('div')
   tiersWrap.className = 'plan-limits-tiers-wrap'
@@ -416,7 +423,7 @@ function buildPlanLimits(): HTMLElement {
   return section
 }
 
-function buildTierCard(data: { name: string; price: string; cap: string; daily: string; burst: string; discount: string }, tier: string): HTMLElement {
+function buildTierCard(data: PlanLimitEntry, tier: string): HTMLElement {
   const card = document.createElement('div')
   card.className = `plan-limits-tier tier-${tier}`
 
@@ -426,7 +433,7 @@ function buildTierCard(data: { name: string; price: string; cap: string; daily: 
 
   const priceEl = document.createElement('div')
   priceEl.className = 'tier-price'
-  priceEl.textContent = data.price
+  priceEl.textContent = data.priceLabel
 
   const divider = document.createElement('div')
   divider.className = 'tier-divider'
@@ -434,14 +441,26 @@ function buildTierCard(data: { name: string; price: string; cap: string; daily: 
   const rows = document.createElement('div')
   rows.className = 'tier-rows'
   rows.append(
-    buildTierRow('Monthly cap', data.cap, 'Max usage per cycle'),
-    buildTierRow('Daily reqs', data.daily, 'Max API reqs/day'),
-    buildTierRow('4H burst', data.burst, 'Rolling spend cap'),
-    buildTierRow('PAYG off', data.discount, 'Pay-as-you-go')
+    buildTierRow('Monthly cap', data.monthlyCapLabel, 'Max usage per cycle'),
+    buildTierRow('Daily reqs', data.dailyRequestLimitLabel, 'Max API reqs/day'),
+    buildTierRow('4H burst', data.fourHourCapLabel, 'Rolling spend cap'),
+    buildTierRow('PAYG off', data.paygDiscountLabel, 'Pay-as-you-go')
   )
 
   card.append(nameEl, priceEl, divider, rows)
   return card
+}
+
+function buildFiveXDescription(planLimits: PlanLimitEntry[]): string {
+  const examples = planLimits
+    .slice(0, 3)
+    .map((planLimit) => `${planLimit.name} gets ${planLimit.monthlyCapLabel}`)
+
+  if (examples.length === 0) {
+    return 'Every subscription includes up to 5 times the monthly price in equivalent pay-as-you-go usage.'
+  }
+
+  return `Every subscription includes up to 5 times the monthly price in equivalent pay-as-you-go usage. Examples: ${examples.join(', ')}.`
 }
 
 function buildTierRow(label: string, value: string, tooltip: string): HTMLElement {

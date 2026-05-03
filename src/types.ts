@@ -38,10 +38,20 @@ export interface PlanInfo {
   paygDiscountPercent: number | null
 }
 
+export interface PlanLimitEntry {
+  name: string
+  priceLabel: string
+  monthlyCapLabel: string
+  dailyRequestLimitLabel: string
+  fourHourCapLabel: string
+  paygDiscountLabel: string
+}
+
 export interface DashboardData {
   windows: UsageWindow[]
   quotas: QuotaEntry[]
   plan: PlanInfo | null
+  planLimits: PlanLimitEntry[]
 }
 
 export interface QuotaUsageSummary {
