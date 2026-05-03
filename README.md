@@ -60,7 +60,7 @@ The sidebar dashboard includes:
 - a compact header with sync state and actions
 - a plan snapshot with the most relevant subscription figures
 - stacked usage cards optimized for narrow Activity Bar layouts
-- a `Plan Limits` reference section that explains Base, Plus, and Pro limits without exposing a raw quota payload table
+- a `Plan Limits` reference section that uses pricing data when available without exposing a raw quota payload table
 
 The dashboard refreshes when you run the refresh command, on the configured refresh interval, when the dashboard becomes visible again, and when VS Code regains window focus.
 

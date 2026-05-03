@@ -29,7 +29,7 @@ It includes:
 - a header with connection status and actions
 - a plan snapshot with key subscription details
 - stacked usage cards for the main billing windows
-- a `Plan Limits` section with Base, Plus, and Pro monthly cap, daily request, burst, and PAYG discount references
+- a `Plan Limits` section with monthly cap, daily request, burst, and PAYG discount references, using live pricing data when available
 
 Depending on the current state, the dashboard shows onboarding, loading, ready, or error content.
 
@@ -77,7 +77,7 @@ Depending on the API responses available for your account, the extension can dis
 - 4-hour rolling window usage
 - daily request usage
 - plan information such as subscription price or caps when available
-- a built-in subscription limits reference for Base, Plus, and Pro tiers
+- a built-in subscription limits reference based on pricing data when available, with packaged defaults as a fallback
 
 ## Managing Your API Key
 
