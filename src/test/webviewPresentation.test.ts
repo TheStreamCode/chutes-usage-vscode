@@ -25,17 +25,19 @@ test('keeps key management actions available when the dashboard is in error with
     errorMessage: 'Request failed with status 401'
   }), () => '10:11:12')
 
-  assert.equal(presentation.statusText, 'PRO // SYNC FAILED')
+  assert.equal(presentation.statusText, 'Pro · sync failed')
   assert.equal(presentation.keyActionLabel, 'Replace Key')
   assert.equal(presentation.removeDisabled, false)
+  assert.equal(presentation.tone, 'error')
 })
 
 test('shows onboarding actions only when the API key is actually missing', () => {
   const presentation = getHeaderPresentation(createState())
 
-  assert.equal(presentation.statusText, '// AWAITING API KEY')
+  assert.equal(presentation.statusText, 'Awaiting API key')
   assert.equal(presentation.keyActionLabel, 'Set Key')
   assert.equal(presentation.removeDisabled, true)
+  assert.equal(presentation.tone, 'idle')
 })
 
 test('shows the last synced time when the dashboard is ready', () => {
@@ -59,8 +61,16 @@ test('shows the last synced time when the dashboard is ready', () => {
     errorMessage: null
   }), () => '10:11:12')
 
-  assert.equal(presentation.statusText, '$20/MO // updated 10:11:12')
+  assert.equal(presentation.statusText, '$20/mo · updated 10:11:12')
   assert.equal(presentation.showDot, true)
+  assert.equal(presentation.tone, 'live')
+})
+
+test('keeps the title in natural case without monospace divider prefix', () => {
+  const presentation = getHeaderPresentation(createState({ connectionState: 'loading' }))
+
+  assert.doesNotMatch(presentation.statusText, /\/\//)
+  assert.equal(presentation.tone, 'live')
 })
 
 test('formats reset timestamps into clearer short labels', () => {

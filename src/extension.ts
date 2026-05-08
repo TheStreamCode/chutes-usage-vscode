@@ -44,9 +44,11 @@ export function activate(context: vscode.ExtensionContext): void {
       clearInterval(refreshTimer)
     }
 
+    const intervalSeconds = getRefreshInterval()
+    provider.setRefreshIntervalMs(intervalSeconds * 1000)
     refreshTimer = setInterval(() => {
       void dashboardStore.refresh()
-    }, getRefreshInterval() * 1000)
+    }, intervalSeconds * 1000)
   }
 
   context.subscriptions.push({

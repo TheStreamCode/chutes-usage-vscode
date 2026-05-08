@@ -1,8 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { normalizeDashboardData, summarizeStatusBar } from '../services/normalize'
-import type { JsonObject } from '../types'
+import { normalizeDashboardData, summarizeStatusBar, summarizeStatusBarCompact } from '../services/normalize'
+import type { DashboardData, DashboardState, JsonObject, UsageWindow } from '../types'
 
 test('normalizes known subscription usage and quotas for a pro account', () => {
   const subscriptionUsage: JsonObject = {
@@ -586,3 +586,87 @@ test('summarizes unlimited daily quota and stale sync states clearly', () => {
 
   assert.equal(summary, 'Chutes | --/Unlimited')
 })
+
+test('compact status bar reports info severity and key codicon when API key is missing', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({ connectionState: 'missing-key', data: null }))
+  assert.equal(summary.text, '$(key) Chutes')
+  assert.equal(summary.severity, 'info')
+})
+
+test('compact status bar reports loading codicon during refresh', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({ connectionState: 'loading', data: null }))
+  assert.equal(summary.text, '$(loading~spin) Chutes')
+  assert.equal(summary.severity, 'info')
+})
+
+test('compact status bar reports error severity when connection fails', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({ connectionState: 'error', data: null }))
+  assert.equal(summary.text, '$(error) Chutes')
+  assert.equal(summary.severity, 'error')
+})
+
+test('compact status bar shows only billing usage when nothing is critical', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([
+      makeWindow('billing-cycle', 'usd', 6.6, 100, 6.6),
+      makeWindow('rolling-4h', 'usd', 0, 8.33, 0),
+      makeWindow('daily-requests', 'requests', 50, 5000, 1)
+    ])
+  }))
+
+  assert.equal(summary.text, '$(graph) Chutes $6.60')
+  assert.equal(summary.severity, 'info')
+})
+
+test('compact status bar surfaces the worst window with info graph icon at 75-89%', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([
+      makeWindow('billing-cycle', 'usd', 60, 100, 60),
+      makeWindow('rolling-4h', 'usd', 6.5, 8.33, 78)
+    ])
+  }))
+
+  assert.equal(summary.text, '$(graph) Chutes 4h $6.50/$8')
+  assert.equal(summary.severity, 'info')
+})
+
+test('compact status bar escalates to warning severity when any window crosses 90%', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([
+      makeWindow('billing-cycle', 'usd', 60, 100, 60),
+      makeWindow('rolling-4h', 'usd', 7.8, 8.33, 94)
+    ])
+  }))
+
+  assert.equal(summary.text, '$(warning) Chutes 4h $7.80/$8')
+  assert.equal(summary.severity, 'warning')
+})
+
+function createCompactState(overrides: Partial<DashboardState>): { connectionState: DashboardState['connectionState']; data: DashboardData | null } {
+  const base: { connectionState: DashboardState['connectionState']; data: DashboardData | null } = {
+    connectionState: 'missing-key',
+    data: null
+  }
+  return { ...base, ...overrides }
+}
+
+function createCompactData(windows: UsageWindow[]): DashboardData {
+  return { windows, quotas: [], plan: null, planLimits: [] }
+}
+
+function makeWindow(kind: UsageWindow['kind'], unit: 'usd' | 'requests', used: number, limit: number, percentUsed: number): UsageWindow {
+  return {
+    id: kind,
+    kind,
+    label: kind,
+    unit,
+    used,
+    limit,
+    remaining: Math.max(0, limit - used),
+    percentUsed,
+    resetLabel: null
+  }
+}

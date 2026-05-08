@@ -18,24 +18,28 @@ After installation:
 
 ## Features
 
-- Sidebar dashboard with plan snapshot, stacked usage cards, and a built-in plan limits reference
-- Optional status bar summary for quick usage visibility
+- Sidebar dashboard aligned with the chutes.ai look: pure-black on dark themes, pill buttons, mint pill badges, headline-violet section titles, generous whitespace
+- Theme-aware: backgrounds, foregrounds, borders, and description text follow VS Code theme tokens; works with Light, Dark, and High Contrast themes
+- Plan snapshot, per-window usage cards with progress bars, and a Plan Limits reference that highlights your current tier
+- Compact status bar summary with severity-aware codicon and background color; full detail in the tooltip
 - Secure API key storage through VS Code `SecretStorage`
 - Manual refresh command for immediate sync
-- Automatic refresh on a timer, when the dashboard becomes visible again, and when the VS Code window regains focus
-- Immediate sidebar snapshot restore when the dashboard is opened after a background refresh
+- Automatic refresh on a configurable timer, when the dashboard becomes visible again, and when the VS Code window regains focus
+- Live `refresh in Ns` countdown driven by your `refreshIntervalSeconds` setting
+- Cached state restore on side-panel reopen — no `Loading…` flash, no flicker on every tick
+- Accessible by default: ARIA progressbar/alert/status semantics, `prefers-reduced-motion` support, and visible focus rings
+- Hardened webview CSP with a per-load nonce and scoped `font-src`/`img-src`
 
 ## Latest Changes
 
+- `0.4.2` fixes a critical visibility bug where `[hidden]` was being overridden by `display: flex/grid/inline-flex`, which kept the loading skeleton, stale banner, and per-card stale and current-tier badges visible regardless of state.
+- `0.4.1` clears the next-refresh ticker on hide/unload, fixes the Plan Limits collapsed preference when no cache exists yet, keeps the refresh button enabled after reopening from a cached `loading` state, and pipes the configured `refreshIntervalSeconds` into the webview countdown.
+- `0.4.0` redesigns the dashboard around the chutes.ai visual language, makes it theme-aware (`--vscode-*` tokens with mint/violet accents), eliminates dashboard flicker via mount/update DOM diffing, persists state with `vscode.setState/getState`, replaces unicode glyphs with Codicons, hardens the CSP with a nonce, adds full ARIA + `prefers-reduced-motion`, introduces a current-tier highlight and per-card stale badge, makes the Plan Limits section collapsible, and shrinks the status bar text to a severity-aware compact summary.
 - `0.3.3` rebuilds the package with the latest documentation for the pricing-data-backed plan limits reference.
 - `0.3.2` hardens external link handling, reduces unnecessary quota fallback requests, and feeds pricing data into the plan limits reference.
 - `0.3.0` renames the extension to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
 - `0.2.9` clarifies dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
 - `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.
-- `0.2.7` refreshes the Marketplace PNG icon artwork while keeping the dedicated single-color icon used in the VS Code Activity Bar/sidebar.
-- `0.2.6` refreshes the extension branding with a dedicated single-color icon for the VS Code Activity Bar/sidebar and an updated Marketplace icon.
-- `0.2.5` fixes a dashboard regression where the sidebar could render only the background after activation.
-- The dashboard bootstrap is now packaged as browser-safe ES modules to match the VS Code webview runtime.
 
 ## Commands
 

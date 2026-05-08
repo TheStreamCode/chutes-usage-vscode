@@ -2,7 +2,7 @@
   "name": "chutes-usage-vscode",
   "displayName": "Chutes Usage Monitor",
   "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.3.3",
+  "version": "0.4.3",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -125,7 +125,7 @@
     }
   },
   "scripts": {
-    "compile": "tsc -p ./ && tsc -p ./tsconfig.webview.json && powershell -NoProfile -Command \"Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force\"",
+    "compile": "tsc -p ./ && tsc -p ./tsconfig.webview.json && powershell -NoProfile -Command \"Copy-Item -Path 'webview/styles.css' -Destination 'out/webview/styles.css' -Force; Copy-Item -Path 'node_modules/@vscode/codicons/dist/codicon.css' -Destination 'out/webview/codicon.css' -Force; Copy-Item -Path 'node_modules/@vscode/codicons/dist/codicon.ttf' -Destination 'out/webview/codicon.ttf' -Force\"",
     "watch": "tsc -w -p ./",
     "test": "npm run compile && node --test out/src/test/**/*.test.js",
     "package": "vsce package",
@@ -133,6 +133,7 @@
     "vscode:uninstall": "node ./out/src/lifecycle.js"
   },
   "devDependencies": {
+    "@vscode/codicons": "^0.0.36",
     "@vscode/vsce": "^3.8.1",
     "@types/node": "^25.6.0",
     "@types/vscode": "^1.103.0",

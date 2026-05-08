@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 
 import type { DashboardState } from '../types'
-import { summarizeStatusBar } from '../services/normalize'
+import { summarizeStatusBarCompact } from '../services/normalize'
 
 export class StatusBarController implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem
@@ -9,6 +9,7 @@ export class StatusBarController implements vscode.Disposable {
   public constructor() {
     this.item = vscode.window.createStatusBarItem('chutesUsageVscode.status', vscode.StatusBarAlignment.Left, 100)
     this.item.command = 'chutesUsageVscode.openDashboard'
+    this.item.name = 'Chutes Usage'
   }
 
   public render(state: DashboardState, visible: boolean): void {
@@ -17,22 +18,19 @@ export class StatusBarController implements vscode.Disposable {
       return
     }
 
-    switch (state.connectionState) {
-      case 'missing-key':
-        this.item.text = 'Chutes Sign in'
-        this.item.tooltip = 'Set your Chutes API key to start monitoring usage.'
-        break
-      case 'loading':
-        this.item.text = '$(loading~spin) Chutes'
-        this.item.tooltip = 'Refreshing Chutes usage...'
-        break
-      case 'ready':
-        this.item.text = state.data ? summarizeStatusBar(state.data) : 'Chutes'
-        this.item.tooltip = buildTooltip(state)
+    const summary = summarizeStatusBarCompact(state)
+    this.item.text = summary.text
+    this.item.tooltip = buildTooltip(state)
+
+    switch (summary.severity) {
+      case 'warning':
+        this.item.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground')
         break
       case 'error':
-        this.item.text = 'Chutes Error'
-        this.item.tooltip = state.errorMessage ?? 'Unable to refresh Chutes usage.'
+        this.item.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground')
+        break
+      default:
+        this.item.backgroundColor = undefined
         break
     }
 
@@ -53,6 +51,12 @@ function buildTooltip(state: DashboardState): string {
       const suffix = window.resetLabel ? ` (${window.resetLabel})` : ''
       lines.push(`${window.label}: ${used}/${limit}${suffix}`)
     }
+  }
+
+  if (state.connectionState === 'missing-key') {
+    lines.push('Set your Chutes API key to start monitoring usage.')
+  } else if (state.connectionState === 'error' && state.errorMessage) {
+    lines.push(`Sync failed: ${state.errorMessage}`)
   }
 
   if (state.lastUpdatedAt) {

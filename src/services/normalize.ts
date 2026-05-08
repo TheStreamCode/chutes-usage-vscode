@@ -453,6 +453,77 @@ function formatInteger(value: number): string {
   return Math.round(value).toLocaleString()
 }
 
+export type StatusBarSeverity = 'info' | 'warning' | 'error'
+
+export interface StatusBarSummary {
+  text: string
+  severity: StatusBarSeverity
+}
+
+// Pick the worst window by percentUsed (highest percent first).
+function pickWorstWindow(windows: UsageWindow[]): UsageWindow | null {
+  let worst: UsageWindow | null = null
+  for (const window of windows) {
+    if (window.percentUsed === null) continue
+    if (worst === null || window.percentUsed > (worst.percentUsed ?? 0)) {
+      worst = window
+    }
+  }
+  return worst
+}
+
+function shortKindLabel(kind: UsageWindow['kind']): string {
+  switch (kind) {
+    case 'billing-cycle': return 'mo'
+    case 'rolling-4h': return '4h'
+    case 'daily-requests': return 'day'
+    case 'weekly': return 'wk'
+    default: return ''
+  }
+}
+
+function formatCompactValue(window: UsageWindow): string {
+  if (window.unit === 'requests') {
+    const used = window.used === null ? '--' : Math.round(window.used).toString()
+    const limit = window.limit === null ? '--' : window.limit === 0 ? '∞' : Math.round(window.limit).toString()
+    return `${used}/${limit}`
+  }
+  const used = window.used === null ? '--' : `$${window.used.toFixed(2)}`
+  const limit = window.limit === null ? '--' : `$${window.limit.toFixed(0)}`
+  return `${used}/${limit}`
+}
+
+// Build a very short status-bar text + severity for the new compact bar style.
+export function summarizeStatusBarCompact(state: { connectionState: 'missing-key' | 'loading' | 'ready' | 'error'; data: DashboardData | null }): StatusBarSummary {
+  if (state.connectionState === 'missing-key') return { text: '$(key) Chutes', severity: 'info' }
+  if (state.connectionState === 'loading')      return { text: '$(loading~spin) Chutes', severity: 'info' }
+  if (state.connectionState === 'error')        return { text: '$(error) Chutes', severity: 'error' }
+  if (!state.data)                              return { text: '$(graph) Chutes', severity: 'info' }
+
+  const worst = pickWorstWindow(state.data.windows)
+
+  if (worst && worst.percentUsed !== null && worst.percentUsed >= 90) {
+    return {
+      text: `$(warning) Chutes ${shortKindLabel(worst.kind)} ${formatCompactValue(worst)}`.trim(),
+      severity: 'warning'
+    }
+  }
+
+  if (worst && worst.percentUsed !== null && worst.percentUsed >= 75) {
+    return {
+      text: `$(graph) Chutes ${shortKindLabel(worst.kind)} ${formatCompactValue(worst)}`.trim(),
+      severity: 'info'
+    }
+  }
+
+  const billing = state.data.windows.find((w) => w.kind === 'billing-cycle')
+  if (billing && billing.used !== null) {
+    return { text: `$(graph) Chutes $${billing.used.toFixed(2)}`, severity: 'info' }
+  }
+
+  return { text: '$(graph) Chutes', severity: 'info' }
+}
+
 // Build a compact status bar summary that stays short and easy to scan.
 export function summarizeStatusBar(data: DashboardData): string {
   const billing = data.windows.find((window) => window.kind === 'billing-cycle')

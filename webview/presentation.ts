@@ -1,3 +1,5 @@
+// KEEP IN SYNC WITH src/types.ts — these types are duplicated for the
+// webview bundle which compiles separately from the extension host.
 type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
 
 type PlanInfo = {
@@ -24,6 +26,7 @@ export type HeaderPresentation = {
   showDot: boolean
   keyActionLabel: 'Set Key' | 'Replace Key'
   removeDisabled: boolean
+  tone: 'idle' | 'live' | 'warn' | 'error'
 }
 
 export function formatResetLabel(
@@ -51,37 +54,41 @@ export function getHeaderPresentation(state: DashboardState, formatTime: (value:
   switch (state.connectionState) {
     case 'missing-key':
       return {
-        statusText: '// AWAITING API KEY',
+        statusText: 'Awaiting API key',
         showDot: false,
         keyActionLabel: 'Set Key',
-        removeDisabled: true
+        removeDisabled: true,
+        tone: 'idle'
       }
     case 'loading': {
       const prefix = buildPrefix(planName, monthlyPrice)
       return {
-        statusText: prefix ? `${prefix} // REFRESHING` : '// REFRESHING',
+        statusText: prefix ? `${prefix} · refreshing` : 'Refreshing',
         showDot: hasStoredCredentials,
         keyActionLabel: 'Replace Key',
-        removeDisabled: false
+        removeDisabled: false,
+        tone: 'live'
       }
     }
     case 'error': {
       const prefix = buildPrefix(planName, monthlyPrice)
       return {
-        statusText: prefix ? `${prefix} // SYNC FAILED` : '// SYNC FAILED',
+        statusText: prefix ? `${prefix} · sync failed` : 'Sync failed',
         showDot: hasStoredCredentials,
         keyActionLabel: 'Replace Key',
-        removeDisabled: false
+        removeDisabled: false,
+        tone: 'error'
       }
     }
     case 'ready': {
       const prefix = buildPrefix(planName, monthlyPrice)
       const suffix = timeText ? `updated ${timeText}` : 'connected'
       return {
-        statusText: prefix ? `${prefix} // ${suffix}` : `// ${suffix}`,
+        statusText: prefix ? `${prefix} · ${suffix}` : suffix.charAt(0).toUpperCase() + suffix.slice(1),
         showDot: true,
         keyActionLabel: 'Replace Key',
-        removeDisabled: false
+        removeDisabled: false,
+        tone: 'live'
       }
     }
   }
@@ -89,11 +96,11 @@ export function getHeaderPresentation(state: DashboardState, formatTime: (value:
 
 function buildPrefix(planName: string | null | undefined, monthlyPrice: number | null | undefined): string {
   if (planName) {
-    return planName.toUpperCase()
+    return planName
   }
 
   if (monthlyPrice !== null && monthlyPrice !== undefined) {
-    return `$${monthlyPrice.toFixed(0)}/MO`
+    return `$${monthlyPrice.toFixed(0)}/mo`
   }
 
   return ''

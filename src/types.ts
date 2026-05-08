@@ -77,6 +77,7 @@ export interface DashboardState {
 export interface WebviewStateMessage {
   type: 'state'
   state: DashboardState
+  refreshIntervalMs?: number
 }
 
 export interface WebviewActionMessage {

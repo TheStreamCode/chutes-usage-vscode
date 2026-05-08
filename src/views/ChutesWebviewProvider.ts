@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { randomBytes } from 'crypto'
 
 import { DASHBOARD_VIEW_ID } from '../constants'
 import type { DashboardState, WebviewActionMessage, WebviewStateMessage } from '../types'
@@ -13,11 +14,17 @@ type Actions = {
 
 export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView
+  private refreshIntervalMs?: number
 
   public constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly actions: Actions
   ) {}
+
+  public setRefreshIntervalMs(ms: number): void {
+    this.refreshIntervalMs = ms
+    if (this.view) this.postState(this.actions.getState())
+  }
 
   public resolveWebviewView(webviewView: vscode.WebviewView): void {
     this.view = webviewView
@@ -66,7 +73,8 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
 
     const message: WebviewStateMessage = {
       type: 'state',
-      state
+      state,
+      refreshIntervalMs: this.refreshIntervalMs
     }
 
     void this.view.webview.postMessage(message)
@@ -75,22 +83,29 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
   private getHtml(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'out', 'webview', 'main.js'))
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'out', 'webview', 'styles.css'))
+    const codiconUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'out', 'webview', 'codicon.css'))
+    const nonce = generateNonce()
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src ${webview.cspSource};">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource}; img-src ${webview.cspSource} data:; font-src ${webview.cspSource};">
   <title>Chutes Usage Monitor</title>
+  <link rel="stylesheet" href="${codiconUri}" />
   <link rel="stylesheet" href="${styleUri}" />
 </head>
 <body>
   <div id="app"></div>
-  <script type="module" src="${scriptUri}"></script>
+  <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`
   }
+}
+
+function generateNonce(): string {
+  return randomBytes(16).toString('base64')
 }
 
 function isWebviewActionMessage(message: unknown): message is WebviewActionMessage {

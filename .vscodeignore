@@ -7,6 +7,8 @@ tsconfig.webview.json
 package-lock.json
 .playwright-mcp/
 Screenshot_*.jpeg
+Screenshot*.png
+Screenshot*.jpg
 out/src/test/
 .github/
 .editorconfig
