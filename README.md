@@ -4,6 +4,8 @@ Monitor Chutes subscription usage, rolling limits, and request quotas directly i
 
 This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
 
+![Chutes Usage Monitor dashboard](media/screenshot-chutes-usage.png)
+
 ## Installation
 
 Install the extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode):
@@ -32,6 +34,8 @@ After installation:
 
 ## Latest Changes
 
+- `0.4.4` adds a dashboard screenshot to the README and Marketplace description, and includes the screenshot asset in the packaged VSIX.
+- `0.4.3` refreshes the README and changelog to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.
 - `0.4.2` fixes a critical visibility bug where `[hidden]` was being overridden by `display: flex/grid/inline-flex`, which kept the loading skeleton, stale banner, and per-card stale and current-tier badges visible regardless of state.
 - `0.4.1` clears the next-refresh ticker on hide/unload, fixes the Plan Limits collapsed preference when no cache exists yet, keeps the refresh button enabled after reopening from a cached `loading` state, and pipes the configured `refreshIntervalSeconds` into the webview countdown.
 - `0.4.0` redesigns the dashboard around the chutes.ai visual language, makes it theme-aware (`--vscode-*` tokens with mint/violet accents), eliminates dashboard flicker via mount/update DOM diffing, persists state with `vscode.setState/getState`, replaces unicode glyphs with Codicons, hardens the CSP with a nonce, adds full ARIA + `prefers-reduced-motion`, introduces a current-tier highlight and per-card stale badge, makes the Plan Limits section collapsible, and shrinks the status bar text to a severity-aware compact summary.

@@ -9,6 +9,8 @@ package-lock.json
 Screenshot_*.jpeg
 Screenshot*.png
 Screenshot*.jpg
+screenshot-chutes-usage.png
+!media/screenshot-chutes-usage.png
 out/src/test/
 .github/
 .editorconfig

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4
+
+- Added a dashboard screenshot to the README and Marketplace description.
+- Included the screenshot asset in the packaged VSIX while keeping root screenshot artifacts excluded.
+
 ## 0.4.3
 
 - Refreshed `README.md` and `CHANGELOG.md` to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.
