@@ -58,24 +58,54 @@ test('normalizes plan limits from pricing payload when available', () => {
   const result = normalizeDashboardData({}, [], null, null, null, [
     {
       name: 'Base',
-      monthly_price: 4,
-      monthly_cap_usd: 20,
-      daily_request_limit: 400,
-      four_hour_cap_usd: 1.67,
-      payg_discount_percent: 4
+      monthly_price: 3,
+      monthly_cap_usd: 15,
+      daily_request_limit: 300,
+      four_hour_cap_usd: 1.25,
+      payg_discount_percent: 3
+    },
+    {
+      name: 'Plus',
+      monthly_price: 10,
+      monthly_cap_usd: 50,
+      daily_request_limit: 2000,
+      four_hour_cap_usd: 4.17,
+      payg_discount_percent: 6
+    },
+    {
+      name: 'Pro',
+      monthly_price: 20,
+      monthly_cap_usd: 100,
+      daily_request_limit: 5000,
+      four_hour_cap_usd: 8.33,
+      payg_discount_percent: 10
     }
   ])
 
   assert.deepEqual(result.planLimits, [
     {
-      name: 'Base',
-      priceLabel: '$4/mo',
-      monthlyCapLabel: '$20',
-      dailyRequestLimitLabel: '400',
-      fourHourCapLabel: '$1.67',
-      paygDiscountLabel: '4%'
+      name: 'Plus',
+      priceLabel: '$10/mo',
+      monthlyCapLabel: '$50',
+      dailyRequestLimitLabel: '2,000',
+      fourHourCapLabel: '$4.17',
+      paygDiscountLabel: '6%'
+    },
+    {
+      name: 'Pro',
+      priceLabel: '$20/mo',
+      monthlyCapLabel: '$100',
+      dailyRequestLimitLabel: '5,000',
+      fourHourCapLabel: '$8.33',
+      paygDiscountLabel: '10%'
     }
   ])
+})
+
+test('defaults plan limits to the current Plus and Pro subscription tiers', () => {
+  const result = normalizeDashboardData({}, [])
+
+  assert.deepEqual(result.planLimits.map((limit) => limit.name), ['Plus', 'Pro'])
 })
 
 test('normalizes quotas when the API returns a top-level array', () => {
@@ -267,6 +297,16 @@ test('falls back to Free tier when the user is not on subscription', () => {
   const result = normalizeDashboardData(subscriptionUsage, [], null)
 
   assert.equal(result.plan?.planName, 'Free tier')
+})
+
+test('does not derive the retired Base tier from the former three dollar subscription price', () => {
+  const result = normalizeDashboardData({
+    subscription: true,
+    custom: false,
+    monthly_price: 3
+  }, [])
+
+  assert.equal(result.plan?.planName, 'Paid tier')
 })
 
 test('uses live quota usage data so the daily window shows 0 instead of unknown', () => {

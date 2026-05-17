@@ -557,10 +557,6 @@ body {
   opacity: 0.55;
 }
 
-.plan-limits-tier.tier-base::before {
-  background: var(--vscode-descriptionForeground);
-}
-
 .plan-limits-tier.tier-plus::before {
   background: var(--chutes-accent-violet);
 }

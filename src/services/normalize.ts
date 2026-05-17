@@ -367,10 +367,6 @@ function derivePlanName(payload: JsonObject): string | null {
 }
 
 function getPlanNameFromMonthlyPrice(monthlyPrice: number): string | null {
-  if (monthlyPrice === 3) {
-    return 'Base'
-  }
-
   if (monthlyPrice === 10) {
     return 'Plus'
   }
@@ -396,6 +392,10 @@ function normalizePlanLimits(payload: JsonContainer | null): PlanLimitEntry[] {
       const discount = asNumber(item.payg_discount_percent) ?? asNumber(item.paygDiscountPercent)
 
       if (name === null || monthlyPrice === null || monthlyCap === null || dailyLimit === null || fourHourCap === null || discount === null) {
+        return null
+      }
+
+      if (isRetiredBasePlan(name, monthlyPrice)) {
         return null
       }
 
@@ -437,9 +437,12 @@ function getPlanLimitItems(payload: JsonContainer | null): JsonArray {
   return []
 }
 
+function isRetiredBasePlan(name: string, monthlyPrice: number): boolean {
+  return name.toLowerCase() === 'base' || monthlyPrice === 3
+}
+
 function getDefaultPlanLimits(): PlanLimitEntry[] {
   return [
-    { name: 'Base', priceLabel: '$3/mo', monthlyCapLabel: '$15', dailyRequestLimitLabel: '300', fourHourCapLabel: '$1.25', paygDiscountLabel: '3%' },
     { name: 'Plus', priceLabel: '$10/mo', monthlyCapLabel: '$50', dailyRequestLimitLabel: '2,000', fourHourCapLabel: '$4.17', paygDiscountLabel: '6%' },
     { name: 'Pro', priceLabel: '$20/mo', monthlyCapLabel: '$100', dailyRequestLimitLabel: '5,000', fourHourCapLabel: '$8.33', paygDiscountLabel: '10%' }
   ]
@@ -450,7 +453,7 @@ function formatUsd(value: number): string {
 }
 
 function formatInteger(value: number): string {
-  return Math.round(value).toLocaleString()
+  return Math.round(value).toLocaleString('en-US')
 }
 
 export type StatusBarSeverity = 'info' | 'warning' | 'error'

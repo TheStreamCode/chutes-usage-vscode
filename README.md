@@ -34,6 +34,7 @@ After installation:
 
 ## Latest Changes
 
+- `0.4.5` removes the retired `$3/mo` Base plan from Plan Limits and keeps the built-in fallback reference aligned to the current Plus and Pro tiers.
 - `0.4.4` adds a dashboard screenshot to the README and Marketplace description, and includes the screenshot asset in the packaged VSIX.
 - `0.4.3` refreshes the README and changelog to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.
 - `0.4.2` fixes a critical visibility bug where `[hidden]` was being overridden by `display: flex/grid/inline-flex`, which kept the loading skeleton, stale banner, and per-card stale and current-tier badges visible regardless of state.

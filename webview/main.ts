@@ -830,7 +830,6 @@ function applyPlanLimits(refs: DomRefs, planLimits: PlanLimitEntry[], currentPla
     const isPro = entry.name.toLowerCase() === 'pro'
     cls(tier.root, 'tier-pro', isPro)
     cls(tier.root, 'tier-plus', entry.name.toLowerCase() === 'plus')
-    cls(tier.root, 'tier-base', entry.name.toLowerCase() === 'base')
   })
 }
 

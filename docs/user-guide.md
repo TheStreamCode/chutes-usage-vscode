@@ -77,7 +77,7 @@ Depending on the API responses available for your account, the extension can dis
 - 4-hour rolling window usage
 - daily request usage
 - plan information such as subscription price or caps when available
-- a built-in subscription limits reference based on pricing data when available, with packaged defaults as a fallback
+- a built-in subscription limits reference based on pricing data when available, with packaged Plus and Pro defaults as a fallback
 
 ## Managing Your API Key
 

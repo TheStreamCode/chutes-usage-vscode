@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.5
+
+- Removed the retired $3 Base plan from the Plan Limits reference.
+- Kept packaged fallback limits and normalized pricing payloads aligned to the current Plus and Pro subscription tiers.
+- Stopped deriving a Base plan from the former $3 monthly subscription price.
+
 ## 0.4.4
 
 - Added a dashboard screenshot to the README and Marketplace description.
