@@ -99,6 +99,10 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 - [Support](SUPPORT.md)
 - [Security](SECURITY.md)
 
+## Support The Project
+
+If Chutes Usage Monitor helps you track quotas from VS Code, support continued maintenance through GitHub Sponsors: [github.com/sponsors/TheStreamCode](https://github.com/sponsors/TheStreamCode).
+
 ## License
 
 MIT
