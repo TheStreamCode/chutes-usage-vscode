@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.7
+
+- Unified the `LICENSE` copyright holder to **Michael Gasperini (Mikesoft)**. No functional changes.
+
 ## 0.4.6
 
 - Marketplace discoverability: sharper title and summary, expanded keywords.
