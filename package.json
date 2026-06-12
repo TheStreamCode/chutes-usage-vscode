@@ -1,8 +1,8 @@
 {
   "name": "chutes-usage-vscode",
-  "displayName": "Chutes Usage Monitor",
-  "description": "Monitor Chutes usage, quotas, and rolling limits directly inside VS Code.",
-  "version": "0.4.5",
+  "displayName": "Chutes Usage Monitor — Track Chutes API Usage & Quotas",
+  "description": "Monitor your Chutes AI usage, rolling limits, and request quotas in a VS Code sidebar dashboard and status bar — secure key storage, auto-refresh, theme-aware. Unofficial third-party extension.",
+  "version": "0.4.6",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
@@ -16,6 +16,9 @@
   "bugs": {
     "url": "https://github.com/TheStreamCode/chutes-usage-vscode/issues"
   },
+  "sponsor": {
+    "url": "https://github.com/sponsors/TheStreamCode"
+  },
   "pricing": "Free",
   "galleryBanner": {
     "color": "#0d1117",
@@ -28,11 +31,16 @@
   ],
   "keywords": [
     "chutes",
-    "quota",
+    "chutes ai",
     "usage",
+    "quota",
+    "rolling limits",
     "billing",
     "dashboard",
-    "api"
+    "api",
+    "monitor",
+    "status bar",
+    "llm"
   ],
   "engines": {
     "vscode": "^1.103.0"

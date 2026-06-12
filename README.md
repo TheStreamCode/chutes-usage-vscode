@@ -1,5 +1,12 @@
 # Chutes Usage Monitor
 
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/mikesoft.chutes-usage-vscode?label=Marketplace&color=6366F1)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
+[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/mikesoft.chutes-usage-vscode?color=0EA5E9)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
+[![Open VSX](https://img.shields.io/open-vsx/v/mikesoft/chutes-usage-vscode?label=Open%20VSX&color=a60ee5)](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode)
+[![CI](https://github.com/TheStreamCode/chutes-usage-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/TheStreamCode/chutes-usage-vscode/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/Sponsor-TheStreamCode-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/TheStreamCode)
+
 Monitor Chutes subscription usage, rolling limits, and request quotas directly inside VS Code.
 
 This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
@@ -34,6 +41,7 @@ After installation:
 
 ## Latest Changes
 
+- `0.4.6` improves Marketplace discoverability (sharper title and summary, expanded keywords) and adds Marketplace, Open VSX, CI, and GitHub Sponsors badges plus a `sponsor` link. No functional changes.
 - `0.4.5` removes the retired `$3/mo` Base plan from Plan Limits and keeps the built-in fallback reference aligned to the current Plus and Pro tiers.
 - `0.4.4` adds a dashboard screenshot to the README and Marketplace description, and includes the screenshot asset in the packaged VSIX.
 - `0.4.3` refreshes the README and changelog to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.

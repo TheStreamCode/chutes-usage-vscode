@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.6
+
+- Marketplace discoverability: sharper title and summary, expanded keywords.
+- Added Marketplace, Open VSX, CI, and GitHub Sponsors badges and a `sponsor` link to the README and package metadata. No functional changes.
+
 ## 0.4.5
 
 - Removed the retired $3 Base plan from the Plan Limits reference.
