@@ -144,7 +144,7 @@
     "@vscode/codicons": "^0.0.45",
     "@vscode/vsce": "^3.8.1",
     "@types/node": "^25.6.0",
-    "@types/vscode": "^1.103.0",
+    "@types/vscode": "^1.125.0",
     "typescript": "^6.0.2"
   }
 }
