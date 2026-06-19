@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.8
+
+- Made the build fully cross-platform: the webview asset copy step in `compile` now uses a Node script (`scripts/copy-webview-assets.mjs`) instead of a Windows-only PowerShell command, so the extension builds on Linux and macOS as well.
+- Refreshed development dependencies (including `@vscode/codicons`) and cleared all `npm audit` advisories. No functional changes to the extension.
+
 ## 0.4.7
 
 - Unified the `LICENSE` copyright holder to **Michael Gasperini (Mikesoft)**. No functional changes.
