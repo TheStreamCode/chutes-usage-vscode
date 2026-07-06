@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { normalizeDashboardData, summarizeStatusBar, summarizeStatusBarCompact } from '../services/normalize'
+import { normalizeDashboardData, normalizePaygCredit, summarizeStatusBar, summarizeStatusBarCompact } from '../services/normalize'
 import type { DashboardData, DashboardState, JsonObject, UsageWindow } from '../types'
 
 test('normalizes known subscription usage and quotas for a pro account', () => {
@@ -52,6 +52,24 @@ test('normalizes known subscription usage and quotas for a pro account', () => {
   assert.equal(result.windows[2]?.kind, 'daily-requests')
   assert.equal(result.quotas[0]?.modelLabel, 'All Models')
   assert.equal(result.quotas[0]?.quota, 5000)
+})
+
+test('extracts the PAYG credit balance from the /users/me payload', () => {
+  const result = normalizeDashboardData({}, [], null, null, null, null, { balance: 12.34 })
+  assert.equal(result.paygCreditUsd, 12.34)
+})
+
+test('returns null PAYG credit when the /users/me payload is missing or empty', () => {
+  assert.equal(normalizeDashboardData({}, []).paygCreditUsd, null)
+  assert.equal(normalizeDashboardData({}, [], null, null, null, null, {}).paygCreditUsd, null)
+})
+
+test('reads PAYG credit from documented fallback balance fields', () => {
+  assert.equal(normalizePaygCredit({ balance: 12.34 }), 12.34)
+  assert.equal(normalizePaygCredit({ effective_balance: 7 }), 7)
+  assert.equal(normalizePaygCredit({ current_balance: { effective_balance: 9.5 } }), 9.5)
+  assert.equal(normalizePaygCredit({ payment_balance: '3.20' }), 3.2)
+  assert.equal(normalizePaygCredit(null), null)
 })
 
 test('normalizes plan limits from pricing payload when available', () => {
@@ -568,6 +586,7 @@ test('summarizes status bar text in a compact and user friendly format', () => {
     ],
     quotas: [],
     planLimits: [],
+    paygCreditUsd: null,
     plan: {
       planName: 'Pro',
       monthlyPriceUsd: 20,
@@ -598,6 +617,7 @@ test('summarizes unknown daily request usage without coercing it to zero', () =>
     ],
     quotas: [],
     planLimits: [],
+    paygCreditUsd: null,
     plan: null
   })
 
@@ -621,6 +641,7 @@ test('summarizes unlimited daily quota and stale sync states clearly', () => {
     ],
     quotas: [],
     planLimits: [],
+    paygCreditUsd: null,
     plan: null
   })
 
@@ -694,7 +715,7 @@ function createCompactState(overrides: Partial<DashboardState>): { connectionSta
 }
 
 function createCompactData(windows: UsageWindow[]): DashboardData {
-  return { windows, quotas: [], plan: null, planLimits: [] }
+  return { windows, quotas: [], plan: null, planLimits: [], paygCreditUsd: null }
 }
 
 function makeWindow(kind: UsageWindow['kind'], unit: 'usd' | 'requests', used: number, limit: number, percentUsed: number): UsageWindow {

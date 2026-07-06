@@ -44,6 +44,10 @@ test('fetches fallback quota usage through documented per-chute endpoints when a
       return jsonResponse([])
     }
 
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
+    }
+
     throw new Error(`Unexpected URL ${url}`)
   }) as typeof fetch
 
@@ -93,6 +97,10 @@ test('skips per-chute fallback quota usage when aggregate usage is available', a
       return jsonResponse([])
     }
 
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
+    }
+
     throw new Error(`Unexpected URL ${url}`)
   }) as typeof fetch
 
@@ -135,6 +143,10 @@ test('treats numeric string aggregate quota usage as available', async () => {
       return jsonResponse([])
     }
 
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
+    }
+
     throw new Error(`Unexpected URL ${url}`)
   }) as typeof fetch
 
@@ -175,6 +187,10 @@ test('returns null fallback quota usage when quota rows have no chute ids', asyn
 
     if (url.endsWith('/invocations/stats/llm')) {
       return jsonResponse([])
+    }
+
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
     }
 
     throw new Error(`Unexpected URL ${url}`)
@@ -220,6 +236,10 @@ test('prefers quota_usage me and llm stats in the dashboard payload', async () =
       return jsonResponse([])
     }
 
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
+    }
+
     throw new Error(`Unexpected URL ${url}`)
   }) as typeof fetch
 
@@ -233,6 +253,8 @@ test('prefers quota_usage me and llm stats in the dashboard payload', async () =
     ])
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/me')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/invocations/stats/llm')))
+    assert.deepEqual(payload.me, { balance: 12.34 })
+    assert.ok(requestedUrls.some((url) => url.endsWith('/users/me')))
   } finally {
     globalThis.fetch = originalFetch
   }

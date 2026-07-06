@@ -46,6 +46,7 @@ type DashboardState = {
     windows: UsageWindow[]
     plan: PlanInfo | null
     planLimits: PlanLimitEntry[]
+    paygCreditUsd: number | null
   } | null
   errorMessage: string | null
 }
@@ -73,6 +74,8 @@ declare function acquireVsCodeApi(): {
 const SCHEMA_VERSION = 2
 const DEFAULT_REFRESH_INTERVAL_MS = 60_000
 const KNOWN_KINDS: UsageWindowKind[] = ['billing-cycle', 'rolling-4h', 'daily-requests', 'weekly']
+// PAYG credit tile turns amber below this USD threshold, and red at/under zero.
+const PAYG_CREDIT_WARN_USD = 5
 
 const vscode = acquireVsCodeApi()
 const app = document.getElementById('app')
@@ -136,6 +139,7 @@ interface DomRefs {
     monthlyLeft: PlanStatRefs
     fourHLimit: PlanStatRefs
     dailyLimit: PlanStatRefs
+    paygCredit: PlanStatRefs
     metaWrap: HTMLElement
     metaText: Text
   }
@@ -308,6 +312,7 @@ function mount(parent: HTMLElement): DomRefs {
   const monthlyLeft = createPlanStat('Left', '—')
   const fourHLimit = createPlanStat('4h limit', '—')
   const dailyLimit = createPlanStat('Daily limit', '—')
+  const paygCredit = createPlanStat('PAYG credit', '—')
 
   const planGrid = el(
     'div',
@@ -316,7 +321,8 @@ function mount(parent: HTMLElement): DomRefs {
     monthlyPrice.root,
     monthlyLeft.root,
     fourHLimit.root,
-    dailyLimit.root
+    dailyLimit.root,
+    paygCredit.root
   )
 
   const metaText = txt('')
@@ -424,6 +430,7 @@ function mount(parent: HTMLElement): DomRefs {
       monthlyLeft,
       fourHLimit,
       dailyLimit,
+      paygCredit,
       metaWrap,
       metaText
     },
@@ -537,11 +544,23 @@ function createPlanStat(initialLabel: string, initialValue: string): PlanStatRef
   const valueNode = txt(initialValue)
   const root = el(
     'div',
-    { className: 'plan-stat' },
+    { className: 'plan-stat', attrs: { role: 'group', 'aria-label': `${initialLabel}: ${initialValue}` } },
     el('div', { className: 'plan-stat-label' }, labelNode),
     el('div', { className: 'plan-stat-value' }, valueNode)
   )
   return { root, label: labelNode, value: valueNode }
+}
+
+// Update a plan-stat tile value and keep its screen-reader label in sync.
+function setPlanStat(ref: PlanStatRefs, label: string, value: string): void {
+  setText(ref.value, value)
+  ariaSet(ref.root, 'aria-label', `${label}: ${value}`)
+}
+
+// Flag the PAYG credit tile when the balance is running low or exhausted.
+function applyPaygCreditState(root: HTMLElement, credit: number | null): void {
+  cls(root, 'is-crit', credit !== null && credit <= 0)
+  cls(root, 'is-warn', credit !== null && credit > 0 && credit < PAYG_CREDIT_WARN_USD)
 }
 
 function createMetricCard(kind: UsageWindowKind): MetricCardRefs {
@@ -675,7 +694,7 @@ function update(refs: DomRefs, state: DashboardState, options: { fromCache: bool
   applyMode(refs, state)
 
   if (state.data) {
-    applyPlanSummary(refs, state.data.plan, state.data.windows)
+    applyPlanSummary(refs, state.data.plan, state.data.windows, state.data.paygCreditUsd)
     applyMetrics(refs, state.data.windows)
     applyPlanLimits(refs, state.data.planLimits, state.data.plan?.planName ?? null)
   }
@@ -737,16 +756,18 @@ function applyMode(refs: DomRefs, state: DashboardState): void {
   toggle(refs.planLimits.root, hasData)
 }
 
-function applyPlanSummary(refs: DomRefs, plan: PlanInfo | null, windows: UsageWindow[]): void {
+function applyPlanSummary(refs: DomRefs, plan: PlanInfo | null, windows: UsageWindow[], paygCreditUsd: number | null): void {
   const billing = windows.find((w) => w.kind === 'billing-cycle')
   const rolling = windows.find((w) => w.kind === 'rolling-4h')
   const daily = windows.find((w) => w.kind === 'daily-requests')
 
-  setText(refs.planSummary.plan.value, plan?.planName ?? 'Unknown')
-  setText(refs.planSummary.monthlyPrice.value, formatValue(plan?.monthlyPriceUsd ?? null, 'usd'))
-  setText(refs.planSummary.monthlyLeft.value, formatValue(billing?.remaining ?? null, 'usd'))
-  setText(refs.planSummary.fourHLimit.value, formatValue(plan?.fourHourCapUsd ?? rolling?.limit ?? null, 'usd'))
-  setText(refs.planSummary.dailyLimit.value, formatRequestsLimitValue(plan?.dailyRequestLimit ?? daily?.limit ?? null))
+  setPlanStat(refs.planSummary.plan, 'Plan', plan?.planName ?? 'Unknown')
+  setPlanStat(refs.planSummary.monthlyPrice, 'Monthly', formatValue(plan?.monthlyPriceUsd ?? null, 'usd'))
+  setPlanStat(refs.planSummary.monthlyLeft, 'Left', formatValue(billing?.remaining ?? null, 'usd'))
+  setPlanStat(refs.planSummary.fourHLimit, '4h limit', formatValue(plan?.fourHourCapUsd ?? rolling?.limit ?? null, 'usd'))
+  setPlanStat(refs.planSummary.dailyLimit, 'Daily limit', formatRequestsLimitValue(plan?.dailyRequestLimit ?? daily?.limit ?? null))
+  setPlanStat(refs.planSummary.paygCredit, 'PAYG credit', formatValue(paygCreditUsd, 'usd'))
+  applyPaygCreditState(refs.planSummary.paygCredit.root, paygCreditUsd)
 
   const monthlyPrice = plan?.monthlyPriceUsd ?? null
   const monthlyCap = plan?.monthlyCapUsd ?? null

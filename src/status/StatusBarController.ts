@@ -51,6 +51,10 @@ function buildTooltip(state: DashboardState): string {
       const suffix = window.resetLabel ? ` (${window.resetLabel})` : ''
       lines.push(`${window.label}: ${used}/${limit}${suffix}`)
     }
+
+    if (state.data.paygCreditUsd !== null) {
+      lines.push(`PAYG credit: $${state.data.paygCreditUsd.toFixed(2)}`)
+    }
   }
 
   if (state.connectionState === 'missing-key') {

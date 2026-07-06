@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Added a **PAYG credit** tile to the plan snapshot showing your current pay-as-you-go account balance (from the Chutes `GET /users/me` `balance`) — the credit that funds requests once your subscription caps are exceeded. This is distinct from the existing PAYG discount reference.
+- The credit tile turns amber when the balance runs low (under `$5`) and red when it reaches zero, so a depleting balance no longer goes unnoticed.
+- Added a `PAYG credit` line to the status bar tooltip.
+- Improved plan snapshot accessibility: each figure is now an ARIA-labelled group that announces its `label: value` to screen readers.
+
 ## 0.4.8
 
 - Made the build fully cross-platform: the webview asset copy step in `compile` now uses a Node script (`scripts/copy-webview-assets.mjs`) instead of a Windows-only PowerShell command, so the extension builds on Linux and macOS as well.

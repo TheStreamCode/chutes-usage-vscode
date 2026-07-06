@@ -6,7 +6,8 @@ export function normalizeDashboardData(
   quotaUsagePayload: JsonContainer | null = null,
   quotaUsageMePayload: JsonContainer | null = null,
   invocationStatsPayload: JsonContainer | null = null,
-  pricingPayload: JsonContainer | null = null
+  pricingPayload: JsonContainer | null = null,
+  mePayload: JsonContainer | null = null
 ): DashboardData {
   const usageSource = unwrapUsagePayload(subscriptionUsage)
   const quotas = normalizeQuotas(quotasPayload)
@@ -19,8 +20,22 @@ export function normalizeDashboardData(
     windows,
     quotas,
     plan: normalizePlan(usageSource, windows),
-    planLimits: normalizePlanLimits(pricingPayload)
+    planLimits: normalizePlanLimits(pricingPayload),
+    paygCreditUsd: normalizePaygCredit(mePayload)
   }
+}
+
+// Extract the pay-as-you-go account credit (USD balance) from the /users/me payload.
+export function normalizePaygCredit(payload: JsonContainer | null): number | null {
+  const obj = asObject(payload)
+  if (!obj) {
+    return null
+  }
+
+  return asNumber(obj.balance)
+    ?? asNumber(obj.effective_balance)
+    ?? asNumber(asObject(obj.current_balance)?.effective_balance)
+    ?? asNumber(obj.payment_balance)
 }
 
 // Normalize subscription usage payloads into a small set of UI-friendly windows.

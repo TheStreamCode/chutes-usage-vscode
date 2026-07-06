@@ -5,13 +5,14 @@ export class ChutesApiClient {
   public constructor(private readonly apiKey: string) {}
 
   // Fetch all user-facing dashboard endpoints needed for the first extension version.
-  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; pricing: JsonContainer | null }> {
-    const [subscriptionUsage, quotas, pricing, quotaUsageMe, invocationStatsLlm] = await Promise.all([
+  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; pricing: JsonContainer | null; me: JsonContainer | null }> {
+    const [subscriptionUsage, quotas, pricing, quotaUsageMe, invocationStatsLlm, me] = await Promise.all([
       this.getJsonContainer('/users/me/subscription_usage'),
       this.getJsonContainer('/users/me/quotas'),
       this.getJsonContainer('/pricing').catch(() => null),
       this.getJsonContainer('/users/me/quota_usage/me').catch(() => null),
-      this.getJsonContainer('/invocations/stats/llm').catch(() => null)
+      this.getJsonContainer('/invocations/stats/llm').catch(() => null),
+      this.getJsonContainer('/users/me').catch(() => null)
     ])
     const quotaUsageFallback = hasQuotaUsageData(quotaUsageMe) ? null : await this.getQuotaUsagePayload(quotas)
 
@@ -19,7 +20,7 @@ export class ChutesApiClient {
       throw new Error('Unexpected API response shape for /users/me/subscription_usage')
     }
 
-    return { subscriptionUsage, quotas, quotaUsageMe, quotaUsageFallback, invocationStatsLlm, pricing }
+    return { subscriptionUsage, quotas, quotaUsageMe, quotaUsageFallback, invocationStatsLlm, pricing, me }
   }
 
   // Execute one authenticated GET request and return a JSON object or array payload.

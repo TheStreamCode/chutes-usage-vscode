@@ -116,7 +116,8 @@ function createDashboardPayload({ monthlyPriceUsd, billingUsedUsd }: { monthlyPr
     quotaUsageMe: null,
     quotaUsageFallback: null,
     invocationStatsLlm: null,
-    pricing: null
+    pricing: null,
+    me: null
   }
 }
 

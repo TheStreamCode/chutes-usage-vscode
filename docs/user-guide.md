@@ -27,7 +27,7 @@ The dashboard is the primary interface for the extension.
 It includes:
 
 - a header with connection status and actions
-- a plan snapshot with key subscription details
+- a plan snapshot with key subscription details, including your pay-as-you-go credit balance
 - stacked usage cards for the main billing windows
 - a `Plan Limits` section with monthly cap, daily request, burst, and PAYG discount references, using live pricing data when available
 
@@ -77,6 +77,7 @@ Depending on the API responses available for your account, the extension can dis
 - 4-hour rolling window usage
 - daily request usage
 - plan information such as subscription price or caps when available
+- your pay-as-you-go credit balance (the account credit that funds requests beyond your subscription caps), highlighted in amber when it runs low and in red when it reaches zero
 - a built-in subscription limits reference based on pricing data when available, with packaged Plus and Pro defaults as a fallback
 
 ## Managing Your API Key

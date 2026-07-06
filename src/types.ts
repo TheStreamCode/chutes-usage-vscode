@@ -52,6 +52,7 @@ export interface DashboardData {
   quotas: QuotaEntry[]
   plan: PlanInfo | null
   planLimits: PlanLimitEntry[]
+  paygCreditUsd: number | null
 }
 
 export interface QuotaUsageSummary {

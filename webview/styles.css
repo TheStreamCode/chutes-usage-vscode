@@ -302,6 +302,24 @@ body {
   border-color: var(--card-border-strong);
 }
 
+.plan-stat.is-warn {
+  border-color: color-mix(in srgb, var(--chutes-warn) 45%, transparent);
+  background: color-mix(in srgb, var(--chutes-warn) 7%, transparent);
+}
+
+.plan-stat.is-warn .plan-stat-value {
+  color: var(--chutes-warn);
+}
+
+.plan-stat.is-crit {
+  border-color: color-mix(in srgb, var(--chutes-crit) 50%, transparent);
+  background: color-mix(in srgb, var(--chutes-crit) 8%, transparent);
+}
+
+.plan-stat.is-crit .plan-stat-value {
+  color: var(--chutes-crit);
+}
+
 .plan-stat-label {
   font-size: 10px;
   font-weight: 500;

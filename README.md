@@ -30,6 +30,7 @@ After installation:
 - Sidebar dashboard aligned with the chutes.ai look: pure-black on dark themes, pill buttons, mint pill badges, headline-violet section titles, generous whitespace
 - Theme-aware: backgrounds, foregrounds, borders, and description text follow VS Code theme tokens; works with Light, Dark, and High Contrast themes
 - Plan snapshot, per-window usage cards with progress bars, and a Plan Limits reference that highlights your current tier
+- PAYG credit tile showing your pay-as-you-go account balance, with amber/red warnings when the balance runs low or reaches zero
 - Compact status bar summary with severity-aware codicon and background color; full detail in the tooltip
 - Secure API key storage through VS Code `SecretStorage`
 - Manual refresh command for immediate sync
@@ -41,6 +42,7 @@ After installation:
 
 ## Latest Changes
 
+- `0.5.0` adds a PAYG credit tile to the plan snapshot showing your pay-as-you-go account balance (with low/empty-balance warnings and a status bar tooltip line), and improves plan snapshot accessibility with ARIA-labelled figures.
 - `0.4.6` improves Marketplace discoverability (sharper title and summary, expanded keywords) and adds Marketplace, Open VSX, CI, and GitHub Sponsors badges plus a `sponsor` link. No functional changes.
 - `0.4.5` removes the retired `$3/mo` Base plan from Plan Limits and keeps the built-in fallback reference aligned to the current Plus and Pro tiers.
 - `0.4.4` adds a dashboard screenshot to the README and Marketplace description, and includes the screenshot asset in the packaged VSIX.
@@ -76,7 +78,7 @@ The extension shows your current Chutes usage in two places:
 The sidebar dashboard includes:
 
 - a compact header with sync state and actions
-- a plan snapshot with the most relevant subscription figures
+- a plan snapshot with the most relevant subscription figures, including your pay-as-you-go credit balance
 - stacked usage cards optimized for narrow Activity Bar layouts
 - a `Plan Limits` reference section that uses pricing data when available without exposing a raw quota payload table
 

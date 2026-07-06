@@ -13,6 +13,7 @@ test('keeps key management actions available when the dashboard is in error with
       windows: [],
       quotas: [],
       planLimits: [],
+      paygCreditUsd: null,
       plan: {
         planName: 'Pro',
         monthlyPriceUsd: 20,
@@ -49,6 +50,7 @@ test('shows the last synced time when the dashboard is ready', () => {
       windows: [],
       quotas: [],
       planLimits: [],
+      paygCreditUsd: null,
       plan: {
         planName: null,
         monthlyPriceUsd: 20,
