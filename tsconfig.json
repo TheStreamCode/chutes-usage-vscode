@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
     "target": "ES2022",
     "outDir": "out",
     "lib": [
@@ -10,10 +10,9 @@
     "sourceMap": true,
     "rootDir": ".",
     "strict": true,
-    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "resolveJsonModule": true,
     "types": [
       "node",
