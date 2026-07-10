@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Switched the TypeScript build configuration to Node16 module resolution and upgraded TypeScript to 7 for compatibility.
+
 ## 0.5.0
 
 - Added a **PAYG credit** tile to the plan snapshot showing your current pay-as-you-go account balance (from the Chutes `GET /users/me` `balance`) — the credit that funds requests once your subscription caps are exceeded. This is distinct from the existing PAYG discount reference.
