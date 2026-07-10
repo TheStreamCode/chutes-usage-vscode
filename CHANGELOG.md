@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.5.1
+
 - Switched the TypeScript build configuration to Node16 module resolution and upgraded TypeScript to 7 for compatibility.
 
 ## 0.5.0
