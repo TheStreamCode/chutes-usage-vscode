@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.5.2
+
+- Improved legal documentation, trademark notices, third-party terms references, and metadata cleanup.
+
 ## 0.5.1
 
 - Switched the TypeScript build configuration to Node16 module resolution and upgraded TypeScript to 7 for compatibility.
