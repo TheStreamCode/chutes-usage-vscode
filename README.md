@@ -115,4 +115,7 @@ If Chutes Usage Monitor helps you track quotas from VS Code, support continued m
 
 ## License
 
-MIT
+Project-created code and materials are available under the [MIT License](LICENSE).
+See [NOTICE](NOTICE) for trademark, logo, non-affiliation, and Chutes provider
+terms/privacy notices. This is an unofficial third-party extension and is not
+affiliated with or endorsed by Chutes.
