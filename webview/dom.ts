@@ -50,7 +50,7 @@ export function txt(value: string): Text {
 }
 
 export function setText(node: Text, value: string): void {
-  if (node.data !== value) node.data = value
+  if (node.textContent !== value) node.textContent = value
 }
 
 export function toggle(element: HTMLElement, on: boolean): void {

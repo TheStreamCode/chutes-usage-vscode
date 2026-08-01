@@ -35,8 +35,10 @@ test('validates extension messages and cached state before rendering', () => {
 
 test('uses explicit DOM properties instead of a generic attribute sink', () => {
   assert.doesNotMatch(domJs, /setAttribute\(/)
+  assert.doesNotMatch(domJs, /\.data\s*=/)
   assert.match(domJs, /ariaLabel/)
   assert.match(domJs, /dataset\.kind/)
+  assert.match(domJs, /textContent/)
 })
 
 test('does not embed fixed subscription plan examples in the webview bundle', () => {
