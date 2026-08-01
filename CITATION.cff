@@ -1,9 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "Chutes Usage for VS Code"
+title: "Chutes Usage Monitor for VS Code"
+type: software
 authors:
   - family-names: Gasperini
     given-names: Michael
 url: "https://github.com/TheStreamCode/chutes-usage-vscode"
-version: "0.5.2"
+repository-code: "https://github.com/TheStreamCode/chutes-usage-vscode"
+version: "0.5.4"
+date-released: "2026-08-01"
 license: MIT
