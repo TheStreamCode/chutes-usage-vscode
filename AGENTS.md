@@ -109,7 +109,7 @@ Both are supplied by the maintainer at publish time. They are **not** stored in 
 3. `npm test` passes — all suites, no skips.
 4. `npm run audit` reports no high or critical advisories.
 5. `npm run package` produces a VSIX; inspect it with `npx vsce ls --tree` and confirm it contains only `out/` runtime code, `media/`, and the user-facing root documents — no sources, no maps, no tests, no secrets.
-6. `CHANGELOG.md`, `package.json` `version`, `CITATION.cff` `version`, the Git tag, and the GitHub Release must all state the same version.
+6. `CHANGELOG.md`, `package.json`, `package-lock.json`, `CITATION.cff`, the Git tag, and the GitHub Release must all state the same version.
 
 ## Release And Publishing
 
@@ -120,7 +120,8 @@ Versioning is SemVer: patch for fixes, cleanup, and docs; minor for backward-com
 Release sequence once the PR is merged:
 
 ```bash
-npm version <patch|minor|major> --no-git-tag-version   # or edit package.json + CITATION.cff together
+npm version <patch|minor|major> --no-git-tag-version   # updates package.json and package-lock.json together
+# Update CITATION.cff and CHANGELOG.md to the same version before validation.
 npm run preflight
 git tag v<version> && git push origin v<version>
 gh release create v<version> --title "..." --notes-file <notes>

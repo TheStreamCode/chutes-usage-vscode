@@ -10,6 +10,7 @@
 - Removed the April 2026 pre-implementation plan and design notes from `docs/`. They described a scope that no longer matches the shipped extension; the content stays available in the Git history.
 - Synchronized `CITATION.cff` with the released version and added the release date, software type, and repository metadata.
 - Declared the reviewed dependency install scripts through npm's `allowScripts` field so `npm ci` stays deterministic on npm 11 and later.
+- Synchronized `package-lock.json` with the 0.5.4 manifest and added a regression test that keeps the manifest, lockfile, and citation version aligned.
 - Excluded `CITATION.cff` from the packaged VSIX and added local build and tooling artifacts (`*.tsbuildinfo`, `.vscode-test/`, `.playwright-mcp/`) to `.gitignore`.
 - Expanded `README.md` with requirements, the Open VSX install path, verified development commands, and the repository layout, and rewrote `AGENTS.md` as a project-specific contributor and agent guide.
 
