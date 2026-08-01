@@ -542,47 +542,6 @@ export function summarizeStatusBarCompact(state: { connectionState: 'missing-key
   return { text: '$(graph) Chutes', severity: 'info' }
 }
 
-// Build a compact status bar summary that stays short and easy to scan.
-export function summarizeStatusBar(data: DashboardData): string {
-  const billing = data.windows.find((window) => window.kind === 'billing-cycle')
-  const rolling = data.windows.find((window) => window.kind === 'rolling-4h')
-  const daily = data.windows.find((window) => window.kind === 'daily-requests')
-
-  const parts: string[] = []
-
-  if (billing) {
-    parts.push(`Chutes ${formatWindowSummary(billing, '$')}`)
-  } else {
-    parts.push('Chutes')
-  }
-
-  if (rolling) {
-    parts.push(`4h ${formatWindowSummary(rolling, '$', false)}`)
-  }
-
-  if (daily) {
-    parts.push(formatWindowSummary(daily, '', false))
-  }
-
-  return parts.join(' | ')
-}
-
-function formatWindowSummary(window: UsageWindow, prefix: string, includePrefix = true): string {
-  const used = window.used
-  const limit = window.limit
-
-  if (window.unit === 'requests') {
-    const formattedLimit = limit === null ? '--' : limit === 0 ? 'Unlimited' : `${Math.round(limit)}`
-    return `${used === null ? '--' : Math.round(used)}/${formattedLimit}`
-  }
-
-  const safeUsed = used ?? 0
-  const safeLimit = limit ?? 0
-
-  const formatted = `${prefix}${safeUsed.toFixed(2)}/${prefix}${safeLimit.toFixed(2).replace(/\.00$/, '')}`
-  return includePrefix ? formatted : formatted
-}
-
 function asObject(value: unknown): JsonObject | null {
   return typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as JsonObject) : null
 }

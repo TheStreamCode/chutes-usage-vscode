@@ -3,3 +3,6 @@ out/
 dist/
 *.vsix
 coverage/
+*.tsbuildinfo
+.vscode-test/
+.playwright-mcp/

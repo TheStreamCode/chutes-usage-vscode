@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { normalizeDashboardData, normalizePaygCredit, summarizeStatusBar, summarizeStatusBarCompact } from '../services/normalize'
+import { normalizeDashboardData, normalizePaygCredit, summarizeStatusBarCompact } from '../services/normalize'
 import type { DashboardData, DashboardState, JsonObject, UsageWindow } from '../types'
 
 test('normalizes known subscription usage and quotas for a pro account', () => {
@@ -547,105 +547,32 @@ test('defaults quota label to All Models when the API omits a model name', () =>
   assert.equal(result.quotas[0]?.modelLabel, 'All Models')
 })
 
-test('summarizes status bar text in a compact and user friendly format', () => {
-  const summary = summarizeStatusBar({
-    windows: [
-      {
-        id: 'billing',
-        kind: 'billing-cycle',
-        label: 'Billing Cycle Cap',
-        unit: 'usd',
-        used: 55.339,
-        limit: 100,
-        remaining: 44.661,
-        percentUsed: 55.339,
-        resetLabel: null
-      },
-      {
-        id: '4h',
-        kind: 'rolling-4h',
-        label: '4-Hour Window',
-        unit: 'usd',
-        used: 0,
-        limit: 8.3333,
-        remaining: 8.3333,
-        percentUsed: 0,
-        resetLabel: null
-      },
-      {
-        id: 'daily',
-        kind: 'daily-requests',
-        label: 'Daily Quota',
-        unit: 'requests',
-        used: 0,
-        limit: 5000,
-        remaining: 5000,
-        percentUsed: 0,
-        resetLabel: null
-      }
-    ],
-    quotas: [],
-    planLimits: [],
-    paygCreditUsd: null,
-    plan: {
-      planName: 'Pro',
-      monthlyPriceUsd: 20,
-      monthlyCapUsd: 100,
-      fourHourCapUsd: 8.3333,
-      dailyRequestLimit: 5000,
-      paygDiscountPercent: 10
-    }
-  })
+test('compact status bar renders daily request windows with used and limit counts', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([makeWindow('daily-requests', 'requests', 4800, 5000, 96)])
+  }))
 
-  assert.equal(summary, 'Chutes $55.34/$100 | 4h $0.00/$8.33 | 0/5000')
+  assert.equal(summary.text, '$(warning) Chutes day 4800/5000')
+  assert.equal(summary.severity, 'warning')
 })
 
-test('summarizes unknown daily request usage without coercing it to zero', () => {
-  const summary = summarizeStatusBar({
-    windows: [
-      {
-        id: 'daily',
-        kind: 'daily-requests',
-        label: 'Daily Quota',
-        unit: 'requests',
-        used: null,
-        limit: 5000,
-        remaining: null,
-        percentUsed: null,
-        resetLabel: null
-      }
-    ],
-    quotas: [],
-    planLimits: [],
-    paygCreditUsd: null,
-    plan: null
-  })
+test('compact status bar never coerces unverified request usage to zero', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([makeWindow('daily-requests', 'requests', null, 5000, 92)])
+  }))
 
-  assert.equal(summary, 'Chutes | --/5000')
+  assert.equal(summary.text, '$(warning) Chutes day --/5000')
 })
 
-test('summarizes unlimited daily quota and stale sync states clearly', () => {
-  const summary = summarizeStatusBar({
-    windows: [
-      {
-        id: 'daily',
-        kind: 'daily-requests',
-        label: 'Daily Quota',
-        unit: 'requests',
-        used: null,
-        limit: 0,
-        remaining: null,
-        percentUsed: null,
-        resetLabel: 'Possible sync delay'
-      }
-    ],
-    quotas: [],
-    planLimits: [],
-    paygCreditUsd: null,
-    plan: null
-  })
+test('compact status bar renders an unlimited request quota instead of a zero limit', () => {
+  const summary = summarizeStatusBarCompact(createCompactState({
+    connectionState: 'ready',
+    data: createCompactData([makeWindow('daily-requests', 'requests', null, 0, 92)])
+  }))
 
-  assert.equal(summary, 'Chutes | --/Unlimited')
+  assert.equal(summary.text, '$(warning) Chutes day --/∞')
 })
 
 test('compact status bar reports info severity and key codicon when API key is missing', () => {
@@ -718,7 +645,7 @@ function createCompactData(windows: UsageWindow[]): DashboardData {
   return { windows, quotas: [], plan: null, planLimits: [], paygCreditUsd: null }
 }
 
-function makeWindow(kind: UsageWindow['kind'], unit: 'usd' | 'requests', used: number, limit: number, percentUsed: number): UsageWindow {
+function makeWindow(kind: UsageWindow['kind'], unit: 'usd' | 'requests', used: number | null, limit: number, percentUsed: number): UsageWindow {
   return {
     id: kind,
     kind,
@@ -726,7 +653,7 @@ function makeWindow(kind: UsageWindow['kind'], unit: 'usd' | 'requests', used: n
     unit,
     used,
     limit,
-    remaining: Math.max(0, limit - used),
+    remaining: used === null ? null : Math.max(0, limit - used),
     percentUsed,
     resetLabel: null
   }

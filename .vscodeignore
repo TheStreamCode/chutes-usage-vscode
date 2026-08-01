@@ -19,10 +19,11 @@ scripts/
 .editorconfig
 .gitattributes
 .gitignore
-AGENTS.md
 .nvmrc
-CONTRIBUTING.md
+AGENTS.md
+CITATION.cff
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 SECURITY.md
 !LICENSE
 !NOTICE

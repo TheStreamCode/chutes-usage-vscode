@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { randomBytes } from 'crypto'
 
 import { DASHBOARD_VIEW_ID } from '../constants'
+import { toWebviewState } from '../state/webviewState'
 import type { DashboardState, WebviewActionMessage, WebviewStateMessage } from '../types'
 
 type Actions = {
@@ -79,7 +80,7 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
 
     const message: WebviewStateMessage = {
       type: 'state',
-      state,
+      state: toWebviewState(state),
       refreshIntervalMs: this.refreshIntervalMs
     }
 
