@@ -42,9 +42,9 @@ After installation:
 
 ## Latest Changes
 
+- `0.5.3` hardens webview message and cache handling, resolves the remaining CodeQL findings, adds stricter local and CI quality gates, improves cross-platform cleanup, and live-validates the current Chutes API integration.
 - `0.5.2` improves legal documentation, trademark notices, third-party terms references, and project metadata.
 - `0.5.1` updates the TypeScript build to Node16 module resolution and TypeScript 7.
-- `0.5.0` adds a PAYG credit tile to the plan snapshot showing your pay-as-you-go account balance (with low/empty-balance warnings and a status bar tooltip line), and improves plan snapshot accessibility with ARIA-labelled figures.
 
 See the [changelog](CHANGELOG.md) for the complete release history.
 

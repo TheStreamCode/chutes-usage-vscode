@@ -2,7 +2,7 @@
   "name": "chutes-usage-vscode",
   "displayName": "Chutes Usage Monitor — Track Chutes API Usage & Quotas",
   "description": "Monitor your Chutes AI usage, rolling limits, and request quotas in a VS Code sidebar dashboard and status bar — secure key storage, auto-refresh, theme-aware. Unofficial third-party extension.",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",

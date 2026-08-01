@@ -75,7 +75,7 @@ Some endpoints are used as fallbacks when the primary payload is incomplete or d
 
 ## API Compatibility
 
-The current client and dashboard normalization were live-tested on August 1, 2026,
+The `0.5.3` client and dashboard normalization were live-tested on August 1, 2026,
 using an authenticated Chutes account. All required and optional dashboard
 endpoints returned compatible payloads. The test retained neither the API key nor
 account payloads.
