@@ -13,11 +13,17 @@ This is an unofficial third-party extension and is not affiliated with or endors
 
 ![Chutes Usage Monitor dashboard](media/screenshot-chutes-usage.png)
 
+## Requirements
+
+- VS Code `1.103.0` or newer (or a compatible editor that installs from Open VSX)
+- A Chutes account and an API key with access to your own usage data
+
 ## Installation
 
-Install the extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode):
+Install `mikesoft.chutes-usage-vscode` from either registry:
 
-- `mikesoft.chutes-usage-vscode`
+- [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
+- [Open VSX](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode)
 
 After installation:
 
@@ -42,9 +48,9 @@ After installation:
 
 ## Latest Changes
 
+- `0.5.4` trims the dashboard state message to the fields the webview renders, removes dead status bar and webview code, syncs the citation metadata, and expands the project documentation.
 - `0.5.3` hardens webview message and cache handling, resolves the remaining CodeQL findings, adds stricter local and CI quality gates, improves cross-platform cleanup, and live-validates the current Chutes API integration.
 - `0.5.2` improves legal documentation, trademark notices, third-party terms references, and project metadata.
-- `0.5.1` updates the TypeScript build to Node16 module resolution and TypeScript 7.
 
 See the [changelog](CHANGELOG.md) for the complete release history.
 
@@ -91,6 +97,38 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 - The extension uses the key only to request your own usage data.
 - The extension does not keep a local history of usage data.
 - On uninstall, the extension performs best-effort cleanup of its local extension storage.
+
+## Development
+
+Requires Node.js `22` (see `.nvmrc`) and `npm`. The lockfile is authoritative — do not switch package manager.
+
+```bash
+npm ci          # install the locked dependencies
+npm run compile # build extension host + webview and copy webview assets
+npm test        # compile, then run the node:test suite
+npm run audit   # npm audit --audit-level=high
+npm run check   # npm test + npm run audit
+npm run package # build the VSIX with vsce
+npm run preflight # npm run check + npm run package
+```
+
+Press `F5` in VS Code to launch an Extension Development Host.
+
+## Repository Structure
+
+```
+src/            extension host (TypeScript, VS Code API)
+  services/     Chutes API client, secret storage, payload normalization, link allowlist
+  state/        dashboard store and the webview state projection
+  status/       status bar controller
+  views/        webview view provider and CSP-nonced HTML
+  test/         node:test suites
+webview/        browser-side dashboard, compiled separately as ES modules
+scripts/        build helpers
+media/          icon and screenshot assets
+docs/           user guide and troubleshooting
+out/            build output (generated, not committed)
+```
 
 ## Documentation
 
