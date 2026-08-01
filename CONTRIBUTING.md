@@ -10,10 +10,10 @@ Thanks for your interest in improving `Chutes Usage Monitor`.
 
 ## Development Setup
 
-1. Install dependencies:
+1. Install the locked dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 2. Build the extension:
@@ -28,10 +28,19 @@ npm run compile
 npm test
 ```
 
+4. Run the complete preflight before opening a pull request:
+
+```bash
+npm run preflight
+```
+
+Use `npm install` only when intentionally changing dependencies so that
+`package-lock.json` is updated together with `package.json`.
+
 ## Running The Extension Locally
 
 1. Open the repository in VS Code.
-2. Run `npm install` if dependencies are not installed yet.
+2. Run `npm ci` if dependencies are not installed yet.
 3. Press `F5` to launch an Extension Development Host window.
 4. In the new window, run `Chutes Usage Monitor: Set API Key` to test the extension manually.
 
@@ -50,10 +59,9 @@ If you are editing both extension-host code and webview assets, run `npm run com
 
 Before opening a pull request:
 
-1. Run `npm test`.
-2. Run `npm run package`.
-3. Update `CHANGELOG.md` when the change is user-visible.
-4. Update `README.md` or files in `docs/` when setup, behavior, or support guidance changes.
+1. Run `npm run preflight` to compile, test, audit dependencies, and build the VSIX.
+2. Update `CHANGELOG.md` when the change is user-visible.
+3. Update `README.md` or files in `docs/` when setup, behavior, or support guidance changes.
 
 ## Reporting API Shape Issues
 

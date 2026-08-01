@@ -83,7 +83,7 @@ Depending on the API responses available for your account, the extension can dis
 ## Managing Your API Key
 
 - Use `Set API Key` to save or replace the current key.
-- Use `Remove API Key` to remove locally stored extension secrets.
+- Use `Remove API Key` to remove the locally stored Chutes API key.
 
 If no API key is stored, the extension remains in an onboarding state until one is provided.
 

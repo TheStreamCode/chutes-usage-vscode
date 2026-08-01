@@ -19,12 +19,4 @@ export class SecretStore {
   public async removeApiKey(): Promise<void> {
     await this.secrets.delete(SECRET_KEY_API_TOKEN)
   }
-
-  // Remove every secret owned by the extension to avoid local retention.
-  public async clearAll(): Promise<void> {
-    const keys = await this.secrets.keys()
-    await Promise.all(keys.map(async (key) => {
-      await this.secrets.delete(key)
-    }))
-  }
 }

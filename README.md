@@ -42,19 +42,11 @@ After installation:
 
 ## Latest Changes
 
+- `0.5.2` improves legal documentation, trademark notices, third-party terms references, and project metadata.
+- `0.5.1` updates the TypeScript build to Node16 module resolution and TypeScript 7.
 - `0.5.0` adds a PAYG credit tile to the plan snapshot showing your pay-as-you-go account balance (with low/empty-balance warnings and a status bar tooltip line), and improves plan snapshot accessibility with ARIA-labelled figures.
-- `0.4.6` improves Marketplace discoverability (sharper title and summary, expanded keywords) and adds Marketplace, Open VSX, CI, and GitHub Sponsors badges plus a `sponsor` link. No functional changes.
-- `0.4.5` removes the retired `$3/mo` Base plan from Plan Limits and keeps the built-in fallback reference aligned to the current Plus and Pro tiers.
-- `0.4.4` adds a dashboard screenshot to the README and Marketplace description, and includes the screenshot asset in the packaged VSIX.
-- `0.4.3` refreshes the README and changelog to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.
-- `0.4.2` fixes a critical visibility bug where `[hidden]` was being overridden by `display: flex/grid/inline-flex`, which kept the loading skeleton, stale banner, and per-card stale and current-tier badges visible regardless of state.
-- `0.4.1` clears the next-refresh ticker on hide/unload, fixes the Plan Limits collapsed preference when no cache exists yet, keeps the refresh button enabled after reopening from a cached `loading` state, and pipes the configured `refreshIntervalSeconds` into the webview countdown.
-- `0.4.0` redesigns the dashboard around the chutes.ai visual language, makes it theme-aware (`--vscode-*` tokens with mint/violet accents), eliminates dashboard flicker via mount/update DOM diffing, persists state with `vscode.setState/getState`, replaces unicode glyphs with Codicons, hardens the CSP with a nonce, adds full ARIA + `prefers-reduced-motion`, introduces a current-tier highlight and per-card stale badge, makes the Plan Limits section collapsible, and shrinks the status bar text to a severity-aware compact summary.
-- `0.3.3` rebuilds the package with the latest documentation for the pricing-data-backed plan limits reference.
-- `0.3.2` hardens external link handling, reduces unnecessary quota fallback requests, and feeds pricing data into the plan limits reference.
-- `0.3.0` renames the extension to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
-- `0.2.9` clarifies dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
-- `0.2.8` refines the dashboard UI for narrow sidebars, improves onboarding and stale-error messaging, and replaces the raw quotas table with a `Plan Limits` reference section.
+
+See the [changelog](CHANGELOG.md) for the complete release history.
 
 ## Commands
 

@@ -10,6 +10,12 @@
     "sourceMap": true,
     "rootDir": ".",
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node16",
@@ -20,7 +26,6 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "webview/**/*.ts"
+    "src/**/*.ts"
   ]
 }

@@ -1,25 +1,4 @@
-// KEEP IN SYNC WITH src/types.ts — these types are duplicated for the
-// webview bundle which compiles separately from the extension host.
-type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
-
-type PlanInfo = {
-  planName: string | null
-  monthlyPriceUsd: number | null
-  monthlyCapUsd: number | null
-  fourHourCapUsd: number | null
-  dailyRequestLimit: number | null
-  paygDiscountPercent: number | null
-}
-
-type DashboardState = {
-  connectionState: ConnectionState
-  connected: boolean
-  lastUpdatedAt: string | null
-  data: {
-    plan: PlanInfo | null
-  } | null
-  errorMessage: string | null
-}
+import type { DashboardState } from './types.js'
 
 export type HeaderPresentation = {
   statusText: string

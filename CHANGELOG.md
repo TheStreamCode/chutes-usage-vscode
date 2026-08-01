@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+- Hardened webview state handling with runtime validation for extension messages and cached payloads.
+- Replaced the generic DOM attribute sink with explicit safe properties and tightened the webview CSP.
+- Kept API-key removal compatible with the minimum supported VS Code version and added macOS uninstall cleanup paths.
+- Added a unified quality gate, dependency auditing, stricter TypeScript checks, deterministic CI actions, and professional GitHub governance files.
+- Reduced the packaged VSIX to runtime and user-facing assets only.
+- Live-validated the authenticated Chutes API flow and dashboard normalization against the current required and optional endpoints.
+
 ## 0.5.2
 
 - Improved legal documentation, trademark notices, third-party terms references, and metadata cleanup.

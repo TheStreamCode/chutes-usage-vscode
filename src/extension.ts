@@ -60,7 +60,7 @@ export function activate(context: vscode.ExtensionContext): void {
   })
 
   context.subscriptions.push(statusBarController)
-  context.subscriptions.push(registerChutesWebviewProvider(context, provider))
+  context.subscriptions.push(registerChutesWebviewProvider(provider))
 
   context.subscriptions.push(vscode.commands.registerCommand('chutesUsageVscode.openDashboard', async () => {
     await vscode.commands.executeCommand(`workbench.view.extension.${VIEW_CONTAINER_ID}`)
@@ -127,7 +127,7 @@ async function setApiKey(secretStore: SecretStore, dashboardStore: DashboardStor
 
 async function removeApiKey(secretStore: SecretStore, dashboardStore: DashboardStore): Promise<void> {
   const choice = await vscode.window.showWarningMessage(
-    'Remove all locally stored Chutes Usage Monitor secrets?',
+    'Remove the locally stored Chutes API key?',
     { modal: true },
     'Remove'
   )
@@ -136,7 +136,7 @@ async function removeApiKey(secretStore: SecretStore, dashboardStore: DashboardS
     return
   }
 
-  await secretStore.clearAll()
+  await secretStore.removeApiKey()
   await dashboardStore.refresh()
 }
 

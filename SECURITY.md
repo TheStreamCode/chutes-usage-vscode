@@ -10,7 +10,7 @@ Do not open public GitHub issues for sensitive vulnerabilities.
 
 Report security issues privately through one of these channels:
 
-- GitHub security advisories for this repository
+- [GitHub private vulnerability reporting](https://github.com/TheStreamCode/chutes-usage-vscode/security/advisories/new)
 - the maintainer contact listed on `https://mikesoft.it`
 
 Include:

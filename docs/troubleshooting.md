@@ -68,7 +68,17 @@ The extension currently relies on these endpoints for user-facing usage data:
 - `GET /users/me/quota_usage/me`
 - `GET /users/me/quota_usage/{chute_id}`
 - `GET /invocations/stats/llm`
+- `GET /pricing`
+- `GET /users/me`
+
 Some endpoints are used as fallbacks when the primary payload is incomplete or delayed.
+
+## API Compatibility
+
+The current client and dashboard normalization were live-tested on August 1, 2026,
+using an authenticated Chutes account. All required and optional dashboard
+endpoints returned compatible payloads. The test retained neither the API key nor
+account payloads.
 
 ## Reporting An Issue
 

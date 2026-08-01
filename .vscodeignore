@@ -12,9 +12,15 @@ Screenshot*.jpg
 screenshot-chutes-usage.png
 !media/screenshot-chutes-usage.png
 out/src/test/
+out/**/*.map
+out/package.json
+scripts/
 .github/
 .editorconfig
+.gitattributes
 .gitignore
+AGENTS.md
+.nvmrc
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 SECURITY.md

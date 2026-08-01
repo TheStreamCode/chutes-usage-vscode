@@ -36,6 +36,12 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this.getHtml(webviewView.webview)
     this.postState(this.actions.getState())
 
+    webviewView.onDidDispose(() => {
+      if (this.view === webviewView) {
+        this.view = undefined
+      }
+    })
+
     webviewView.onDidChangeVisibility(() => {
       if (webviewView.visible) {
         this.actions.onRefresh()
@@ -91,7 +97,7 @@ export class ChutesWebviewProvider implements vscode.WebviewViewProvider {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource}; img-src ${webview.cspSource} data:; font-src ${webview.cspSource};">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'strict-dynamic'; img-src ${webview.cspSource} data:; font-src ${webview.cspSource};">
   <title>Chutes Usage Monitor</title>
   <link rel="stylesheet" href="${codiconUri}" />
   <link rel="stylesheet" href="${styleUri}" />
@@ -127,7 +133,6 @@ function isWebviewActionMessage(message: unknown): message is WebviewActionMessa
 }
 
 export function registerChutesWebviewProvider(
-  context: vscode.ExtensionContext,
   provider: ChutesWebviewProvider
 ): vscode.Disposable {
   return vscode.window.registerWebviewViewProvider(DASHBOARD_VIEW_ID, provider)

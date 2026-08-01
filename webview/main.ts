@@ -1,69 +1,7 @@
 import { formatResetLabel, getHeaderPresentation, type HeaderPresentation } from './presentation.js'
-import { ariaSet, cls, codicon, el, setStyleVar, setText, toggle, txt } from './dom.js'
-
-// KEEP IN SYNC WITH src/types.ts — these types are duplicated for the
-// webview bundle which compiles separately from the extension host.
-type ConnectionState = 'missing-key' | 'loading' | 'ready' | 'error'
-type UsageWindowKind = 'billing-cycle' | 'rolling-4h' | 'daily-requests' | 'weekly' | 'unknown'
-
-type UsageWindow = {
-  id: string
-  kind: UsageWindowKind
-  label: string
-  unit: 'usd' | 'requests'
-  used: number | null
-  limit: number | null
-  remaining: number | null
-  percentUsed: number | null
-  resetLabel: string | null
-  status?: 'trusted' | 'stale' | 'unknown'
-  dataSource?: 'quota-usage-me' | 'quota-usage-fallback' | 'subscription-usage' | 'quotas' | 'unknown'
-}
-
-type PlanInfo = {
-  planName: string | null
-  monthlyPriceUsd: number | null
-  monthlyCapUsd: number | null
-  fourHourCapUsd: number | null
-  dailyRequestLimit: number | null
-  paygDiscountPercent: number | null
-}
-
-type PlanLimitEntry = {
-  name: string
-  priceLabel: string
-  monthlyCapLabel: string
-  dailyRequestLimitLabel: string
-  fourHourCapLabel: string
-  paygDiscountLabel: string
-}
-
-type DashboardState = {
-  connectionState: ConnectionState
-  connected: boolean
-  lastUpdatedAt: string | null
-  data: {
-    windows: UsageWindow[]
-    plan: PlanInfo | null
-    planLimits: PlanLimitEntry[]
-    paygCreditUsd: number | null
-  } | null
-  errorMessage: string | null
-}
-
-type StateMessage = {
-  type: 'state'
-  state: DashboardState
-  refreshIntervalMs?: number
-}
-
-type ActionType = 'refresh' | 'setApiKey' | 'removeApiKey' | 'openExternal'
-
-type CachedPayload = {
-  version: number
-  state: DashboardState
-  planLimitsCollapsed: boolean
-}
+import { cls, codicon, el, setAriaExpanded, setAriaLabel, setAriaValueNow, setStyleVar, setText, toggle, txt } from './dom.js'
+import { isCachedPayload, isStateMessage } from './messages.js'
+import type { ActionType, CachedPayload, DashboardState, PlanInfo, PlanLimitEntry, UsageWindow, UsageWindowKind } from './types.js'
 
 declare function acquireVsCodeApi(): {
   postMessage: (message: { type: ActionType; href?: string }) => void
@@ -182,12 +120,13 @@ if (app) {
     update(refs, initialState(), { fromCache: true })
   }
 
-  window.addEventListener('message', (event: MessageEvent<StateMessage>) => {
-    if (event.data?.type !== 'state') return
-    if (typeof event.data.refreshIntervalMs === 'number' && event.data.refreshIntervalMs > 0) {
-      refreshIntervalMs = event.data.refreshIntervalMs
+  window.addEventListener('message', (event: MessageEvent<unknown>) => {
+    if (!isStateMessage(event.data)) return
+    const message = event.data
+    if (message.refreshIntervalMs !== undefined) {
+      refreshIntervalMs = message.refreshIntervalMs
     }
-    const incoming = event.data.state
+    const incoming = message.state
     update(refs, incoming, { fromCache: false })
 
     if (incoming.connectionState !== 'loading' || incoming.data !== null) {
@@ -219,8 +158,8 @@ function initialState(): DashboardState {
 
 function readCached(): CachedPayload | null {
   try {
-    const raw = vscode.getState() as CachedPayload | null
-    if (!raw || raw.version !== SCHEMA_VERSION) return null
+    const raw = vscode.getState()
+    if (!isCachedPayload(raw) || raw.version !== SCHEMA_VERSION) return null
     return raw
   } catch {
     return null
@@ -244,7 +183,7 @@ function mount(parent: HTMLElement): DomRefs {
   const body = document.body
 
   // ---- Header ----
-  const dot = el('span', { className: 'status-dot', attrs: { 'aria-hidden': 'true' } })
+  const dot = el('span', { className: 'status-dot', ariaHidden: true })
   const statusText = txt('Connecting…')
   const statusLine = el('div', { className: 'status-line' }, dot, statusText)
 
@@ -257,7 +196,7 @@ function mount(parent: HTMLElement): DomRefs {
       className: 'btn btn-ghost btn-icon',
       type: 'button',
       title: 'Refresh',
-      attrs: { 'aria-label': 'Refresh Chutes usage' }
+      ariaLabel: 'Refresh Chutes usage'
     },
     codicon('refresh')
   )
@@ -269,7 +208,7 @@ function mount(parent: HTMLElement): DomRefs {
     {
       className: 'btn btn-ghost',
       type: 'button',
-      attrs: { 'aria-label': 'Set or replace API key' }
+      ariaLabel: 'Set or replace API key'
     },
     setKeyLabel
   )
@@ -281,7 +220,7 @@ function mount(parent: HTMLElement): DomRefs {
       className: 'btn btn-ghost btn-danger btn-icon',
       type: 'button',
       title: 'Remove key',
-      attrs: { 'aria-label': 'Remove stored API key' }
+      ariaLabel: 'Remove stored API key'
     },
     codicon('trash')
   )
@@ -294,7 +233,7 @@ function mount(parent: HTMLElement): DomRefs {
   const staleText = txt('')
   const staleBanner = el(
     'div',
-    { className: 'banner banner-stale', hidden: true, attrs: { role: 'status', 'aria-live': 'polite' } },
+    { className: 'banner banner-stale', hidden: true, role: 'status', ariaLive: 'polite' },
     codicon('warning'),
     staleText
   ) as HTMLDivElement
@@ -357,14 +296,12 @@ function mount(parent: HTMLElement): DomRefs {
     {
       className: 'plan-limits-toggle',
       type: 'button',
-      attrs: {
-        'aria-expanded': planLimitsCollapsed ? 'false' : 'true',
-        'aria-controls': 'plan-limits-tiers'
-      }
+      ariaExpanded: !planLimitsCollapsed
     },
     el('span', { className: 'section-title-text' }, 'Plan limits'),
     chevron
   )
+  toggleBtn.setAttribute('aria-controls', 'plan-limits-tiers')
   toggleBtn.addEventListener('click', () => {
     planLimitsCollapsed = !planLimitsCollapsed
     applyCollapsedState(refs.planLimits.toggleBtn, refs.planLimits.body, refs.planLimits.chevron, planLimitsCollapsed)
@@ -386,10 +323,12 @@ function mount(parent: HTMLElement): DomRefs {
   const nextRefreshText = txt('')
   const chutesLink = el(
     'a',
-    { className: 'footer-link', href: 'https://chutes.ai', attrs: { rel: 'noopener noreferrer' } },
+    { className: 'footer-link' },
     'chutes.ai ',
     codicon('link-external')
   )
+  chutesLink.href = 'https://chutes.ai'
+  chutesLink.rel = 'noopener noreferrer'
   chutesLink.addEventListener('click', (event) => {
     event.preventDefault()
     dispatchAction('openExternal', 'https://chutes.ai')
@@ -468,7 +407,7 @@ function stopRefreshTicker(): void {
 }
 
 function buildMissingKey(): HTMLElement {
-  const container = el('section', { className: 'empty-state', hidden: true, attrs: { role: 'region', 'aria-label': 'API key required' } })
+  const container = el('section', { className: 'empty-state', hidden: true, role: 'region', ariaLabel: 'API key required' })
   const title = el('h2', { className: 'empty-title' }, 'Connect your API key')
   const text = el('p', { className: 'empty-text' }, 'Enter your Chutes API key to start monitoring usage and quotas in real time.')
   const button = el(
@@ -484,7 +423,7 @@ function buildMissingKey(): HTMLElement {
 }
 
 function buildLoadingSkeleton(): HTMLElement {
-  const container = el('section', { className: 'loading-skeleton', hidden: true, attrs: { 'aria-label': 'Loading usage data' } })
+  const container = el('section', { className: 'loading-skeleton', hidden: true, ariaLabel: 'Loading usage data' })
   for (let i = 0; i < 3; i++) {
     const card = el('div', { className: 'skeleton-card' })
     setStyleVar(card, '--card-index', String(i))
@@ -502,7 +441,7 @@ function buildLoadingSkeleton(): HTMLElement {
 function buildErrorState(errorMessage: Text): HTMLElement {
   const container = el(
     'section',
-    { className: 'empty-state empty-state-error', hidden: true, attrs: { role: 'alert', 'aria-live': 'assertive' } }
+    { className: 'empty-state empty-state-error', hidden: true, role: 'alert', ariaLive: 'assertive' }
   )
   const title = el('h2', { className: 'empty-title' }, 'Connection error')
   const text = el('p', { className: 'empty-text' }, errorMessage)
@@ -544,7 +483,7 @@ function createPlanStat(initialLabel: string, initialValue: string): PlanStatRef
   const valueNode = txt(initialValue)
   const root = el(
     'div',
-    { className: 'plan-stat', attrs: { role: 'group', 'aria-label': `${initialLabel}: ${initialValue}` } },
+    { className: 'plan-stat', role: 'group', ariaLabel: `${initialLabel}: ${initialValue}` },
     el('div', { className: 'plan-stat-label' }, labelNode),
     el('div', { className: 'plan-stat-value' }, valueNode)
   )
@@ -554,7 +493,7 @@ function createPlanStat(initialLabel: string, initialValue: string): PlanStatRef
 // Update a plan-stat tile value and keep its screen-reader label in sync.
 function setPlanStat(ref: PlanStatRefs, label: string, value: string): void {
   setText(ref.value, value)
-  ariaSet(ref.root, 'aria-label', `${label}: ${value}`)
+  setAriaLabel(ref.root, `${label}: ${value}`)
 }
 
 // Flag the PAYG credit tile when the balance is running low or exhausted.
@@ -569,7 +508,7 @@ function createMetricCard(kind: UsageWindowKind): MetricCardRefs {
   const unitBadge = el('span', { className: 'unit-badge' }, unitText)
   const staleBadge = el(
     'span',
-    { className: 'stale-badge', hidden: true, attrs: { title: 'Possible sync delay' } },
+    { className: 'stale-badge', hidden: true, title: 'Possible sync delay' },
     codicon('warning'),
     txt(' stale')
   )
@@ -582,19 +521,17 @@ function createMetricCard(kind: UsageWindowKind): MetricCardRefs {
     'div',
     {
       className: 'progress-track',
-      attrs: {
-        role: 'progressbar',
-        'aria-valuemin': '0',
-        'aria-valuemax': '100',
-        'aria-valuenow': '0'
-      }
+      role: 'progressbar',
+      ariaValueMin: 0,
+      ariaValueMax: 100,
+      ariaValueNow: 0
     },
     fill
   ) as HTMLDivElement
 
   const root = el(
     'article',
-    { className: `metric-card metric-${kind}`, attrs: { 'data-kind': kind } },
+    { className: `metric-card metric-${kind}`, dataKind: kind },
     el(
       'div',
       { className: 'metric-header' },
@@ -634,7 +571,7 @@ function ensureTiers(refs: DomRefs, count: number): void {
 
     const currentBadge = el(
       'span',
-      { className: 'tier-current-badge', hidden: true, attrs: { 'aria-label': 'Current plan' } },
+      { className: 'tier-current-badge', hidden: true, ariaLabel: 'Current plan' },
       codicon('star-full'),
       txt(' current')
     )
@@ -677,7 +614,7 @@ function buildTierRow(label: string, valueNode: Text, tooltip: string): HTMLElem
 }
 
 function applyCollapsedState(button: HTMLButtonElement, body: HTMLElement, chevron: HTMLElement, collapsed: boolean): void {
-  ariaSet(button, 'aria-expanded', collapsed ? 'false' : 'true')
+  setAriaExpanded(button, !collapsed)
   toggle(body, !collapsed)
   cls(chevron, 'is-collapsed', collapsed)
 }
@@ -807,8 +744,8 @@ function applyMetrics(refs: DomRefs, windows: UsageWindow[]): void {
 
     const pct = Math.max(0, Math.min(window.percentUsed ?? 0, 100))
     setStyleVar(card.progress.fill, '--progress-w', `${pct}%`)
-    ariaSet(card.progress.container, 'aria-valuenow', String(Math.round(pct)))
-    ariaSet(card.progress.container, 'aria-label', `${window.label} usage`)
+    setAriaValueNow(card.progress.container, Math.round(pct))
+    setAriaLabel(card.progress.container, `${window.label} usage`)
 
     cls(card.progress.fill, 'progress-violet', window.kind === 'rolling-4h')
     cls(card.progress.fill, 'progress-warn', window.kind !== 'rolling-4h' && pct >= 75 && pct < 90)

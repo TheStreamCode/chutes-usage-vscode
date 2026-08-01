@@ -10,8 +10,7 @@ Fixes #
 
 ## Verification
 
-- [ ] `npm test` passes
-- [ ] `npm run package` produces a valid VSIX
+- [ ] `npm run preflight` passes
 - [ ] Manually verified in Extension Development Host
 - [ ] Usage/quota data renders correctly in webview
 - [ ] No new outbound endpoints beyond Chutes API

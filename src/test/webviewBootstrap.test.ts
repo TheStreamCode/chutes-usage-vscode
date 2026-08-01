@@ -5,6 +5,8 @@ import { join } from 'node:path'
 
 const root = process.cwd()
 const mainJs = readFileSync(join(root, 'out', 'webview', 'main.js'), 'utf8')
+const messagesJs = readFileSync(join(root, 'out', 'webview', 'messages.js'), 'utf8')
+const domJs = readFileSync(join(root, 'out', 'webview', 'dom.js'), 'utf8')
 const stylesCss = readFileSync(join(root, 'out', 'webview', 'styles.css'), 'utf8')
 const providerJs = readFileSync(join(root, 'out', 'src', 'views', 'ChutesWebviewProvider.js'), 'utf8')
 
@@ -18,8 +20,23 @@ test('compiles the webview bootstrap as browser-safe JavaScript', () => {
 test('loads the webview bootstrap as an ES module script with a CSP nonce', () => {
   assert.match(providerJs, /type="module"/)
   assert.match(providerJs, /nonce-/)
+  assert.match(providerJs, /strict-dynamic/)
+  assert.match(providerJs, /base-uri 'none'/)
+  assert.match(providerJs, /form-action 'none'/)
   assert.match(providerJs, /font-src/)
   assert.match(providerJs, /img-src/)
+})
+
+test('validates extension messages and cached state before rendering', () => {
+  assert.match(mainJs, /isStateMessage\(event\.data\)/)
+  assert.match(mainJs, /isCachedPayload\(raw\)/)
+  assert.match(messagesJs, /Number\.isFinite/)
+})
+
+test('uses explicit DOM properties instead of a generic attribute sink', () => {
+  assert.doesNotMatch(domJs, /setAttribute\(/)
+  assert.match(domJs, /ariaLabel/)
+  assert.match(domJs, /dataset\.kind/)
 })
 
 test('does not embed fixed subscription plan examples in the webview bundle', () => {
@@ -43,10 +60,10 @@ test('persists state with vscode.setState/getState to avoid Loading flashes on r
 })
 
 test('exposes ARIA progressbar semantics on metric cards', () => {
-  assert.match(mainJs, /role:\s*['"]progressbar['"]/)
-  assert.match(mainJs, /aria-valuemin/)
-  assert.match(mainJs, /aria-valuemax/)
-  assert.match(mainJs, /aria-valuenow/)
+  assert.match(mainJs, /progressbar/)
+  assert.match(mainJs, /ariaValueMin/)
+  assert.match(mainJs, /ariaValueMax/)
+  assert.match(mainJs, /ariaValueNow/)
 })
 
 test('migrates styles to VS Code theme tokens with chutes accents', () => {

@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security report
-    url: https://mikesoft.it
-    about: Please report sensitive vulnerabilities privately.
+    url: https://github.com/TheStreamCode/chutes-usage-vscode/security/advisories/new
+    about: Report sensitive vulnerabilities privately through GitHub.
+  - name: Questions and support
+    url: https://github.com/TheStreamCode/chutes-usage-vscode/discussions
+    about: Ask usage questions and get help from the community.
