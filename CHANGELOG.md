@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-- Refreshed the public project presentation with a current dashboard screenshot rendered from the real webview using synthetic values, a custom GitHub social preview, clearer installation links, and a more user-focused README introduction.
+## 0.5.5 — 2026-08-08
+
+- Refreshed the public project presentation and Marketplace metadata with a current dashboard screenshot rendered from the real webview using synthetic values, a custom GitHub social preview, clearer installation links, PAYG-focused discoverability, and a more user-focused README introduction.
 - Cleared the `fast-uri` and `undici` development dependency advisories with an npm-managed lockfile refresh.
 - Stopped persisting dashboard account snapshots in webview state. Only the Plan Limits collapsed preference is retained, and the cache schema is now version 3.
 - Removed the unrelated `/pricing` request. Plan reference prices and PAYG discounts are clearly identified as public references, while account-specific limits are shown only when returned for the current plan; unavailable values use `--`.

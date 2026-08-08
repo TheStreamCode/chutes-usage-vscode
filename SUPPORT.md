@@ -1,12 +1,8 @@
 # Support
 
-Use GitHub Issues for reproducible bug reports and feature requests:
+Use [GitHub Issues](https://github.com/TheStreamCode/chutes-usage-vscode/issues) for reproducible bug reports and feature requests.
 
-- `https://github.com/TheStreamCode/chutes-usage-vscode/issues`
-
-Use GitHub Discussions for setup help and usage questions:
-
-- `https://github.com/TheStreamCode/chutes-usage-vscode/discussions`
+Use [GitHub Discussions](https://github.com/TheStreamCode/chutes-usage-vscode/discussions) for setup help and usage questions.
 
 ## Before Opening An Issue
 

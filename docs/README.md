@@ -4,12 +4,13 @@ This directory contains the public project documentation for `Chutes Usage Monit
 
 ## Index
 
-- `user-guide.md`: end-user setup, commands, settings, and day-to-day usage
-- `troubleshooting.md`: common issues, refresh behavior notes, API behavior notes, and support guidance
+- [User guide](user-guide.md): end-user setup, commands, settings, privacy, and day-to-day usage
+- [Troubleshooting](troubleshooting.md): common issues, refresh behavior notes, API behavior notes, and support guidance
 
 ## Related Files
 
-- `../README.md`: repository overview and quick start
-- `../CONTRIBUTING.md`: development workflow and pull request expectations
-- `../SUPPORT.md`: support and issue reporting
-- `../SECURITY.md`: vulnerability reporting and data handling guidance
+- [Repository overview](../README.md): project presentation and quick start
+- [Contributing](../CONTRIBUTING.md): development workflow and pull request expectations
+- [Support](../SUPPORT.md): support and issue reporting
+- [Security](../SECURITY.md): vulnerability reporting and data handling guidance
+- [GitHub Discussions](https://github.com/TheStreamCode/chutes-usage-vscode/discussions): setup questions and community help
