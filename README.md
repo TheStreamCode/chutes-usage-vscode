@@ -7,13 +7,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-TheStreamCode-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/TheStreamCode)
 
-Monitor Chutes subscription usage, rolling limits, and request quotas directly inside VS Code.
+Keep Chutes usage visible while you code. The sidebar shows subscription spend, rolling limits, daily requests, and pay-as-you-go credit without leaving VS Code.
+
+[Install from the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode) · [Install from Open VSX](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode) · [Read the user guide](docs/user-guide.md)
 
 This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
 
 ![Chutes Usage Monitor dashboard](media/screenshot-chutes-usage.png)
 
-> The fixed screenshot is illustrative of the earlier dashboard layout. Current releases omit the retired Base tier and include the PAYG credit tile.
+_Current dashboard rendered with synthetic, illustrative values._
 
 ## Requirements
 
@@ -33,29 +35,14 @@ After installation:
 2. Run `Chutes Usage Monitor: Set API Key`.
 3. Open the `Chutes Usage Monitor` view from the Activity Bar.
 
-## Features
+## What You Get
 
-- Sidebar dashboard aligned with the chutes.ai look: pure-black on dark themes, pill buttons, mint pill badges, headline-violet section titles, generous whitespace
-- Theme-aware: backgrounds, foregrounds, borders, and description text follow VS Code theme tokens; works with Light, Dark, and High Contrast themes
-- Plan snapshot, per-window usage cards with progress bars, and a Plan Limits reference that uses account data only for your current tier
-- PAYG credit tile showing your pay-as-you-go account balance, with visible low/no-credit labels in addition to warning colors
-- Compact status bar summary with severity-aware codicon and background color; full detail in the tooltip
-- Secure API key storage through VS Code `SecretStorage`
-- Manual refresh command for immediate sync
-- Automatic refresh on a configurable timer, when the dashboard becomes visible again, and when the VS Code window regains focus
-- Live `refresh in Ns` countdown driven by your `refreshIntervalSeconds` setting
-- Privacy-safe webview state: only the Plan Limits collapsed preference is retained; usage snapshots are never persisted
-- Accessible by default: ARIA progressbar/alert/status semantics, `prefers-reduced-motion` support, and visible focus rings
-- Hardened webview CSP with a per-load nonce and scoped `font-src`/`img-src`
-
-## Latest Changes
-
-- `Unreleased` clears dependency advisories, removes persisted usage snapshots and the unrelated pricing request, tightens the webview boundary, and improves accessibility.
-- `0.5.4` trims the dashboard state message to the fields the webview renders, removes dead status bar and webview code, syncs the citation metadata, and expands the project documentation.
-- `0.5.3` hardens webview message and cache handling, resolves the remaining CodeQL findings, adds stricter local and CI quality gates, improves cross-platform cleanup, and live-validates the current Chutes API integration.
-- `0.5.2` improves legal documentation, trademark notices, third-party terms references, and project metadata.
-
-See the [changelog](CHANGELOG.md) for the complete release history.
+- A focused sidebar dashboard for billing-cycle, rolling four-hour, and daily request usage
+- Plan context and PAYG credit at a glance, with visible low- and no-credit warnings
+- An optional status bar summary for quick checks without opening the dashboard
+- Manual and automatic refresh when the timer fires, the view reopens, or VS Code regains focus
+- Native Light, Dark, and High Contrast theme support with keyboard and screen-reader accessibility
+- Read-only account access, secure API-key storage, no local usage history, and a locked-down webview
 
 ## Commands
 
@@ -102,6 +89,14 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 - The webview persists only whether the Plan Limits section is collapsed, never an account snapshot.
 - On uninstall, the extension performs best-effort cleanup of its local extension storage.
 
+## Latest Changes
+
+- `Unreleased` clears dependency advisories, removes persisted usage snapshots and the unrelated pricing request, tightens the webview boundary, and improves accessibility.
+- `0.5.4` trims dashboard state, removes dead code, synchronizes release metadata, and expands the project documentation.
+- `0.5.3` strengthens webview security, repository quality gates, cross-platform cleanup, and API compatibility.
+
+See the [changelog](CHANGELOG.md) for the complete release history and the [latest GitHub release](https://github.com/TheStreamCode/chutes-usage-vscode/releases/latest) for downloadable artifacts.
+
 ## Development
 
 Requires Node.js `22.17.0` (see `.nvmrc`) and `npm`. The lockfile is authoritative — do not switch package manager.
@@ -139,6 +134,8 @@ out/            build output (generated, not committed)
 - [User guide](docs/user-guide.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Documentation index](docs/README.md)
+- [Questions and community support](https://github.com/TheStreamCode/chutes-usage-vscode/discussions)
+- [Bug reports and feature requests](https://github.com/TheStreamCode/chutes-usage-vscode/issues)
 - [Contributing](CONTRIBUTING.md)
 - [Support](SUPPORT.md)
 - [Security](SECURITY.md)
