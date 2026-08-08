@@ -4,7 +4,7 @@ Thanks for your interest in improving `Chutes Usage Monitor`.
 
 ## Prerequisites
 
-- Node.js 22 or newer
+- Node.js 22.17.0 (the exact version in `.nvmrc`)
 - `npm`
 - Visual Studio Code
 

@@ -29,7 +29,7 @@ It includes:
 - a header with connection status and actions
 - a plan snapshot with key subscription details, including your pay-as-you-go credit balance
 - stacked usage cards for the main billing windows
-- a `Plan Limits` section with monthly cap, daily request, burst, and PAYG discount references, using live pricing data when available
+- a `Plan Limits` section with public plan prices and PAYG discounts; monthly, daily, and burst limits are filled only for your current plan when the account API provides them
 
 Depending on the current state, the dashboard shows onboarding, loading, ready, or error content.
 
@@ -67,7 +67,7 @@ The extension refreshes data in three ways:
 
 Use `chutesUsageVscode.refreshIntervalSeconds` to control the refresh interval.
 
-When you reopen the dashboard after a recent refresh, the latest snapshot is shown immediately and then refreshed again in the background.
+While the extension host remains active, reopening the dashboard can reuse its in-memory snapshot before refreshing. The webview itself persists only whether the Plan Limits section is collapsed and never stores usage or account values.
 
 ## Usage Data Shown
 
@@ -77,8 +77,8 @@ Depending on the API responses available for your account, the extension can dis
 - 4-hour rolling window usage
 - daily request usage
 - plan information such as subscription price or caps when available
-- your pay-as-you-go credit balance (the account credit that funds requests beyond your subscription caps), highlighted in amber when it runs low and in red when it reaches zero
-- a built-in subscription limits reference based on pricing data when available, with packaged Plus and Pro defaults as a fallback
+- your pay-as-you-go credit balance (the account credit that funds requests beyond your subscription caps), with visible `Low credit` or `No credit` text and warning colors when applicable
+- a Plus and Pro reference using public prices and PAYG discounts; other limits show `--` unless they are verified from the current account
 
 ## Managing Your API Key
 

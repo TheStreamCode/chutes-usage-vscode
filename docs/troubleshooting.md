@@ -68,10 +68,10 @@ The extension currently relies on these endpoints for user-facing usage data:
 - `GET /users/me/quota_usage/me`
 - `GET /users/me/quota_usage/{chute_id}`
 - `GET /invocations/stats/llm`
-- `GET /pricing`
 - `GET /users/me`
 
 Some endpoints are used as fallbacks when the primary payload is incomplete or delayed.
+The Plan Limits link opens the public `https://chutes.ai/pricing` page; the extension does not fetch or parse that page as account data.
 
 ## API Compatibility
 

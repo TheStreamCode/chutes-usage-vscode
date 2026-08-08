@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { toWebviewState } from '../state/webviewState'
 import type { DashboardState } from '../types'
 
-test('keeps states without dashboard data untouched', () => {
+test('projects states without dashboard data to the exact webview shape', () => {
   const state: DashboardState = {
     connectionState: 'missing-key',
     connected: false,
@@ -13,7 +13,8 @@ test('keeps states without dashboard data untouched', () => {
     errorMessage: null
   }
 
-  assert.equal(toWebviewState(state), state)
+  assert.deepEqual(toWebviewState(state), state)
+  assert.notEqual(toWebviewState(state), state)
 })
 
 test('drops the per-model quota rows the webview never renders', () => {
@@ -23,7 +24,7 @@ test('drops the per-model quota rows the webview never renders', () => {
 
   const projected = toWebviewState(state)
 
-  assert.deepEqual(projected.data?.quotas, [])
+  assert.equal(projected.data === null ? false : 'quotas' in projected.data, false)
   assert.equal(projected.connectionState, state.connectionState)
   assert.equal(projected.lastUpdatedAt, state.lastUpdatedAt)
   assert.deepEqual(projected.data?.windows, state.data?.windows)
@@ -32,9 +33,12 @@ test('drops the per-model quota rows the webview never renders', () => {
   assert.equal(projected.data?.paygCreditUsd, state.data?.paygCreditUsd)
 })
 
-test('does not copy the state when there is no quota payload to strip', () => {
+test('does not expose a quotas property even when the host list is empty', () => {
   const state = createReadyState([])
-  assert.equal(toWebviewState(state), state)
+  const projected = toWebviewState(state)
+
+  assert.equal(projected.data === null ? false : 'quotas' in projected.data, false)
+  assert.notEqual(projected, state)
 })
 
 test('leaves the extension-host state object unmodified', () => {

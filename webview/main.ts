@@ -1,5 +1,5 @@
-import { formatResetLabel, getHeaderPresentation, type HeaderPresentation } from './presentation.js'
-import { cls, codicon, el, setAriaExpanded, setAriaLabel, setAriaValueNow, setStyleVar, setText, toggle, txt } from './dom.js'
+import { formatResetLabel, getHeaderPresentation, getProgressPresentation, type HeaderPresentation } from './presentation.js'
+import { cls, codicon, el, setAriaExpanded, setAriaLabel, setAriaValueNow, setAriaValueText, setStyleVar, setText, toggle, txt } from './dom.js'
 import { isCachedPayload, isStateMessage } from './messages.js'
 import type { ActionType, CachedPayload, DashboardState, PlanInfo, PlanLimitEntry, UsageWindow, UsageWindowKind } from './types.js'
 
@@ -9,7 +9,7 @@ declare function acquireVsCodeApi(): {
   getState: () => unknown
 }
 
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 const DEFAULT_REFRESH_INTERVAL_MS = 60_000
 const KNOWN_KINDS: UsageWindowKind[] = ['billing-cycle', 'rolling-4h', 'daily-requests', 'weekly']
 // PAYG credit tile turns amber below this USD threshold, and red at/under zero.
@@ -38,6 +38,8 @@ interface PlanStatRefs {
   root: HTMLElement
   label: Text
   value: Text
+  statusBadge: HTMLSpanElement
+  statusText: Text
 }
 
 interface TierRefs {
@@ -90,7 +92,7 @@ interface DomRefs {
     toggleBtn: HTMLButtonElement
     chevron: HTMLElement
     body: HTMLElement
-    fiveXDesc: Text
+    description: Text
     tiersWrap: HTMLElement
     tiers: TierRefs[]
     cachedTierCount: number
@@ -111,14 +113,10 @@ if (app) {
   if (cached) {
     planLimitsCollapsed = cached.planLimitsCollapsed
   }
+  writeCached({ version: SCHEMA_VERSION, planLimitsCollapsed })
 
   const refs = mount(app)
-
-  if (cached) {
-    update(refs, cached.state, { fromCache: true })
-  } else {
-    update(refs, initialState(), { fromCache: true })
-  }
+  update(refs, initialState(), { initialRender: true })
 
   window.addEventListener('message', (event: MessageEvent<unknown>) => {
     if (!isStateMessage(event.data)) return
@@ -127,11 +125,7 @@ if (app) {
       refreshIntervalMs = message.refreshIntervalMs
     }
     const incoming = message.state
-    update(refs, incoming, { fromCache: false })
-
-    if (incoming.connectionState !== 'loading' || incoming.data !== null) {
-      writeCached({ version: SCHEMA_VERSION, state: incoming, planLimitsCollapsed })
-    }
+    update(refs, incoming, { initialRender: false })
   })
 
   // Pause the next-refresh ticker when the webview is hidden, clear it on unload.
@@ -185,7 +179,12 @@ function mount(parent: HTMLElement): DomRefs {
   // ---- Header ----
   const dot = el('span', { className: 'status-dot', ariaHidden: true })
   const statusText = txt('Connecting…')
-  const statusLine = el('div', { className: 'status-line' }, dot, statusText)
+  const statusLine = el(
+    'div',
+    { className: 'status-line', role: 'status', ariaLive: 'polite', ariaAtomic: true },
+    dot,
+    statusText
+  )
 
   const title = el('h1', { className: 'brand-title' }, 'Chutes ', el('span', { className: 'brand-divider' }, '/'), ' Usage')
   const brand = el('div', { className: 'header-brand' }, title, statusLine)
@@ -271,7 +270,7 @@ function mount(parent: HTMLElement): DomRefs {
   const planSummaryRoot = el(
     'section',
     { className: 'plan-panel' },
-    el('div', { className: 'section-title' }, 'Plan snapshot'),
+    el('h2', { className: 'section-title' }, 'Plan snapshot'),
     planGrid,
     metaWrap
   )
@@ -287,7 +286,14 @@ function mount(parent: HTMLElement): DomRefs {
   }
 
   // ---- Plan Limits ----
-  const fiveXDesc = txt('Subscriptions include 5× the monthly price in pay-as-you-go equivalent usage.')
+  const planLimitsDescription = txt('Plan prices and PAYG discounts are public references. Limits for your current plan come from your account when available; -- means unavailable.')
+  const pricingLink = el('a', { className: 'plan-limits-link' }, 'View current pricing ', codicon('link-external'))
+  pricingLink.href = 'https://chutes.ai/pricing'
+  pricingLink.rel = 'noopener noreferrer'
+  pricingLink.addEventListener('click', (event) => {
+    event.preventDefault()
+    dispatchAction('openExternal', 'https://chutes.ai/pricing')
+  })
   const tiersWrap = el('div', { className: 'plan-limits-tiers', id: 'plan-limits-tiers' })
   const chevron = codicon('chevron-down')
   cls(chevron, 'plan-limits-chevron', true)
@@ -311,12 +317,13 @@ function mount(parent: HTMLElement): DomRefs {
   const planLimitsBody = el(
     'div',
     { className: 'plan-limits-body' },
-    el('p', { className: 'plan-limits-intro' }, fiveXDesc),
+    el('p', { className: 'plan-limits-intro' }, planLimitsDescription, txt(' '), pricingLink),
     tiersWrap,
     buildFootnotes()
   )
 
-  const planLimitsRoot = el('section', { className: 'plan-limits-section' }, toggleBtn, planLimitsBody)
+  const planLimitsHeading = el('h2', { className: 'plan-limits-heading' }, toggleBtn)
+  const planLimitsRoot = el('section', { className: 'plan-limits-section' }, planLimitsHeading, planLimitsBody)
 
   // ---- Footer ----
   const updatedText = txt('')
@@ -379,7 +386,7 @@ function mount(parent: HTMLElement): DomRefs {
       toggleBtn,
       chevron,
       body: planLimitsBody,
-      fiveXDesc,
+      description: planLimitsDescription,
       tiersWrap,
       tiers: [],
       cachedTierCount: 0
@@ -481,13 +488,15 @@ function buildFootnotes(): HTMLElement {
 function createPlanStat(initialLabel: string, initialValue: string): PlanStatRefs {
   const labelNode = txt(initialLabel)
   const valueNode = txt(initialValue)
+  const statusText = txt('')
+  const statusBadge = el('span', { className: 'plan-stat-status', hidden: true }, statusText)
   const root = el(
     'div',
     { className: 'plan-stat', role: 'group', ariaLabel: `${initialLabel}: ${initialValue}` },
     el('div', { className: 'plan-stat-label' }, labelNode),
-    el('div', { className: 'plan-stat-value' }, valueNode)
+    el('div', { className: 'plan-stat-value-row' }, el('div', { className: 'plan-stat-value' }, valueNode), statusBadge)
   )
-  return { root, label: labelNode, value: valueNode }
+  return { root, label: labelNode, value: valueNode, statusBadge, statusText }
 }
 
 // Update a plan-stat tile value and keep its screen-reader label in sync.
@@ -497,9 +506,21 @@ function setPlanStat(ref: PlanStatRefs, label: string, value: string): void {
 }
 
 // Flag the PAYG credit tile when the balance is running low or exhausted.
-function applyPaygCreditState(root: HTMLElement, credit: number | null): void {
-  cls(root, 'is-crit', credit !== null && credit <= 0)
-  cls(root, 'is-warn', credit !== null && credit > 0 && credit < PAYG_CREDIT_WARN_USD)
+function applyPaygCreditState(ref: PlanStatRefs, credit: number | null): void {
+  const exhausted = credit !== null && credit <= 0
+  const low = credit !== null && credit > 0 && credit < PAYG_CREDIT_WARN_USD
+  const status = exhausted ? 'No credit' : low ? 'Low credit' : null
+
+  cls(ref.root, 'is-crit', exhausted)
+  cls(ref.root, 'is-warn', low)
+  cls(ref.statusBadge, 'is-crit', exhausted)
+  cls(ref.statusBadge, 'is-warn', low)
+  toggle(ref.statusBadge, status !== null)
+  setText(ref.statusText, status ?? '')
+
+  if (status !== null) {
+    setAriaLabel(ref.root, `PAYG credit: ${formatValue(credit, 'usd')}, ${status}`)
+  }
 }
 
 function createMetricCard(kind: UsageWindowKind): MetricCardRefs {
@@ -524,7 +545,7 @@ function createMetricCard(kind: UsageWindowKind): MetricCardRefs {
       role: 'progressbar',
       ariaValueMin: 0,
       ariaValueMax: 100,
-      ariaValueNow: 0
+      ariaValueText: 'Usage unavailable'
     },
     fill
   ) as HTMLDivElement
@@ -620,14 +641,12 @@ function applyCollapsedState(button: HTMLButtonElement, body: HTMLElement, chevr
 }
 
 function persistCollapsed(): void {
-  const cached = readCached()
-  const base = cached ?? { version: SCHEMA_VERSION, state: initialState(), planLimitsCollapsed }
-  writeCached({ ...base, planLimitsCollapsed })
+  writeCached({ version: SCHEMA_VERSION, planLimitsCollapsed })
 }
 
-function update(refs: DomRefs, state: DashboardState, options: { fromCache: boolean }): void {
+function update(refs: DomRefs, state: DashboardState, options: { initialRender: boolean }): void {
   const presentation = getHeaderPresentation(state)
-  applyHeader(refs, presentation, state, options.fromCache)
+  applyHeader(refs, presentation, state, options.initialRender)
   applyMode(refs, state)
 
   if (state.data) {
@@ -636,15 +655,15 @@ function update(refs: DomRefs, state: DashboardState, options: { fromCache: bool
     applyPlanLimits(refs, state.data.planLimits, state.data.plan?.planName ?? null)
   }
 
-  applyFooter(refs, state, options.fromCache)
+  applyFooter(refs, state)
 
-  if (!options.fromCache && state.connectionState !== 'loading') {
+  if (!options.initialRender && state.connectionState !== 'loading') {
     lastStateReceivedAt = Date.now()
   }
   refreshNextRefreshLabel(refs)
 }
 
-function applyHeader(refs: DomRefs, presentation: HeaderPresentation, state: DashboardState, fromCache: boolean): void {
+function applyHeader(refs: DomRefs, presentation: HeaderPresentation, state: DashboardState, initialRender: boolean): void {
   setText(refs.header.statusText, presentation.statusText)
   toggle(refs.header.dot, presentation.showDot)
   cls(refs.header.dot, 'tone-live', presentation.tone === 'live')
@@ -655,10 +674,9 @@ function applyHeader(refs: DomRefs, presentation: HeaderPresentation, state: Das
   setText(refs.header.setKeyLabel, presentation.keyActionLabel === 'Set Key' ? 'Set key' : 'Replace key')
   refs.header.removeBtn.disabled = presentation.removeDisabled
 
-  // When rendering from cache the previous state may have been "loading"; keep
-  // the refresh button enabled so the user can retry without waiting for the
-  // first fresh message from the extension host.
-  const isLiveLoading = !fromCache && state.connectionState === 'loading'
+  // Keep refresh available during the initial placeholder render. Once the
+  // extension host posts state, disable it only for an active refresh.
+  const isLiveLoading = !initialRender && state.connectionState === 'loading'
   refs.header.refreshBtn.disabled = isLiveLoading
   cls(refs.header.refreshBtn, 'is-busy', isLiveLoading)
 }
@@ -680,7 +698,7 @@ function applyMode(refs: DomRefs, state: DashboardState): void {
   if (showStaleBanner) {
     const message = state.errorMessage && state.errorMessage.length > 0
       ? state.errorMessage
-      : 'Last sync failed. Showing cached data.'
+      : 'Last sync failed. Showing the last available data.'
     setText(refs.staleBanner.text, ` ${message}`)
   }
 
@@ -704,7 +722,7 @@ function applyPlanSummary(refs: DomRefs, plan: PlanInfo | null, windows: UsageWi
   setPlanStat(refs.planSummary.fourHLimit, '4h limit', formatValue(plan?.fourHourCapUsd ?? rolling?.limit ?? null, 'usd'))
   setPlanStat(refs.planSummary.dailyLimit, 'Daily limit', formatRequestsLimitValue(plan?.dailyRequestLimit ?? daily?.limit ?? null))
   setPlanStat(refs.planSummary.paygCredit, 'PAYG credit', formatValue(paygCreditUsd, 'usd'))
-  applyPaygCreditState(refs.planSummary.paygCredit.root, paygCreditUsd)
+  applyPaygCreditState(refs.planSummary.paygCredit, paygCreditUsd)
 
   const monthlyPrice = plan?.monthlyPriceUsd ?? null
   const monthlyCap = plan?.monthlyCapUsd ?? null
@@ -742,14 +760,16 @@ function applyMetrics(refs: DomRefs, windows: UsageWindow[]): void {
     cls(card.root, 'is-stale', isStale)
     toggle(card.staleBadge, isStale)
 
-    const pct = Math.max(0, Math.min(window.percentUsed ?? 0, 100))
-    setStyleVar(card.progress.fill, '--progress-w', `${pct}%`)
-    setAriaValueNow(card.progress.container, Math.round(pct))
+    const progress = getProgressPresentation(window)
+    const pct = progress.percentUsed
+    setStyleVar(card.progress.fill, '--progress-w', `${pct ?? 0}%`)
+    setAriaValueNow(card.progress.container, pct === null ? null : Math.round(pct))
+    setAriaValueText(card.progress.container, progress.ariaValueText)
     setAriaLabel(card.progress.container, `${window.label} usage`)
 
     cls(card.progress.fill, 'progress-violet', window.kind === 'rolling-4h')
-    cls(card.progress.fill, 'progress-warn', window.kind !== 'rolling-4h' && pct >= 75 && pct < 90)
-    cls(card.progress.fill, 'progress-crit', window.kind !== 'rolling-4h' && pct >= 90)
+    cls(card.progress.fill, 'progress-warn', window.kind !== 'rolling-4h' && pct !== null && pct >= 75 && pct < 90)
+    cls(card.progress.fill, 'progress-crit', window.kind !== 'rolling-4h' && pct !== null && pct >= 90)
   }
 
   for (const [kind, card] of refs.metricsGrid.cards) {
@@ -761,13 +781,7 @@ function applyMetrics(refs: DomRefs, windows: UsageWindow[]): void {
 
 function applyPlanLimits(refs: DomRefs, planLimits: PlanLimitEntry[], currentPlanName: string | null): void {
   ensureTiers(refs, planLimits.length)
-
-  const examples = planLimits.slice(0, 3).map((p) => `${p.name} gets ${p.monthlyCapLabel}`)
-  if (examples.length > 0) {
-    setText(refs.planLimits.fiveXDesc, `Subscriptions include 5× the monthly price in pay-as-you-go equivalent. Examples: ${examples.join(', ')}.`)
-  } else {
-    setText(refs.planLimits.fiveXDesc, 'Subscriptions include 5× the monthly price in pay-as-you-go equivalent usage.')
-  }
+  setText(refs.planLimits.description, 'Plan prices and PAYG discounts are public references. Limits for your current plan come from your account when available; -- means unavailable.')
 
   const lowerCurrent = currentPlanName?.toLowerCase() ?? null
 
@@ -791,10 +805,10 @@ function applyPlanLimits(refs: DomRefs, planLimits: PlanLimitEntry[], currentPla
   })
 }
 
-function applyFooter(refs: DomRefs, state: DashboardState, fromCache: boolean): void {
+function applyFooter(refs: DomRefs, state: DashboardState): void {
   if (state.lastUpdatedAt) {
     const time = new Date(state.lastUpdatedAt).toLocaleTimeString()
-    setText(refs.footer.updatedText, fromCache ? `Cached · ${time}` : `Updated ${time}`)
+    setText(refs.footer.updatedText, `Updated ${time}`)
   } else {
     setText(refs.footer.updatedText, '')
   }

@@ -27,10 +27,16 @@ test('loads the webview bootstrap as an ES module script with a CSP nonce', () =
   assert.match(providerJs, /img-src/)
 })
 
-test('validates extension messages and cached state before rendering', () => {
+test('validates extension messages and cached display preferences before rendering', () => {
   assert.match(mainJs, /isStateMessage\(event\.data\)/)
   assert.match(mainJs, /isCachedPayload\(raw\)/)
   assert.match(messagesJs, /Number\.isFinite/)
+})
+
+test('rejects unknown fields in actions sent back to the extension host', () => {
+  assert.match(providerJs, /Object\.keys\(message\)\.length === 1/)
+  assert.match(providerJs, /Object\.keys\(message\)\.length === 2/)
+  assert.match(providerJs, /Object\.hasOwn\(message, 'href'\)/)
 })
 
 test('uses explicit DOM properties instead of a generic attribute sink', () => {
@@ -55,17 +61,28 @@ test('renders the dashboard without ever wiping innerHTML on state updates', () 
   assert.equal(replaceChildrenCount, 1, 'mount() should call parent.replaceChildren exactly once')
 })
 
-test('persists state with vscode.setState/getState to avoid Loading flashes on reopen', () => {
+test('persists only non-sensitive display preferences in webview state', () => {
   assert.match(mainJs, /vscode\.getState\(/)
   assert.match(mainJs, /vscode\.setState\(/)
-  assert.match(mainJs, /SCHEMA_VERSION/)
+  assert.match(mainJs, /SCHEMA_VERSION\s*=\s*3/)
+  assert.match(mainJs, /writeCached\(\{ version: SCHEMA_VERSION, planLimitsCollapsed \}\)/)
+  assert.doesNotMatch(mainJs, /writeCached\(\{[^}]*\bstate:/s)
 })
 
 test('exposes ARIA progressbar semantics on metric cards', () => {
   assert.match(mainJs, /progressbar/)
   assert.match(mainJs, /ariaValueMin/)
   assert.match(mainJs, /ariaValueMax/)
-  assert.match(mainJs, /ariaValueNow/)
+  assert.match(mainJs, /setAriaValueNow/)
+  assert.match(mainJs, /setAriaValueText/)
+  assert.match(domJs, /removeAttribute\('aria-valuenow'\)/)
+})
+
+test('announces live status and exposes non-colour PAYG warnings', () => {
+  assert.match(mainJs, /role: 'status', ariaLive: 'polite', ariaAtomic: true/)
+  assert.match(mainJs, /Low credit/)
+  assert.match(mainJs, /No credit/)
+  assert.match(mainJs, /el\('h2', \{ className: 'section-title' \}/)
 })
 
 test('migrates styles to VS Code theme tokens with chutes accents', () => {

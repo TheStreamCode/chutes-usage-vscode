@@ -22,7 +22,7 @@ The repository is **public** on GitHub, MIT licensed, and published to both the 
 Two independently compiled worlds that only talk through `postMessage`:
 
 1. **Extension host** (`src/`, `tsconfig.json`, `module: node16`)
-   - `services/ChutesApiClient.ts` — authenticated `fetch` against `https://api.chutes.ai`, 15 s abort timeout per request. `/users/me/subscription_usage` and `/users/me/quotas` are required; `/pricing`, `/users/me/quota_usage/me`, `/users/me/quota_usage/{chute_id}`, `/invocations/stats/llm`, `/users/me` are optional and fail soft.
+   - `services/ChutesApiClient.ts` — authenticated `fetch` against `https://api.chutes.ai`, 15 s abort timeout per request. `/users/me/subscription_usage` and `/users/me/quotas` are required; `/users/me/quota_usage/me`, `/users/me/quota_usage/{chute_id}`, `/invocations/stats/llm`, and `/users/me` are optional and fail soft. Per-chute fallbacks run with bounded concurrency.
    - `services/normalize.ts` — defensive normalization of loose API payloads into `DashboardData`, plus the compact status bar summary. All API shape tolerance lives here.
    - `services/SecretStore.ts` — the only place the API key is read or written, always through `vscode.SecretStorage`.
    - `services/externalLinks.ts` — https-only allowlist (`https://chutes.ai`) for anything the webview asks the host to open.

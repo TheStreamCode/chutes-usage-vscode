@@ -55,13 +55,13 @@ test('normalizes known subscription usage and quotas for a pro account', () => {
 })
 
 test('extracts the PAYG credit balance from the /users/me payload', () => {
-  const result = normalizeDashboardData({}, [], null, null, null, null, { balance: 12.34 })
+  const result = normalizeDashboardData({}, [], null, null, null, { balance: 12.34 })
   assert.equal(result.paygCreditUsd, 12.34)
 })
 
 test('returns null PAYG credit when the /users/me payload is missing or empty', () => {
   assert.equal(normalizeDashboardData({}, []).paygCreditUsd, null)
-  assert.equal(normalizeDashboardData({}, [], null, null, null, null, {}).paygCreditUsd, null)
+  assert.equal(normalizeDashboardData({}, [], null, null, null, {}).paygCreditUsd, null)
 })
 
 test('reads PAYG credit from documented fallback balance fields', () => {
@@ -72,33 +72,17 @@ test('reads PAYG credit from documented fallback balance fields', () => {
   assert.equal(normalizePaygCredit(null), null)
 })
 
-test('normalizes plan limits from pricing payload when available', () => {
-  const result = normalizeDashboardData({}, [], null, null, null, [
-    {
-      name: 'Base',
-      monthly_price: 3,
-      monthly_cap_usd: 15,
-      daily_request_limit: 300,
-      four_hour_cap_usd: 1.25,
-      payg_discount_percent: 3
-    },
-    {
+test('uses account data only for the current plan limits', () => {
+  const result = normalizeDashboardData({
+    plan: {
       name: 'Plus',
       monthly_price: 10,
       monthly_cap_usd: 50,
       daily_request_limit: 2000,
       four_hour_cap_usd: 4.17,
       payg_discount_percent: 6
-    },
-    {
-      name: 'Pro',
-      monthly_price: 20,
-      monthly_cap_usd: 100,
-      daily_request_limit: 5000,
-      four_hour_cap_usd: 8.33,
-      payg_discount_percent: 10
     }
-  ])
+  }, [])
 
   assert.deepEqual(result.planLimits, [
     {
@@ -112,9 +96,9 @@ test('normalizes plan limits from pricing payload when available', () => {
     {
       name: 'Pro',
       priceLabel: '$20/mo',
-      monthlyCapLabel: '$100',
-      dailyRequestLimitLabel: '5,000',
-      fourHourCapLabel: '$8.33',
+      monthlyCapLabel: '--',
+      dailyRequestLimitLabel: '--',
+      fourHourCapLabel: '--',
       paygDiscountLabel: '10%'
     }
   ])
@@ -124,6 +108,25 @@ test('defaults plan limits to the current Plus and Pro subscription tiers', () =
   const result = normalizeDashboardData({}, [])
 
   assert.deepEqual(result.planLimits.map((limit) => limit.name), ['Plus', 'Pro'])
+  assert.deepEqual(result.planLimits.map((limit) => limit.monthlyCapLabel), ['--', '--'])
+})
+
+test('prepends an unrecognized current plan using only account-provided values', () => {
+  const result = normalizeDashboardData({
+    plan: {
+      name: 'Enterprise',
+      monthly_cap_usd: 250
+    }
+  }, [])
+
+  assert.deepEqual(result.planLimits[0], {
+    name: 'Enterprise',
+    priceLabel: '--',
+    monthlyCapLabel: '$250',
+    dailyRequestLimitLabel: '--',
+    fourHourCapLabel: '--',
+    paygDiscountLabel: '--'
+  })
 })
 
 test('normalizes quotas when the API returns a top-level array', () => {

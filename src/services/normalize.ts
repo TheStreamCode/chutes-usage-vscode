@@ -6,7 +6,6 @@ export function normalizeDashboardData(
   quotaUsagePayload: JsonContainer | null = null,
   quotaUsageMePayload: JsonContainer | null = null,
   invocationStatsPayload: JsonContainer | null = null,
-  pricingPayload: JsonContainer | null = null,
   mePayload: JsonContainer | null = null
 ): DashboardData {
   const usageSource = unwrapUsagePayload(subscriptionUsage)
@@ -15,12 +14,13 @@ export function normalizeDashboardData(
   const quotaUsageMe = normalizeQuotaUsage(quotaUsageMePayload)
   const invocationStats = normalizeInvocationStats(invocationStatsPayload)
   const windows = normalizeUsageWindows(usageSource, quotas, quotaUsageFallback, quotaUsageMe, invocationStats)
+  const plan = normalizePlan(usageSource, windows)
 
   return {
     windows,
     quotas,
-    plan: normalizePlan(usageSource, windows),
-    planLimits: normalizePlanLimits(pricingPayload),
+    plan,
+    planLimits: normalizePlanLimits(plan),
     paygCreditUsd: normalizePaygCredit(mePayload)
   }
 }
@@ -393,74 +393,38 @@ function getPlanNameFromMonthlyPrice(monthlyPrice: number): string | null {
   return null
 }
 
-function normalizePlanLimits(payload: JsonContainer | null): PlanLimitEntry[] {
-  const items = getPlanLimitItems(payload)
-  const normalized = items
-    .map((item) => asObject(item))
-    .filter((item): item is JsonObject => item !== null)
-    .map((item) => {
-      const name = asString(item.name) ?? asString(item.plan_name) ?? asString(item.label)
-      const monthlyPrice = asNumber(item.monthly_price) ?? asNumber(item.monthlyPriceUsd)
-      const monthlyCap = asNumber(item.monthly_cap_usd) ?? asNumber(item.monthlyCapUsd)
-      const dailyLimit = asNumber(item.daily_request_limit) ?? asNumber(item.dailyRequestLimit)
-      const fourHourCap = asNumber(item.four_hour_cap_usd) ?? asNumber(item.fourHourCapUsd)
-      const discount = asNumber(item.payg_discount_percent) ?? asNumber(item.paygDiscountPercent)
-
-      if (name === null || monthlyPrice === null || monthlyCap === null || dailyLimit === null || fourHourCap === null || discount === null) {
-        return null
-      }
-
-      if (isRetiredBasePlan(name, monthlyPrice)) {
-        return null
-      }
-
-      return {
-        name,
-        priceLabel: `${formatUsd(monthlyPrice)}/mo`,
-        monthlyCapLabel: formatUsd(monthlyCap),
-        dailyRequestLimitLabel: formatInteger(dailyLimit),
-        fourHourCapLabel: formatUsd(fourHourCap),
-        paygDiscountLabel: `${Math.round(discount)}%`
-      } satisfies PlanLimitEntry
-    })
-    .filter((item): item is PlanLimitEntry => item !== null)
-
-  return normalized.length > 0 ? normalized : getDefaultPlanLimits()
-}
-
-function getPlanLimitItems(payload: JsonContainer | null): JsonArray {
-  if (payload === null) {
-    return []
-  }
-
-  if (Array.isArray(payload)) {
-    return payload
-  }
-
-  if (Array.isArray(payload.items)) {
-    return payload.items
-  }
-
-  if (Array.isArray(payload.plans)) {
-    return payload.plans
-  }
-
-  if (Array.isArray(payload.pricing)) {
-    return payload.pricing
-  }
-
-  return []
-}
-
-function isRetiredBasePlan(name: string, monthlyPrice: number): boolean {
-  return name.toLowerCase() === 'base' || monthlyPrice === 3
-}
-
-function getDefaultPlanLimits(): PlanLimitEntry[] {
-  return [
-    { name: 'Plus', priceLabel: '$10/mo', monthlyCapLabel: '$50', dailyRequestLimitLabel: '2,000', fourHourCapLabel: '$4.17', paygDiscountLabel: '6%' },
-    { name: 'Pro', priceLabel: '$20/mo', monthlyCapLabel: '$100', dailyRequestLimitLabel: '5,000', fourHourCapLabel: '$8.33', paygDiscountLabel: '10%' }
+function normalizePlanLimits(plan: PlanInfo | null): PlanLimitEntry[] {
+  // Public price and discount references verified on 2026-08-08. Exact limits
+  // are never inferred for another tier; only current-account values may fill them.
+  const references = [
+    { name: 'Plus', monthlyPriceUsd: 10, paygDiscountPercent: 6 },
+    { name: 'Pro', monthlyPriceUsd: 20, paygDiscountPercent: 10 }
   ]
+
+  const entries = references.map((reference) => {
+    const isCurrent = plan?.planName?.toLowerCase() === reference.name.toLowerCase()
+    return toPlanLimitEntry(reference.name, isCurrent ? plan : null, reference.monthlyPriceUsd, reference.paygDiscountPercent)
+  })
+
+  if (plan?.planName && !references.some((reference) => reference.name.toLowerCase() === plan.planName?.toLowerCase())) {
+    entries.unshift(toPlanLimitEntry(plan.planName, plan, null, null))
+  }
+
+  return entries
+}
+
+function toPlanLimitEntry(name: string, plan: PlanInfo | null, referenceMonthlyPrice: number | null, referenceDiscount: number | null): PlanLimitEntry {
+  const monthlyPrice = plan?.monthlyPriceUsd ?? referenceMonthlyPrice
+  const paygDiscount = plan?.paygDiscountPercent ?? referenceDiscount
+
+  return {
+    name,
+    priceLabel: monthlyPrice === null ? '--' : `${formatUsd(monthlyPrice)}/mo`,
+    monthlyCapLabel: plan?.monthlyCapUsd === null || plan?.monthlyCapUsd === undefined ? '--' : formatUsd(plan.monthlyCapUsd),
+    dailyRequestLimitLabel: plan?.dailyRequestLimit === null || plan?.dailyRequestLimit === undefined ? '--' : formatInteger(plan.dailyRequestLimit),
+    fourHourCapLabel: plan?.fourHourCapUsd === null || plan?.fourHourCapUsd === undefined ? '--' : formatUsd(plan.fourHourCapUsd),
+    paygDiscountLabel: paygDiscount === null ? '--' : `${Math.round(paygDiscount)}%`
+  }
 }
 
 function formatUsd(value: number): string {

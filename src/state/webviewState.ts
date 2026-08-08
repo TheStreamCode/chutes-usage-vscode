@@ -1,13 +1,22 @@
-import type { DashboardState } from '../types'
+import type { DashboardState, WebviewDashboardState } from '../types'
 
 // Send the webview only what the dashboard renders. The per-model `quotas` rows
 // are consumed by the extension host to derive the daily window and are never
-// read by the webview, so they stay out of every `postMessage` payload and out
-// of the state the webview persists through `vscode.setState`.
-export function toWebviewState(state: DashboardState): DashboardState {
-  if (state.data === null || state.data.quotas.length === 0) {
-    return state
+// read by the webview, so project an exact boundary type rather than forwarding
+// the wider extension-host state object.
+export function toWebviewState(state: DashboardState): WebviewDashboardState {
+  return {
+    connectionState: state.connectionState,
+    connected: state.connected,
+    lastUpdatedAt: state.lastUpdatedAt,
+    data: state.data === null
+      ? null
+      : {
+          windows: state.data.windows,
+          plan: state.data.plan,
+          planLimits: state.data.planLimits,
+          paygCreditUsd: state.data.paygCreditUsd
+        },
+    errorMessage: state.errorMessage
   }
-
-  return { ...state, data: { ...state.data, quotas: [] } }
 }

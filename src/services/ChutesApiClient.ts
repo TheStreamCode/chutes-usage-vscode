@@ -1,15 +1,16 @@
 import { API_BASE_URL } from '../constants'
 import type { JsonContainer, JsonObject } from '../types'
 
+const QUOTA_USAGE_CONCURRENCY = 5
+
 export class ChutesApiClient {
   public constructor(private readonly apiKey: string) {}
 
   // Fetch all user-facing dashboard endpoints needed for the first extension version.
-  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; pricing: JsonContainer | null; me: JsonContainer | null }> {
-    const [subscriptionUsage, quotas, pricing, quotaUsageMe, invocationStatsLlm, me] = await Promise.all([
+  public async getDashboardPayload(): Promise<{ subscriptionUsage: JsonObject; quotas: JsonContainer; quotaUsageMe: JsonContainer | null; quotaUsageFallback: JsonContainer | null; invocationStatsLlm: JsonContainer | null; me: JsonContainer | null }> {
+    const [subscriptionUsage, quotas, quotaUsageMe, invocationStatsLlm, me] = await Promise.all([
       this.getJsonContainer('/users/me/subscription_usage'),
       this.getJsonContainer('/users/me/quotas'),
-      this.getJsonContainer('/pricing').catch(() => null),
       this.getJsonContainer('/users/me/quota_usage/me').catch(() => null),
       this.getJsonContainer('/invocations/stats/llm').catch(() => null),
       this.getJsonContainer('/users/me').catch(() => null)
@@ -20,7 +21,7 @@ export class ChutesApiClient {
       throw new Error('Unexpected API response shape for /users/me/subscription_usage')
     }
 
-    return { subscriptionUsage, quotas, quotaUsageMe, quotaUsageFallback, invocationStatsLlm, pricing, me }
+    return { subscriptionUsage, quotas, quotaUsageMe, quotaUsageFallback, invocationStatsLlm, me }
   }
 
   // Execute one authenticated GET request and return a JSON object or array payload.
@@ -60,11 +61,11 @@ export class ChutesApiClient {
       return null
     }
 
-    const entries = await Promise.all(chuteIds.map(async (chuteId) => {
+    const entries = await mapWithConcurrency(chuteIds, QUOTA_USAGE_CONCURRENCY, async (chuteId) => {
       const path = `/users/me/quota_usage/${encodePathSegment(chuteId)}`
       const payload = await this.getJsonContainer(path).catch(() => null)
       return payload === null ? null : [chuteId, payload] as const
-    }))
+    })
 
     const validEntries = entries.filter((entry): entry is readonly [string, JsonContainer] => entry !== null)
     if (validEntries.length === 0) {
@@ -73,6 +74,25 @@ export class ChutesApiClient {
 
     return Object.fromEntries(validEntries)
   }
+}
+
+async function mapWithConcurrency<T, R>(items: readonly T[], concurrency: number, mapper: (item: T) => Promise<R>): Promise<R[]> {
+  const results = new Array<R>(items.length)
+  let nextIndex = 0
+  const workerCount = Math.min(concurrency, items.length)
+
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex++
+      const item = items[index]
+      if (item !== undefined) {
+        results[index] = await mapper(item)
+      }
+    }
+  })
+
+  await Promise.all(workers)
+  return results
 }
 
 function isJsonObject(value: unknown): value is JsonObject {

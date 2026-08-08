@@ -1,8 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { formatResetLabel, getHeaderPresentation } from '../../webview/presentation'
-import type { DashboardState } from '../types'
+import { formatResetLabel, getHeaderPresentation, getProgressPresentation } from '../../webview/presentation'
+import type { DashboardState, UsageWindow } from '../types'
 
 test('keeps key management actions available when the dashboard is in error with stale data', () => {
   const presentation = getHeaderPresentation(createState({
@@ -93,6 +93,50 @@ test('keeps explanatory reset labels readable', () => {
   assert.equal(formatResetLabel('Possible sync delay'), 'Possible sync delay')
 })
 
+test('announces a known progress value with its verified usage and limit', () => {
+  const presentation = getProgressPresentation(createWindow({
+    used: 21.2,
+    limit: 50,
+    percentUsed: 42.4
+  }))
+
+  assert.deepEqual(presentation, {
+    percentUsed: 42.4,
+    ariaValueText: '42% used; $21.20 of $50.00'
+  })
+})
+
+test('omits the numeric progress value when the percentage is unknown', () => {
+  assert.deepEqual(getProgressPresentation(createWindow({
+    unit: 'requests',
+    used: 3,
+    limit: null,
+    percentUsed: null
+  })), {
+    percentUsed: null,
+    ariaValueText: '3 used; limit unavailable'
+  })
+
+  assert.equal(getProgressPresentation(createWindow()).ariaValueText, 'Usage unavailable')
+})
+
+test('announces an unlimited request quota without inventing a percentage', () => {
+  assert.deepEqual(getProgressPresentation(createWindow({
+    unit: 'requests',
+    used: 8,
+    limit: 0,
+    percentUsed: null
+  })), {
+    percentUsed: null,
+    ariaValueText: '8 used; unlimited request quota'
+  })
+})
+
+test('clamps progress percentages to the ARIA range', () => {
+  assert.equal(getProgressPresentation(createWindow({ percentUsed: 140 })).percentUsed, 100)
+  assert.equal(getProgressPresentation(createWindow({ percentUsed: -10 })).percentUsed, 0)
+})
+
 // Build a minimal dashboard state for presentation tests.
 function createState(overrides: Partial<DashboardState> = {}): DashboardState {
   return {
@@ -101,6 +145,21 @@ function createState(overrides: Partial<DashboardState> = {}): DashboardState {
     lastUpdatedAt: null,
     data: null,
     errorMessage: null,
+    ...overrides
+  }
+}
+
+function createWindow(overrides: Partial<UsageWindow> = {}): UsageWindow {
+  return {
+    id: 'billing',
+    kind: 'billing-cycle',
+    label: 'Billing Cycle Cap',
+    unit: 'usd',
+    used: null,
+    limit: null,
+    remaining: null,
+    percentUsed: null,
+    resetLabel: null,
     ...overrides
   }
 }

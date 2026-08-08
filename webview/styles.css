@@ -7,11 +7,11 @@
 }
 
 :root {
-  --chutes-accent-mint: #6ef2b1;
-  --chutes-accent-violet: #7c7bff;
-  --chutes-headline-violet: #a78bfa;
-  --chutes-warn: #f59e0b;
-  --chutes-crit: #ef4444;
+  --chutes-accent-mint: var(--vscode-charts-green, #1f8f5f);
+  --chutes-accent-violet: var(--vscode-charts-purple, #7568e8);
+  --chutes-headline-violet: var(--vscode-textLink-foreground, #7568e8);
+  --chutes-warn: var(--vscode-notificationsWarningIcon-foreground, #b86e00);
+  --chutes-crit: var(--vscode-errorForeground, #d83b3b);
 
   --radius-pill: 999px;
   --radius-card: 12px;
@@ -32,6 +32,14 @@
   --card-border-strong: var(--vscode-focusBorder, color-mix(in srgb, var(--vscode-foreground) 24%, transparent));
 }
 
+body.vscode-light {
+  --chutes-accent-mint: #0b6b3a;
+  --chutes-accent-violet: #4736b3;
+  --chutes-headline-violet: #5b21b6;
+  --chutes-warn: #7c3e00;
+  --chutes-crit: #b42318;
+}
+
 body.vscode-dark {
   --app-bg: #000;
   --panel-bg: #0a0a0c;
@@ -43,9 +51,11 @@ body.vscode-dark {
 
 body.vscode-high-contrast,
 body.vscode-high-contrast-light {
-  --chutes-accent-mint: var(--vscode-charts-green, #6ef2b1);
-  --chutes-accent-violet: var(--vscode-charts-purple, #7c7bff);
-  --chutes-headline-violet: var(--vscode-charts-purple, #a78bfa);
+  --chutes-accent-mint: var(--vscode-charts-green, currentColor);
+  --chutes-accent-violet: var(--vscode-charts-purple, currentColor);
+  --chutes-headline-violet: var(--vscode-charts-purple, currentColor);
+  --chutes-warn: var(--vscode-editorWarning-foreground, currentColor);
+  --chutes-crit: var(--vscode-errorForeground, currentColor);
   --card-border: var(--vscode-contrastBorder, currentColor);
   --card-border-strong: var(--vscode-contrastActiveBorder, currentColor);
 }
@@ -111,7 +121,6 @@ body {
   color: var(--chutes-headline-violet);
   font-weight: 400;
   margin: 0 2px;
-  opacity: 0.85;
 }
 
 .status-line {
@@ -339,6 +348,32 @@ body {
   text-overflow: ellipsis;
 }
 
+.plan-stat-value-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.plan-stat-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.plan-stat-status.is-warn {
+  color: var(--chutes-warn);
+}
+
+.plan-stat-status.is-crit {
+  color: var(--chutes-crit);
+}
+
 .plan-meta {
   margin-top: var(--gap-md);
   font-size: 11px;
@@ -371,7 +406,7 @@ body {
 }
 
 .metric-card.is-stale {
-  opacity: 0.78;
+  border-style: dashed;
 }
 
 .metric-header {
@@ -482,6 +517,11 @@ body {
   padding-top: var(--gap-lg);
 }
 
+.plan-limits-heading {
+  margin: 0;
+  font: inherit;
+}
+
 .plan-limits-toggle {
   display: flex;
   width: 100%;
@@ -545,6 +585,22 @@ body {
   font-size: 11px;
   color: var(--vscode-descriptionForeground);
   line-height: 1.5;
+}
+
+.plan-limits-link {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.plan-limits-link:hover {
+  color: var(--vscode-textLink-activeForeground, var(--vscode-textLink-foreground));
+  text-decoration: underline;
+}
+
+.plan-limits-link:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, currentColor);
+  outline-offset: 2px;
 }
 
 .plan-limits-tiers {
@@ -675,7 +731,6 @@ body {
   font-size: 10px;
   color: var(--vscode-descriptionForeground);
   line-height: 1.5;
-  opacity: 0.85;
 }
 
 .plan-limits-footnote .codicon {
@@ -722,7 +777,6 @@ body {
 .empty-hint {
   font-size: 10px;
   color: var(--vscode-descriptionForeground);
-  opacity: 0.75;
   margin-top: var(--gap-md);
   line-height: 1.5;
 }
@@ -800,10 +854,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.footer-next {
-  opacity: 0.7;
 }
 
 .footer-link {
