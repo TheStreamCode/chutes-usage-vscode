@@ -58,6 +58,5 @@ export type ActionType = 'refresh' | 'setApiKey' | 'removeApiKey' | 'openExterna
 
 export type CachedPayload = {
   version: number
-  state: DashboardState
   planLimitsCollapsed: boolean
 }

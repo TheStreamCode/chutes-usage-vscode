@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+- Cleared the `fast-uri` and `undici` development dependency advisories with an npm-managed lockfile refresh.
+- Stopped persisting dashboard account snapshots in webview state. Only the Plan Limits collapsed preference is retained, and the cache schema is now version 3.
+- Removed the unrelated `/pricing` request. Plan reference prices and PAYG discounts are clearly identified as public references, while account-specific limits are shown only when returned for the current plan; unavailable values use `--`.
+- Tightened host-to-webview projections and runtime validators so quota rows and unknown fields cannot cross the message boundary.
+- Improved accessibility with contrast-safe light-theme accents, live sync announcements, truthful progressbar values, semantic section headings, and text labels for low or exhausted PAYG credit.
+- Limited per-chute quota fallback requests to five concurrent calls and pinned CI to the exact Node.js version in `.nvmrc`.
+
 ## 0.5.4 — 2026-08-01
 
 - Stopped sending the per-model quota rows to the dashboard webview. They are only used by the extension host to derive the daily window, so every state message and the state the webview persists are now smaller. No visible change to the dashboard.

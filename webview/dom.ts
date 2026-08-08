@@ -8,10 +8,12 @@ type ElProps<K extends keyof HTMLElementTagNameMap> = {
   ariaLabel?: string
   ariaHidden?: boolean
   ariaLive?: 'off' | 'polite' | 'assertive'
+  ariaAtomic?: boolean
   ariaExpanded?: boolean
   ariaValueMin?: number
   ariaValueMax?: number
   ariaValueNow?: number
+  ariaValueText?: string
   dataKind?: string
 } & Partial<Pick<HTMLElementTagNameMap[K], 'id'>>
 
@@ -30,10 +32,12 @@ export function el<K extends keyof HTMLElementTagNameMap>(
   if (props.ariaLabel !== undefined) node.ariaLabel = props.ariaLabel
   if (props.ariaHidden !== undefined) node.ariaHidden = String(props.ariaHidden)
   if (props.ariaLive !== undefined) node.ariaLive = props.ariaLive
+  if (props.ariaAtomic !== undefined) node.ariaAtomic = String(props.ariaAtomic)
   if (props.ariaExpanded !== undefined) node.ariaExpanded = String(props.ariaExpanded)
   if (props.ariaValueMin !== undefined) node.ariaValueMin = String(props.ariaValueMin)
   if (props.ariaValueMax !== undefined) node.ariaValueMax = String(props.ariaValueMax)
   if (props.ariaValueNow !== undefined) node.ariaValueNow = String(props.ariaValueNow)
+  if (props.ariaValueText !== undefined) node.ariaValueText = props.ariaValueText
   if (props.dataKind !== undefined) node.dataset.kind = props.dataKind
   if (tag === 'button' && props.type !== undefined) {
     (node as HTMLButtonElement).type = props.type as 'button' | 'reset' | 'submit'
@@ -70,9 +74,18 @@ export function setAriaExpanded(element: HTMLElement, value: boolean): void {
   if (element.ariaExpanded !== stringValue) element.ariaExpanded = stringValue
 }
 
-export function setAriaValueNow(element: HTMLElement, value: number): void {
+export function setAriaValueNow(element: HTMLElement, value: number | null): void {
+  if (value === null) {
+    if (element.ariaValueNow !== null) element.removeAttribute('aria-valuenow')
+    return
+  }
+
   const stringValue = String(value)
   if (element.ariaValueNow !== stringValue) element.ariaValueNow = stringValue
+}
+
+export function setAriaValueText(element: HTMLElement, value: string): void {
+  if (element.ariaValueText !== value) element.ariaValueText = value
 }
 
 export function setStyleVar(element: HTMLElement, name: string, value: string): void {

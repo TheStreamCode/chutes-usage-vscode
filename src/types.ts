@@ -55,6 +55,13 @@ export interface DashboardData {
   paygCreditUsd: number | null
 }
 
+export interface WebviewDashboardData {
+  windows: UsageWindow[]
+  plan: PlanInfo | null
+  planLimits: PlanLimitEntry[]
+  paygCreditUsd: number | null
+}
+
 export interface QuotaUsageSummary {
   used: number | null
   quota: number | null
@@ -75,9 +82,17 @@ export interface DashboardState {
   errorMessage: string | null
 }
 
+export interface WebviewDashboardState {
+  connectionState: ConnectionState
+  connected: boolean
+  lastUpdatedAt: string | null
+  data: WebviewDashboardData | null
+  errorMessage: string | null
+}
+
 export interface WebviewStateMessage {
   type: 'state'
-  state: DashboardState
+  state: WebviewDashboardState
   refreshIntervalMs?: number
 }
 

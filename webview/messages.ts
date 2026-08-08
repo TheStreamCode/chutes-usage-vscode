@@ -7,7 +7,10 @@ const WINDOW_STATUSES = new Set(['trusted', 'stale', 'unknown'])
 const DATA_SOURCES = new Set(['quota-usage-me', 'quota-usage-fallback', 'subscription-usage', 'quotas', 'unknown'])
 
 export function isStateMessage(value: unknown): value is StateMessage {
-  if (!isObject(value) || value.type !== 'state' || !isDashboardState(value.state)) {
+  if (!isObject(value)
+    || !hasOnlyKeys(value, ['type', 'state', 'refreshIntervalMs'])
+    || value.type !== 'state'
+    || !isDashboardState(value.state)) {
     return false
   }
 
@@ -16,13 +19,14 @@ export function isStateMessage(value: unknown): value is StateMessage {
 
 export function isCachedPayload(value: unknown): value is CachedPayload {
   return isObject(value)
+    && hasOnlyKeys(value, ['version', 'planLimitsCollapsed'])
     && Number.isInteger(value.version)
     && typeof value.planLimitsCollapsed === 'boolean'
-    && isDashboardState(value.state)
 }
 
 function isDashboardState(value: unknown): value is DashboardState {
   if (!isObject(value)
+    || !hasOnlyKeys(value, ['connectionState', 'connected', 'lastUpdatedAt', 'data', 'errorMessage'])
     || typeof value.connectionState !== 'string'
     || !CONNECTION_STATES.has(value.connectionState)
     || typeof value.connected !== 'boolean'
@@ -36,6 +40,7 @@ function isDashboardState(value: unknown): value is DashboardState {
   }
 
   return isObject(value.data)
+    && hasOnlyKeys(value.data, ['windows', 'plan', 'planLimits', 'paygCreditUsd'])
     && Array.isArray(value.data.windows)
     && value.data.windows.every(isUsageWindow)
     && (value.data.plan === null || isPlanInfo(value.data.plan))
@@ -46,6 +51,7 @@ function isDashboardState(value: unknown): value is DashboardState {
 
 function isUsageWindow(value: unknown): value is UsageWindow {
   if (!isObject(value)
+    || !hasOnlyKeys(value, ['id', 'kind', 'label', 'unit', 'used', 'limit', 'remaining', 'percentUsed', 'resetLabel', 'status', 'dataSource'])
     || typeof value.id !== 'string'
     || typeof value.kind !== 'string'
     || !WINDOW_KINDS.has(value.kind)
@@ -70,6 +76,7 @@ function isUsageWindow(value: unknown): value is UsageWindow {
 
 function isPlanInfo(value: unknown): value is PlanInfo {
   return isObject(value)
+    && hasOnlyKeys(value, ['planName', 'monthlyPriceUsd', 'monthlyCapUsd', 'fourHourCapUsd', 'dailyRequestLimit', 'paygDiscountPercent'])
     && isNullableString(value.planName)
     && isNullableFiniteNumber(value.monthlyPriceUsd)
     && isNullableFiniteNumber(value.monthlyCapUsd)
@@ -80,6 +87,7 @@ function isPlanInfo(value: unknown): value is PlanInfo {
 
 function isPlanLimitEntry(value: unknown): value is PlanLimitEntry {
   return isObject(value)
+    && hasOnlyKeys(value, ['name', 'priceLabel', 'monthlyCapLabel', 'dailyRequestLimitLabel', 'fourHourCapLabel', 'paygDiscountLabel'])
     && typeof value.name === 'string'
     && typeof value.priceLabel === 'string'
     && typeof value.monthlyCapLabel === 'string'
@@ -90,6 +98,11 @@ function isPlanLimitEntry(value: unknown): value is PlanLimitEntry {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, allowedKeys: readonly string[]): boolean {
+  const allowed = new Set(allowedKeys)
+  return Object.keys(value).every((key) => allowed.has(key))
 }
 
 function isNullableString(value: unknown): value is string | null {

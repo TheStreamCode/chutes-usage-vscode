@@ -40,10 +40,6 @@ test('fetches fallback quota usage through documented per-chute endpoints when a
       return jsonResponse([])
     }
 
-    if (url.endsWith('/pricing')) {
-      return jsonResponse([])
-    }
-
     if (url.endsWith('/users/me')) {
       return jsonResponse({ balance: 12.34 })
     }
@@ -63,6 +59,7 @@ test('fetches fallback quota usage through documented per-chute endpoints when a
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/my-chute')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/me')))
     assert.ok(requestedUrls.some((url) => url.endsWith('/invocations/stats/llm')))
+    assert.ok(!requestedUrls.some((url) => url.endsWith('/pricing')))
     assert.ok(!requestedUrls.some((url) => url.endsWith('/users/me/quota_usage/*')))
   } finally {
     globalThis.fetch = originalFetch
@@ -90,10 +87,6 @@ test('skips per-chute fallback quota usage when aggregate usage is available', a
     }
 
     if (url.endsWith('/invocations/stats/llm')) {
-      return jsonResponse([])
-    }
-
-    if (url.endsWith('/pricing')) {
       return jsonResponse([])
     }
 
@@ -139,10 +132,6 @@ test('treats numeric string aggregate quota usage as available', async () => {
       return jsonResponse([])
     }
 
-    if (url.endsWith('/pricing')) {
-      return jsonResponse([])
-    }
-
     if (url.endsWith('/users/me')) {
       return jsonResponse({ balance: 12.34 })
     }
@@ -175,10 +164,6 @@ test('returns null fallback quota usage when quota rows have no chute ids', asyn
           { model: 'All Models', quota: 5000 }
         ]
       })
-    }
-
-    if (url.endsWith('/pricing')) {
-      return jsonResponse([])
     }
 
     if (url.endsWith('/users/me/quota_usage/me')) {
@@ -232,10 +217,6 @@ test('prefers quota_usage me and llm stats in the dashboard payload', async () =
       ])
     }
 
-    if (url.endsWith('/pricing')) {
-      return jsonResponse([])
-    }
-
     if (url.endsWith('/users/me')) {
       return jsonResponse({ balance: 12.34 })
     }
@@ -255,6 +236,56 @@ test('prefers quota_usage me and llm stats in the dashboard payload', async () =
     assert.ok(requestedUrls.some((url) => url.endsWith('/invocations/stats/llm')))
     assert.deepEqual(payload.me, { balance: 12.34 })
     assert.ok(requestedUrls.some((url) => url.endsWith('/users/me')))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('limits per-chute fallback requests to five concurrent calls', async () => {
+  const originalFetch = globalThis.fetch
+  let inFlight = 0
+  let maxInFlight = 0
+  const chuteIds = Array.from({ length: 12 }, (_, index) => `chute-${index}`)
+
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+
+    if (url.endsWith('/users/me/subscription_usage')) {
+      return jsonResponse({ subscription: true, monthly_price: 20 })
+    }
+
+    if (url.endsWith('/users/me/quotas')) {
+      return jsonResponse(chuteIds.map((chuteId) => ({ chute_id: chuteId, quota: 100 })))
+    }
+
+    if (url.endsWith('/users/me/quota_usage/me')) {
+      return jsonResponse({})
+    }
+
+    if (url.endsWith('/invocations/stats/llm')) {
+      return jsonResponse([])
+    }
+
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({ balance: 12.34 })
+    }
+
+    if (url.includes('/users/me/quota_usage/chute-')) {
+      inFlight++
+      maxInFlight = Math.max(maxInFlight, inFlight)
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      inFlight--
+      return jsonResponse({ used: 1, quota: 100 })
+    }
+
+    throw new Error(`Unexpected URL ${url}`)
+  }) as typeof fetch
+
+  try {
+    const payload = await new ChutesApiClient('test-key').getDashboardPayload()
+
+    assert.equal(Object.keys(payload.quotaUsageFallback ?? {}).length, chuteIds.length)
+    assert.equal(maxInFlight, 5)
   } finally {
     globalThis.fetch = originalFetch
   }

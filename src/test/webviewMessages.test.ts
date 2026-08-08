@@ -30,6 +30,43 @@ test('accepts a complete dashboard state message', () => {
   assert.equal(isStateMessage({ type: 'state', state: readyState, refreshIntervalMs: 60_000 }), true)
 })
 
+test('rejects unknown fields at every webview message boundary', () => {
+  assert.equal(isStateMessage({ type: 'state', state: readyState, unexpected: true }), false)
+  assert.equal(isStateMessage({ type: 'state', state: { ...readyState, quotas: [] } }), false)
+  assert.equal(isStateMessage({
+    type: 'state',
+    state: { ...readyState, data: { ...readyState.data, quotas: [] } }
+  }), false)
+  assert.equal(isStateMessage({
+    type: 'state',
+    state: {
+      ...readyState,
+      data: {
+        ...readyState.data,
+        windows: [{ ...readyState.data.windows[0], unexpected: true }]
+      }
+    }
+  }), false)
+  assert.equal(isStateMessage({
+    type: 'state',
+    state: {
+      ...readyState,
+      data: {
+        ...readyState.data,
+        plan: {
+          planName: 'Pro',
+          monthlyPriceUsd: 20,
+          monthlyCapUsd: 100,
+          fourHourCapUsd: 8.33,
+          dailyRequestLimit: 5000,
+          paygDiscountPercent: 10,
+          unexpected: true
+        }
+      }
+    }
+  }), false)
+})
+
 test('rejects malformed dashboard values before rendering them', () => {
   const malformed = structuredClone(readyState)
   malformed.data.windows[0].used = Number.NaN
@@ -40,7 +77,8 @@ test('rejects malformed dashboard values before rendering them', () => {
 })
 
 test('validates cached payloads before restoring webview state', () => {
-  assert.equal(isCachedPayload({ version: 2, state: readyState, planLimitsCollapsed: false }), true)
-  assert.equal(isCachedPayload({ version: 2, state: readyState, planLimitsCollapsed: 'false' }), false)
-  assert.equal(isCachedPayload({ version: 2, state: { ...readyState, data: { windows: [] } }, planLimitsCollapsed: false }), false)
+  assert.equal(isCachedPayload({ version: 3, planLimitsCollapsed: false }), true)
+  assert.equal(isCachedPayload({ version: 3, planLimitsCollapsed: 'false' }), false)
+  assert.equal(isCachedPayload({ version: 3, planLimitsCollapsed: false, unexpected: true }), false)
+  assert.equal(isCachedPayload({ version: 2, state: readyState, planLimitsCollapsed: false }), false)
 })

@@ -1,4 +1,4 @@
-import type { DashboardState } from './types.js'
+import type { DashboardState, UsageWindow } from './types.js'
 
 export type HeaderPresentation = {
   statusText: string
@@ -6,6 +6,44 @@ export type HeaderPresentation = {
   keyActionLabel: 'Set Key' | 'Replace Key'
   removeDisabled: boolean
   tone: 'idle' | 'live' | 'warn' | 'error'
+}
+
+export type ProgressPresentation = {
+  percentUsed: number | null
+  ariaValueText: string
+}
+
+export function getProgressPresentation(window: UsageWindow): ProgressPresentation {
+  const percentUsed = window.percentUsed === null
+    ? null
+    : Math.max(0, Math.min(window.percentUsed, 100))
+
+  if (percentUsed === null) {
+    if (window.unit === 'requests' && window.limit === 0) {
+      return {
+        percentUsed: null,
+        ariaValueText: window.used === null
+          ? 'Unlimited request quota'
+          : `${formatProgressValue(window.used, window.unit)} used; unlimited request quota`
+      }
+    }
+
+    return {
+      percentUsed: null,
+      ariaValueText: window.used === null
+        ? 'Usage unavailable'
+        : `${formatProgressValue(window.used, window.unit)} used; limit unavailable`
+    }
+  }
+
+  const limit = window.limit === 0 && window.unit === 'requests'
+    ? 'Unlimited'
+    : formatProgressValue(window.limit, window.unit)
+
+  return {
+    percentUsed,
+    ariaValueText: `${Math.round(percentUsed)}% used; ${formatProgressValue(window.used, window.unit)} of ${limit}`
+  }
 }
 
 export function formatResetLabel(
@@ -83,6 +121,12 @@ function buildPrefix(planName: string | null | undefined, monthlyPrice: number |
   }
 
   return ''
+}
+
+function formatProgressValue(value: number | null, unit: UsageWindow['unit']): string {
+  if (value === null) return '—'
+  if (unit === 'requests') return Math.round(value).toLocaleString('en-US')
+  return `$${value.toFixed(2)}`
 }
 
 function defaultFormatTime(value: string): string {

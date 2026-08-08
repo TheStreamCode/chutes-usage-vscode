@@ -13,6 +13,8 @@ This is an unofficial third-party extension and is not affiliated with or endors
 
 ![Chutes Usage Monitor dashboard](media/screenshot-chutes-usage.png)
 
+> The fixed screenshot is illustrative of the earlier dashboard layout. Current releases omit the retired Base tier and include the PAYG credit tile.
+
 ## Requirements
 
 - VS Code `1.103.0` or newer (or a compatible editor that installs from Open VSX)
@@ -35,19 +37,20 @@ After installation:
 
 - Sidebar dashboard aligned with the chutes.ai look: pure-black on dark themes, pill buttons, mint pill badges, headline-violet section titles, generous whitespace
 - Theme-aware: backgrounds, foregrounds, borders, and description text follow VS Code theme tokens; works with Light, Dark, and High Contrast themes
-- Plan snapshot, per-window usage cards with progress bars, and a Plan Limits reference that highlights your current tier
-- PAYG credit tile showing your pay-as-you-go account balance, with amber/red warnings when the balance runs low or reaches zero
+- Plan snapshot, per-window usage cards with progress bars, and a Plan Limits reference that uses account data only for your current tier
+- PAYG credit tile showing your pay-as-you-go account balance, with visible low/no-credit labels in addition to warning colors
 - Compact status bar summary with severity-aware codicon and background color; full detail in the tooltip
 - Secure API key storage through VS Code `SecretStorage`
 - Manual refresh command for immediate sync
 - Automatic refresh on a configurable timer, when the dashboard becomes visible again, and when the VS Code window regains focus
 - Live `refresh in Ns` countdown driven by your `refreshIntervalSeconds` setting
-- Cached state restore on side-panel reopen — no `Loading…` flash, no flicker on every tick
+- Privacy-safe webview state: only the Plan Limits collapsed preference is retained; usage snapshots are never persisted
 - Accessible by default: ARIA progressbar/alert/status semantics, `prefers-reduced-motion` support, and visible focus rings
 - Hardened webview CSP with a per-load nonce and scoped `font-src`/`img-src`
 
 ## Latest Changes
 
+- `Unreleased` clears dependency advisories, removes persisted usage snapshots and the unrelated pricing request, tightens the webview boundary, and improves accessibility.
 - `0.5.4` trims the dashboard state message to the fields the webview renders, removes dead status bar and webview code, syncs the citation metadata, and expands the project documentation.
 - `0.5.3` hardens webview message and cache handling, resolves the remaining CodeQL findings, adds stricter local and CI quality gates, improves cross-platform cleanup, and live-validates the current Chutes API integration.
 - `0.5.2` improves legal documentation, trademark notices, third-party terms references, and project metadata.
@@ -78,7 +81,7 @@ The sidebar dashboard includes:
 - a compact header with sync state and actions
 - a plan snapshot with the most relevant subscription figures, including your pay-as-you-go credit balance
 - stacked usage cards optimized for narrow Activity Bar layouts
-- a `Plan Limits` reference section that uses pricing data when available without exposing a raw quota payload table
+- a `Plan Limits` reference section with public plan prices and PAYG discounts; current-plan limits come from your account and unavailable values display as `--`
 
 The dashboard refreshes when you run the refresh command, on the configured refresh interval, when the dashboard becomes visible again, and when VS Code regains window focus.
 
@@ -96,11 +99,12 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 - Your Chutes API key is stored using VS Code `SecretStorage`.
 - The extension uses the key only to request your own usage data.
 - The extension does not keep a local history of usage data.
+- The webview persists only whether the Plan Limits section is collapsed, never an account snapshot.
 - On uninstall, the extension performs best-effort cleanup of its local extension storage.
 
 ## Development
 
-Requires Node.js `22` (see `.nvmrc`) and `npm`. The lockfile is authoritative — do not switch package manager.
+Requires Node.js `22.17.0` (see `.nvmrc`) and `npm`. The lockfile is authoritative — do not switch package manager.
 
 ```bash
 npm ci          # install the locked dependencies

@@ -59,7 +59,6 @@ export class DashboardStore {
         payload.quotaUsageFallback,
         payload.quotaUsageMe,
         payload.invocationStatsLlm,
-        payload.pricing,
         payload.me
       )
 

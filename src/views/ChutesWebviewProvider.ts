@@ -125,9 +125,11 @@ function isWebviewActionMessage(message: unknown): message is WebviewActionMessa
     case 'refresh':
     case 'setApiKey':
     case 'removeApiKey':
-      return true
+      return Object.keys(message).length === 1
     case 'openExternal':
       return typeof candidate.href === 'string'
+        && Object.keys(message).length === 2
+        && Object.hasOwn(message, 'href')
     default:
       return false
   }
