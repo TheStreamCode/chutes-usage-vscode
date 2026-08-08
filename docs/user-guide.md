@@ -2,7 +2,7 @@
 
 ## Overview
 
-`Chutes Usage Monitor` helps you monitor subscription usage and request quotas without leaving VS Code.
+`Chutes Usage Monitor` helps you monitor subscription usage, rolling limits, request quotas, and PAYG credit without leaving VS Code.
 
 The extension provides:
 
@@ -58,7 +58,7 @@ The extension contributes these commands:
 
 ## Refresh Behavior
 
-The extension refreshes data in three ways:
+The extension refreshes data in four ways:
 
 - manual refresh through the command or dashboard action
 - automatic refresh on the configured interval
@@ -68,6 +68,13 @@ The extension refreshes data in three ways:
 Use `chutesUsageVscode.refreshIntervalSeconds` to control the refresh interval.
 
 While the extension host remains active, reopening the dashboard can reuse its in-memory snapshot before refreshing. The webview itself persists only whether the Plan Limits section is collapsed and never stores usage or account values.
+
+## Privacy Model
+
+- The API key is stored only in VS Code `SecretStorage` and is never sent to the webview.
+- Usage and account responses remain in extension-host memory and are not logged or written to a usage history.
+- The webview persists only whether the `Plan Limits` section is collapsed.
+- Removing the API key deletes it from `SecretStorage`; uninstall cleanup also removes extension storage on a best-effort basis.
 
 ## Usage Data Shown
 

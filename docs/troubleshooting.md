@@ -37,7 +37,7 @@ If the extension shows an error state:
 - reopen the dashboard to trigger a fresh visibility refresh
 - switch back to VS Code after changing network or account state to trigger a focus refresh
 
-The extension preserves the last successful snapshot when possible, so a temporary API failure may still leave previous data visible.
+While the extension host remains active, it preserves the last successful snapshot in memory when possible, so a temporary API failure may still leave previous data visible. The webview does not persist account snapshots.
 
 If the dashboard still shows onboarding after replacing a key, run `Chutes Usage Monitor: Refresh` once to confirm the new key is valid.
 
@@ -79,6 +79,10 @@ The `0.5.3` client and dashboard normalization were live-tested on August 1, 202
 using an authenticated Chutes account. All required and optional dashboard
 endpoints returned compatible payloads. The test retained neither the API key nor
 account payloads.
+
+Version `0.5.5` keeps the same account-data endpoints, removes the unrelated
+background `/pricing` request, and adds stricter normalization and message-boundary
+tests without publishing or retaining live account payloads.
 
 ## Reporting An Issue
 

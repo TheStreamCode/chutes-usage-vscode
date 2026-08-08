@@ -91,7 +91,7 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 
 ## Latest Changes
 
-- `Unreleased` clears dependency advisories, removes persisted usage snapshots and the unrelated pricing request, tightens the webview boundary, and improves accessibility.
+- `0.5.5` removes persisted usage snapshots and the unrelated pricing request, clears dependency advisories, tightens the webview boundary, improves accessibility, and refreshes the public project presentation.
 - `0.5.4` trims dashboard state, removes dead code, synchronizes release metadata, and expands the project documentation.
 - `0.5.3` strengthens webview security, repository quality gates, cross-platform cleanup, and API compatibility.
 
