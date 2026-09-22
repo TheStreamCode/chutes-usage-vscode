@@ -87,6 +87,7 @@ Settings changes for refresh interval and status bar visibility apply immediatel
 - The extension uses the key only to request your own usage data.
 - The extension does not keep a local history of usage data.
 - The webview persists only whether the Plan Limits section is collapsed, never an account snapshot.
+- The webview loads its bootstrap as an ES module script with a CSP nonce (covered by `src/test/webviewBootstrap.test.ts`).
 - On uninstall, the extension performs best-effort cleanup of its local extension storage.
 
 ## Latest Changes
