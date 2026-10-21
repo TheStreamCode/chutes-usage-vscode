@@ -12,27 +12,27 @@ Thanks for your interest in improving `Chutes Usage Monitor`.
 
 1. Install the locked dependencies:
 
-```bash
-npm ci
-```
+   ```bash
+   npm ci
+   ```
 
 2. Build the extension:
 
-```bash
-npm run compile
-```
+   ```bash
+   npm run compile
+   ```
 
 3. Run the test suite:
 
-```bash
-npm test
-```
+   ```bash
+   npm test
+   ```
 
 4. Run the complete preflight before opening a pull request:
 
-```bash
-npm run preflight
-```
+   ```bash
+   npm run preflight
+   ```
 
 Use `npm install` only when intentionally changing dependencies so that
 `package-lock.json` is updated together with `package.json`.
