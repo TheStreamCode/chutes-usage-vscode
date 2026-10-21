@@ -101,10 +101,10 @@
 - Removed all infinite glow / scan / pulse animations. Only `fadeIn 0.3s` (one-shot at mount) and the progress-bar `width` transition remain. Skeleton shimmer and the refresh spinner are gated behind `prefers-reduced-motion`.
 - Added accessibility: `role="progressbar"` with `aria-valuemin/max/now` on every metric card, `role="status" aria-live="polite"` on the stale banner, `role="alert" aria-live="assertive"` on the error state, `aria-label` on icon-only buttons, `aria-hidden="true"` on decorative dots and codicons, and a full `prefers-reduced-motion: reduce` block.
 - Persisted the last known dashboard state with `vscode.setState/getState` (schema-versioned) so reopening the side panel no longer flashes a `Loading…` empty state. The Plan Limits collapsed preference is also persisted.
-- Added a current-tier highlight in the Plan Limits comparison (the tier matching `PlanInfo.planName` shows a `★ current` badge), per-card stale badge for windows with `status === 'stale'`, and a `refresh in Ns` countdown in the footer.
+- Added a current-tier highlight in the Plan Limits comparison (the tier matching `PlanInfo.planName` shows a `current` badge), per-card stale badge for windows with `status === 'stale'`, and a `refresh in Ns` countdown in the footer.
 - Made the Plan Limits section collapsible with `aria-expanded` / `aria-controls` and remembered the open/closed state across sessions.
 - Replaced the long status bar text with a compact summary backed by a new `summarizeStatusBarCompact`. The status bar now shows `$(graph) Chutes $X.XX` by default, escalates to `$(graph) Chutes 4h $X.XX/$Y` past 75%, and to `$(warning) Chutes …` with `statusBarItem.warningBackground` past 90%. Errors use `$(error) Chutes` with `statusBarItem.errorBackground`. Loading uses `$(loading~spin) Chutes` and a missing key uses `$(key) Chutes`.
-- Switched all unicode glyphs (`⚠`, `↗`, `→`) to real Codicons (`codicon-warning`, `codicon-link-external`, `codicon-arrow-small-right`). The codicon font is bundled into `out/webview/` from `@vscode/codicons` at build time.
+- Switched the warning, external-link and arrow glyphs to real Codicons (`codicon-warning`, `codicon-link-external`, `codicon-arrow-small-right`). The codicon font is bundled into `out/webview/` from `@vscode/codicons` at build time.
 - Hardened the webview Content-Security-Policy: a per-load random nonce is now required for the `<script>` tag, and `font-src`/`img-src` directives are scoped to `webview.cspSource` (`img-src` also allows `data:`).
 - Added a small zero-deps DOM helper (`webview/dom.ts`) that builds the entire UI without a framework. Shipped extensive bundle-level regression tests for the new render path, ARIA semantics, theme tokens, packaged Codicons, and natural-case copy.
 
@@ -256,3 +256,4 @@
 ## 0.0.1
 
 - Initial development scaffold.
+
