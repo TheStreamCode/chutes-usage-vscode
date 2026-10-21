@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Security report
-    url: https://github.com/TheStreamCode/chutes-usage-vscode/security/advisories/new
-    about: Report sensitive vulnerabilities privately through GitHub.
   - name: Questions and support
     url: https://github.com/TheStreamCode/chutes-usage-vscode/discussions
-    about: Ask usage questions and get help from the community.
+    about: Ask usage questions and get help from the community
+  - name: Troubleshooting guide
+    url: https://github.com/TheStreamCode/chutes-usage-vscode/blob/main/docs/troubleshooting.md
+    about: Common problems and fixes before opening an issue

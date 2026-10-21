@@ -1,153 +1,149 @@
 # Chutes Usage Monitor
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/mikesoft.chutes-usage-vscode?label=Marketplace&color=6366F1)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
-[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/mikesoft.chutes-usage-vscode?color=0EA5E9)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
-[![Open VSX](https://img.shields.io/open-vsx/v/mikesoft/chutes-usage-vscode?label=Open%20VSX&color=a60ee5)](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode)
+Track Chutes usage, quotas, and rolling limits in a VS Code sidebar without leaving the editor.
+
 [![CI](https://github.com/TheStreamCode/chutes-usage-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/TheStreamCode/chutes-usage-vscode/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Sponsor](https://img.shields.io/badge/Sponsor-TheStreamCode-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/TheStreamCode)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/mikesoft.chutes-usage-vscode?label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
 
-Keep Chutes usage visible while you code. The sidebar shows subscription spend, rolling limits, daily requests, and pay-as-you-go credit without leaving VS Code.
-
-[Install from the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode) · [Install from Open VSX](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode) · [Read the user guide](docs/user-guide.md)
-
-This is an unofficial third-party extension and is not affiliated with or endorsed by Chutes.
-
-![Chutes Usage Monitor dashboard](media/screenshot-chutes-usage.png)
+![Chutes Usage Monitor dashboard showing usage cards for the billing window](media/screenshot-chutes-usage.png)
 
 _Current dashboard rendered with synthetic, illustrative values._
 
-## Requirements
+Chutes Usage Monitor is a read-only VS Code extension for developers who run models through Chutes and
+want billing context while they code. It shows subscription spend, rolling limits, daily requests, and
+pay-as-you-go credit in an Activity Bar dashboard and an optional status bar summary, using only the
+API key you provide.
 
-- VS Code `1.103.0` or newer (or a compatible editor that installs from Open VSX)
-- A Chutes account and an API key with access to your own usage data
+This is an independent, unofficial third-party extension. It is not affiliated with, sponsored by, or
+endorsed by Chutes.
 
-## Installation
+## Install
 
 Install `mikesoft.chutes-usage-vscode` from either registry:
 
-- [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
-- [Open VSX](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode)
+```bash
+code --install-extension mikesoft.chutes-usage-vscode
+```
 
-After installation:
+Alternatively, install it from [Open VSX](https://open-vsx.org/extension/mikesoft/chutes-usage-vscode)
+if your editor uses that registry.
 
-1. Open the Command Palette.
-2. Run `Chutes Usage Monitor: Set API Key`.
-3. Open the `Chutes Usage Monitor` view from the Activity Bar.
+## Quick start
 
-## What You Get
+1. Open the Command Palette and run **`Chutes Usage Monitor: Set API Key`**.
+2. Paste a Chutes API key; it is stored in VS Code SecretStorage.
+3. Open the **Chutes Usage Monitor** view from the Activity Bar to see the dashboard.
 
-- A focused sidebar dashboard for billing-cycle, rolling four-hour, and daily request usage
-- Plan context and PAYG credit at a glance, with visible low- and no-credit warnings
-- An optional status bar summary for quick checks without opening the dashboard
-- Manual and automatic refresh when the timer fires, the view reopens, or VS Code regains focus
-- Native Light, Dark, and High Contrast theme support with keyboard and screen-reader accessibility
-- Read-only account access, secure API-key storage, no local usage history, and a locked-down webview
+The dashboard refreshes on the configured interval, when it becomes visible again, and when VS Code
+regains focus. Run **`Chutes Usage Monitor: Refresh`** to refresh immediately.
 
-## Commands
+## Features
 
-- `Chutes Usage Monitor: Open Dashboard`
-- `Chutes Usage Monitor: Refresh`
-- `Chutes Usage Monitor: Set API Key`
-- `Chutes Usage Monitor: Remove API Key`
+- Sidebar dashboard for billing-cycle, rolling four-hour, and daily request usage.
+- Plan context and pay-as-you-go credit with visible low-credit and no-credit warnings.
+- Optional status bar summary for quick checks without opening the dashboard.
+- Manual and automatic refresh, including refresh on view visibility and window focus.
+- Native Light, Dark, and High Contrast theme support, with keyboard and screen-reader accessibility.
+- Read-only access to your own account data; the extension never mutates anything on Chutes.
+- Secure API-key storage in VS Code SecretStorage, with no local usage history.
+- A locked-down webview with a per-load content security policy nonce.
 
-## Settings
+## Requirements
 
-- `chutesUsageVscode.refreshIntervalSeconds`: Refresh interval in seconds. Default: `60`
-- `chutesUsageVscode.showStatusBar`: Show or hide the status bar item. Default: `true`
+- VS Code 1.103.0 or newer, or a compatible editor that installs from Open VSX.
+- A Chutes account and an API key that can read your own usage data.
+- Network access to `https://api.chutes.ai`.
 
-## How It Works
+## Configuration
 
-The extension shows your current Chutes usage in two places:
+| Setting                                    | Purpose                                        | Default |
+| ------------------------------------------ | ---------------------------------------------- | ------- |
+| `chutesUsageVscode.refreshIntervalSeconds` | Refresh interval in seconds.                   | `60`    |
+| `chutesUsageVscode.showStatusBar`          | Show the Chutes Usage Monitor status bar item. | `true`  |
 
-- the `Chutes Usage Monitor` sidebar dashboard for full details
-- the optional status bar item for a compact summary and quick access back to the dashboard
+Both settings apply immediately; no window reload is required.
 
-The sidebar dashboard includes:
+| Command                                | Purpose                              |
+| -------------------------------------- | ------------------------------------ |
+| `Chutes Usage Monitor: Open Dashboard` | Focus the dashboard view.            |
+| `Chutes Usage Monitor: Refresh`        | Fetch a fresh snapshot now.          |
+| `Chutes Usage Monitor: Set API Key`    | Store or replace the Chutes API key. |
+| `Chutes Usage Monitor: Remove API Key` | Delete the stored key.               |
 
-- a compact header with sync state and actions
-- a plan snapshot with the most relevant subscription figures, including your pay-as-you-go credit balance
-- stacked usage cards optimized for narrow Activity Bar layouts
-- a `Plan Limits` reference section with public plan prices and PAYG discounts; current-plan limits come from your account and unavailable values display as `--`
+## Privacy and security
 
-The dashboard refreshes when you run the refresh command, on the configured refresh interval, when the dashboard becomes visible again, and when VS Code regains window focus.
+The API key is stored with VS Code SecretStorage and is used only to request your own usage data. The
+extension keeps no local history of usage data; the webview persists only whether the Plan Limits
+section is collapsed, never an account snapshot. It performs best-effort cleanup of its extension
+storage on uninstall and reports no telemetry.
 
-Settings changes for refresh interval and status bar visibility apply immediately without reloading the extension.
+The webview loads its bootstrap as an ES module with a per-load content security policy nonce, and
+external links open only through an allowlist. Usage figures may lag behind live requests; when daily
+quota data cannot be verified reliably, the dashboard shows `--` instead of a misleading `0`. See
+[`SECURITY.md`](SECURITY.md) for vulnerability reporting.
 
-## Known Limitations
+## Troubleshooting
 
-- Chutes quota metering may lag behind live requests.
-- When daily quota data cannot be verified reliably, the extension shows `--` instead of a potentially misleading `0`.
-- Some API responses are normalized defensively because endpoint shapes may evolve over time.
-- Temporary refresh errors keep the last successful dashboard snapshot visible when possible.
+### The dashboard asks for an API key
 
-## Privacy And Storage
+Run **`Chutes Usage Monitor: Set API Key`**, paste a valid key, then run
+**`Chutes Usage Monitor: Refresh`**.
 
-- Your Chutes API key is stored using VS Code `SecretStorage`.
-- The extension uses the key only to request your own usage data.
-- The extension does not keep a local history of usage data.
-- The webview persists only whether the Plan Limits section is collapsed, never an account snapshot.
-- The webview loads its bootstrap as an ES module script with a CSP nonce (covered by `src/test/webviewBootstrap.test.ts`).
-- On uninstall, the extension performs best-effort cleanup of its local extension storage.
+### The sidebar is blank
 
-## Latest Changes
+Update the extension to the latest release, reload the VS Code window, and reopen the view from the
+Activity Bar. A webview bootstrap regression in an older release could prevent the dashboard from
+rendering at all.
 
-- `0.5.5` removes persisted usage snapshots and the unrelated pricing request, clears dependency advisories, tightens the webview boundary, improves accessibility, and refreshes the public project presentation.
-- `0.5.4` trims dashboard state, removes dead code, synchronizes release metadata, and expands the project documentation.
-- `0.5.3` strengthens webview security, repository quality gates, cross-platform cleanup, and API compatibility.
+### The sidebar icon looks different from the Marketplace icon
 
-See the [changelog](CHANGELOG.md) for the complete release history and the [latest GitHub release](https://github.com/TheStreamCode/chutes-usage-vscode/releases/latest) for downloadable artifacts.
+That is expected. The Activity Bar icon is a dedicated single-color SVG that follows VS Code icon
+guidelines, while the Marketplace listing uses the full-artwork PNG icon.
+
+### Refresh errors or `--` values
+
+Verify that the key is still valid and that the Chutes API is reachable, then refresh. Chutes quota
+metering can lag behind live traffic, so the extension shows `--` when a value cannot be verified
+instead of a possibly wrong `0`. While the extension host stays active, a temporary API failure may
+keep the last successful snapshot visible; the snapshot itself is never persisted.
+
+### Quota rows look incomplete
+
+API response shapes can change. Refresh the dashboard, compare again after a short delay, and when
+reporting the issue include a redacted sample payload that keeps field names and numeric values.
 
 ## Development
 
-Requires Node.js `22.17.0` (see `.nvmrc`) and `npm`. The lockfile is authoritative — do not switch package manager.
+Requires Node.js 22.17.0 (see `.nvmrc`) and npm. The lockfile is authoritative.
 
 ```bash
-npm ci          # install the locked dependencies
-npm run compile # build extension host + webview and copy webview assets
-npm test        # compile, then run the node:test suite
-npm run audit   # npm audit --audit-level=high
-npm run check   # npm test + npm run audit
-npm run package # build the VSIX with vsce
-npm run preflight # npm run check + npm run package
+git clone https://github.com/TheStreamCode/chutes-usage-vscode
+cd chutes-usage-vscode
+npm ci
+npm run check
 ```
 
-Press `F5` in VS Code to launch an Extension Development Host.
+`npm run check` compiles the extension host and webview, runs the `node:test` suites, and audits
+dependencies. `npm run package` builds the VSIX, and `npm run preflight` runs both. Press `F5` in VS
+Code to launch an Extension Development Host.
 
-## Repository Structure
+## Support
 
-```
-src/            extension host (TypeScript, VS Code API)
-  services/     Chutes API client, secret storage, payload normalization, link allowlist
-  state/        dashboard store and the webview state projection
-  status/       status bar controller
-  views/        webview view provider and CSP-nonced HTML
-  test/         node:test suites
-webview/        browser-side dashboard, compiled separately as ES modules
-scripts/        build helpers
-media/          icon and screenshot assets
-docs/           user guide and troubleshooting
-out/            build output (generated, not committed)
-```
+Ask setup and usage questions in
+[GitHub Discussions](https://github.com/TheStreamCode/chutes-usage-vscode/discussions) and report
+reproducible defects in [GitHub Issues](https://github.com/TheStreamCode/chutes-usage-vscode/issues).
+See [`SUPPORT.md`](SUPPORT.md) and [`docs/troubleshooting.md`](docs/troubleshooting.md) for more.
 
-## Documentation
+## Contributing
 
-- [User guide](docs/user-guide.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Documentation index](docs/README.md)
-- [Questions and community support](https://github.com/TheStreamCode/chutes-usage-vscode/discussions)
-- [Bug reports and feature requests](https://github.com/TheStreamCode/chutes-usage-vscode/issues)
-- [Contributing](CONTRIBUTING.md)
-- [Support](SUPPORT.md)
-- [Security](SECURITY.md)
-
-## Support The Project
-
-If Chutes Usage Monitor helps you track quotas from VS Code, support continued maintenance through GitHub Sponsors: [github.com/sponsors/TheStreamCode](https://github.com/sponsors/TheStreamCode).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Pull requests must pass the required CI checks.
 
 ## License
 
-Project-owned code and materials are licensed under the [MIT License](LICENSE).
-See [NOTICE](NOTICE) for trademark, logo, non-affiliation, and Chutes provider
-terms/privacy notices. This is an unofficial third-party extension and is not
-affiliated with or endorsed by Chutes.
+MIT — see [`LICENSE`](LICENSE). Trademark and provider notices are in [`NOTICE`](NOTICE).
+
+---
+
+Maintained by [Michael Gasperini (Mikesoft)](https://mikesoft.it).
+If this project is useful to you, consider [sponsoring its maintenance](https://github.com/sponsors/TheStreamCode).

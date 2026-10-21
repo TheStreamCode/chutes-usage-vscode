@@ -40,16 +40,16 @@ Two independently compiled worlds that only talk through `postMessage`:
 
 All commands are real `npm` scripts from `package.json`:
 
-| Purpose | Command |
-| --- | --- |
-| Install | `npm ci` |
-| Build | `npm run compile` |
-| Watch (host only) | `npm run watch` |
-| Unit tests only | `npm run test:unit` |
-| Compile + tests | `npm test` |
-| Dependency audit | `npm run audit` |
-| Tests + audit | `npm run check` |
-| Package VSIX | `npm run package` |
+| Purpose               | Command             |
+| --------------------- | ------------------- |
+| Install               | `npm ci`            |
+| Build                 | `npm run compile`   |
+| Watch (host only)     | `npm run watch`     |
+| Unit tests only       | `npm run test:unit` |
+| Compile + tests       | `npm test`          |
+| Dependency audit      | `npm run audit`     |
+| Tests + audit         | `npm run check`     |
+| Package VSIX          | `npm run package`   |
 | Full gate before a PR | `npm run preflight` |
 
 There is no separate lint or format step — `tsc` with `strict`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, and `noUncheckedSideEffectImports` is the type and hygiene gate. Do not weaken those flags to make code compile.
@@ -115,7 +115,7 @@ Both are supplied by the maintainer at publish time. They are **not** stored in 
 
 Versioning is SemVer: patch for fixes, cleanup, and docs; minor for backward-compatible features; major only for authorized breaking changes.
 
-`main` is protected: linear history, one required approving review, and the `build` status check. Work on a dedicated branch and open a pull request — never push directly, never force push, never self-approve.
+`main` is protected: linear history, the `build` status check, and pull-request review. Work on a dedicated branch and open a pull request — never push directly, never force push, never self-approve. Dependabot updates are configured in `.github/dependabot.yml`; they arrive as pull requests and must pass the same `npm run preflight` gate as any other change.
 
 Release sequence once the PR is merged:
 

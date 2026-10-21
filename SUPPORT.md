@@ -1,26 +1,30 @@
 # Support
 
-Use [GitHub Issues](https://github.com/TheStreamCode/chutes-usage-vscode/issues) for reproducible bug reports and feature requests.
+## Where to get help
 
-Use [GitHub Discussions](https://github.com/TheStreamCode/chutes-usage-vscode/discussions) for setup help and usage questions.
+- **Usage questions and setup help:** GitHub Discussions on this repository.
+- **Bug reports and reproducible defects:** GitHub Issues using the bug report form.
+- **Security problems:** see `SECURITY.md`, never a public issue.
+- **Distribution problems** (Marketplace review, extension install): use the support channel of the
+  registry when the problem is on their side.
 
-## Before Opening An Issue
+## Before asking
 
-Check the public documentation first:
+1. Check the README troubleshooting section and [docs/troubleshooting.md](docs/troubleshooting.md).
+2. Search existing issues and discussions.
+3. Reproduce on the latest release with a clean configuration.
 
-- `README.md`
-- `docs/user-guide.md`
-- `docs/troubleshooting.md`
+## What support covers
 
-## What To Include
+This is a free, maintainer-run project. Support covers defects in this project's latest release and
+questions about documented behavior. It does not cover customized deployments, third-party
+integrations, or consulting work. Chutes account, billing, and API questions belong to Chutes.
 
-Please include:
+## Response expectations
 
-- extension version
-- VS Code version
-- operating system
-- steps to reproduce
-- expected behavior
-- actual behavior
+Best effort, usually within a week. Issues without version information or a reproduction may be
+closed with a request for details.
 
-If the problem is related to API parsing or quota behavior, include a redacted payload when possible.
+## Maintainer
+
+Michael Gasperini (Mikesoft) — michael@mikesoft.it

@@ -63,6 +63,20 @@ Before opening a pull request:
 2. Update `CHANGELOG.md` when the change is user-visible.
 3. Update `README.md` or files in `docs/` when setup, behavior, or support guidance changes.
 
+## Commit And Pull Request Conventions
+
+- Follow Conventional Commits (`type(scope): summary`, English, imperative mood).
+- Open an issue first for behavior changes, unless the change is a typo or a documentation fix.
+- Keep one problem per pull request; do not mix refactors with behavior changes.
+- `main` is protected: changes land through pull requests that pass the required CI checks.
+
+## Maintainer-Only Areas
+
+- Release tags, GitHub releases, and Marketplace or Open VSX publication are performed only by the
+  maintainer.
+- `package-lock.json` is updated only through npm, never by hand.
+- CI workflows, release metadata, and the files under `.github/` are maintainer-maintained surfaces.
+
 ## Reporting API Shape Issues
 
 If Chutes changes the shape of an endpoint response, include a redacted sample payload in the issue when possible. Remove secrets and personal data, but keep field names and numeric values intact.
