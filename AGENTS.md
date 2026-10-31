@@ -95,12 +95,9 @@ Manual testing: open the repo in VS Code and press `F5` for an Extension Develop
 
 ## Environment Variables
 
-The extension itself reads no environment variables at runtime. Only tooling does:
-
-- `VSCE_PAT` — Visual Studio Marketplace token, used by `vsce publish`.
-- `OVSX_PAT` — Open VSX token, used by `ovsx publish`.
-
-Both are supplied by the maintainer at publish time. They are **not** stored in the repository and there are no GitHub Actions secrets configured for them.
+The extension itself reads no environment variables at runtime. Publishing does not use long-lived
+registry tokens: the manually dispatched Release workflow exchanges a short-lived OIDC token. Never
+add `VSCE_PAT` or `OVSX_PAT` to the repository, workflows, or GitHub Actions secrets.
 
 ## Validation Criteria (mandatory before handing off)
 
@@ -125,11 +122,13 @@ npm version <patch|minor|major> --no-git-tag-version   # updates package.json an
 npm run preflight
 git tag v<version> && git push origin v<version>
 gh release create v<version> --title "..." --notes-file <notes>
-npx vsce publish --packagePath chutes-usage-vscode-<version>.vsix   # needs VSCE_PAT
-npx ovsx publish chutes-usage-vscode-<version>.vsix                 # needs OVSX_PAT
+# Then dispatch the Release workflow with the release tag; it publishes the released
+# VSIX to both registries through OIDC trusted publishing.
 ```
 
-Publishing is manual by design: there is no publish workflow and no GitHub Actions secret. If `VSCE_PAT` or `OVSX_PAT` is absent, build and tag the release, then stop and report the missing credential — never simulate a publish.
+Publishing stays owner-controlled: no tag-triggered publish. Dispatch the Release workflow manually
+with the release tag; it uses OIDC trusted publishing, so no registry token is stored. If the dispatch
+fails, report the failure — never simulate a publish.
 
 ## Repository Visibility Behavior
 
