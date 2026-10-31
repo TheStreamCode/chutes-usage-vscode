@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## 0.5.5 — 2026-08-08
+## [0.5.5] - 2026-08-08
 
 - Refreshed the public project presentation and Marketplace metadata with a current dashboard screenshot rendered from the real webview using synthetic values, a custom GitHub social preview, clearer installation links, PAYG-focused discoverability, and a more user-focused README introduction.
 - Cleared the `fast-uri` and `undici` development dependency advisories with an npm-managed lockfile refresh.
@@ -12,7 +12,7 @@
 - Improved accessibility with contrast-safe light-theme accents, live sync announcements, truthful progressbar values, semantic section headings, and text labels for low or exhausted PAYG credit.
 - Limited per-chute quota fallback requests to five concurrent calls and pinned CI to the exact Node.js version in `.nvmrc`.
 
-## 0.5.4 — 2026-08-01
+## [0.5.4] - 2026-08-01
 
 - Stopped sending the per-model quota rows to the dashboard webview. They are only used by the extension host to derive the daily window, so every state message and the state the webview persists are now smaller. No visible change to the dashboard.
 - Removed the unused `summarizeStatusBar` helper together with its dead `includePrefix` branch, which selected between two identical results. The compact status bar summary that the extension actually renders is unchanged and now has direct test coverage for unverified request usage (`--`) and unlimited request quotas (`∞`).
@@ -24,7 +24,7 @@
 - Excluded `CITATION.cff` from the packaged VSIX and added local build and tooling artifacts (`*.tsbuildinfo`, `.vscode-test/`, `.playwright-mcp/`) to `.gitignore`.
 - Expanded `README.md` with requirements, the Open VSX install path, verified development commands, and the repository layout, and rewrote `AGENTS.md` as a project-specific contributor and agent guide.
 
-## 0.5.3
+## [0.5.3]
 
 - Hardened webview state handling with runtime validation for extension messages and cached payloads.
 - Replaced the generic DOM attribute sink with explicit safe properties and tightened the webview CSP.
@@ -34,57 +34,57 @@
 - Reduced the packaged VSIX to runtime and user-facing assets only.
 - Live-validated the authenticated Chutes API flow and dashboard normalization against the current required and optional endpoints.
 
-## 0.5.2
+## [0.5.2]
 
 - Improved legal documentation, trademark notices, third-party terms references, and metadata cleanup.
 
-## 0.5.1
+## [0.5.1]
 
 - Switched the TypeScript build configuration to Node16 module resolution and upgraded TypeScript to 7 for compatibility.
 
-## 0.5.0
+## [0.5.0]
 
 - Added a **PAYG credit** tile to the plan snapshot showing your current pay-as-you-go account balance (from the Chutes `GET /users/me` `balance`) — the credit that funds requests once your subscription caps are exceeded. This is distinct from the existing PAYG discount reference.
 - The credit tile turns amber when the balance runs low (under `$5`) and red when it reaches zero, so a depleting balance no longer goes unnoticed.
 - Added a `PAYG credit` line to the status bar tooltip.
 - Improved plan snapshot accessibility: each figure is now an ARIA-labelled group that announces its `label: value` to screen readers.
 
-## 0.4.8
+## [0.4.8]
 
 - Made the build fully cross-platform: the webview asset copy step in `compile` now uses a Node script (`scripts/copy-webview-assets.mjs`) instead of a Windows-only PowerShell command, so the extension builds on Linux and macOS as well.
 - Refreshed development dependencies (including `@vscode/codicons`) and cleared all `npm audit` advisories. No functional changes to the extension.
 
-## 0.4.7
+## [0.4.7]
 
 - Unified the `LICENSE` copyright holder to **Michael Gasperini (Mikesoft)**. No functional changes.
 
-## 0.4.6
+## [0.4.6]
 
 - Marketplace discoverability: sharper title and summary, expanded keywords.
 - Added Marketplace, Open VSX, CI, and GitHub Sponsors badges and a `sponsor` link to the README and package metadata. No functional changes.
 
-## 0.4.5
+## [0.4.5]
 
 - Removed the retired $3 Base plan from the Plan Limits reference.
 - Kept packaged fallback limits and normalized pricing payloads aligned to the current Plus and Pro subscription tiers.
 - Stopped deriving a Base plan from the former $3 monthly subscription price.
 
-## 0.4.4
+## [0.4.4]
 
 - Added a dashboard screenshot to the README and Marketplace description.
 - Included the screenshot asset in the packaged VSIX while keeping root screenshot artifacts excluded.
 
-## 0.4.3
+## [0.4.3]
 
 - Refreshed `README.md` and `CHANGELOG.md` to document the 0.4.x redesign, theme-aware tokens, accessibility additions, state persistence, hardened CSP, Codicons, and the compact status bar.
 
-## 0.4.2
+## [0.4.2]
 
 - Fixed a critical visibility bug where `[hidden]` was being overridden by `display: flex/grid/inline-flex` declared on the same elements, causing the loading skeleton, the stale banner, the per-card stale badge, and the current-tier badge to stay visible regardless of state.
 - Added a regression test that pins `[hidden] { display: none !important }` so future class-level display rules can no longer leak the issue.
 - Tightened `.vscodeignore` to exclude both `.png` and `.jpg` screenshot artifacts, not only `.jpeg`.
 
-## 0.4.1
+## [0.4.1]
 
 - Fixed a memory leak where the next-refresh ticker (`setInterval` 1 s) was never cleared; the ticker now pauses on `visibilitychange` and is cleared on `pagehide`.
 - Fixed `persistCollapsed` so the Plan Limits collapsed preference is saved even when no cached state exists yet.
@@ -93,7 +93,7 @@
 - Added `KEEP IN SYNC WITH src/types.ts` markers on the type duplicates inside `webview/main.ts` and `webview/presentation.ts` to make future drift easier to spot.
 - Polished the hover state for the current tier (preserves the mint tint), gave Codicons `font-display: block` to avoid a flash of unstyled glyphs, and made the compact status bar handle `null` USD values cleanly (`$--/$--` instead of `$0.00/$0`).
 
-## 0.4.0
+## [0.4.0]
 
 - Redesigned the dashboard with a modern, minimal look aligned to chutes.ai: pure-black background on dark themes, pill buttons, mint pill badges for units and stale state, headline-violet section titles, natural-case copy (no more `// AWAITING API KEY`), generous whitespace.
 - Made the webview theme-aware: backgrounds, foregrounds, borders, and description text now follow `--vscode-*` tokens; mint and violet stay only as accents on progress bars, status dot, badges, and section titles. Light and high-contrast themes are now first-class.
@@ -108,152 +108,151 @@
 - Hardened the webview Content-Security-Policy: a per-load random nonce is now required for the `<script>` tag, and `font-src`/`img-src` directives are scoped to `webview.cspSource` (`img-src` also allows `data:`).
 - Added a small zero-deps DOM helper (`webview/dom.ts`) that builds the entire UI without a framework. Shipped extensive bundle-level regression tests for the new render path, ARIA semantics, theme tokens, packaged Codicons, and natural-case copy.
 
-## 0.3.3
+## [0.3.3]
 
 - Aligned packaged documentation and release metadata after the plan limits pricing-data clarification.
 - Rebuilt the VSIX so Marketplace and GitHub release assets include the latest docs.
 
-## 0.3.2
+## [0.3.2]
 
 - Hardened webview-to-extension message handling and external link opening with an HTTPS allowlist.
 - Reduced quota refresh fan-out by using aggregate quota usage when available before falling back to per-chute requests.
 - Fed pricing data into the plan limits reference and added contributor guidance in `AGENTS.md`.
 
-## 0.3.1
+## [0.3.1]
 
 - Finalized naming consistency across all documentation, internal specs, and implementation plans.
 - Updated README latest changes section to highlight the 0.3.0 rename.
 
-## 0.3.0
+## [0.3.0]
 
 - Renamed the extension display name to `Chutes Usage Monitor` for a clearer identity across the Marketplace and VS Code UI.
 - Updated all user-facing references, command categories, view titles, and documentation to reflect the new name.
 
-## 0.2.9
+## [0.2.9]
 
 - Clarified dashboard reset and key-removal labels so destructive actions are easier to understand before confirming them.
 - Kept the refreshed dashboard UI and `Plan Limits` guidance from `0.2.8` while polishing the last confusing action copy in the current release.
 
-## 0.2.8
+## [0.2.8]
 
 - Refined the dashboard UI with cleaner hierarchy, better narrow-sidebar behavior, and clearer onboarding/error states while keeping the existing cyber visual effects.
 - Replaced the raw quotas table with a curated `Plan Limits` reference section for Base, Plus, and Pro subscription limits.
 - Fixed dashboard action behavior so destructive key removal is presented more safely and stale refresh failures are surfaced inline.
 
-## 0.2.7
+## [0.2.7]
 
 - Refreshed the Marketplace PNG icon artwork while keeping the dedicated single-color sidebar icon unchanged.
 
-## 0.2.6
+## [0.2.6]
 
 - Refreshed the extension branding with a new Marketplace icon and a dedicated single-color Activity Bar/sidebar icon.
 - Updated the public docs and release notes to reflect the current icon behavior and latest release.
 
-## 0.2.5
+## [0.2.5]
 
 - Fixed a webview bootstrap regression that could leave the sidebar blank with only the background visible.
 - Switched the dashboard webview bootstrap to browser-safe ES modules and added regression tests to prevent CommonJS output from breaking the UI again.
 
-## 0.2.4
+## [0.2.4]
 
 - Fixed overlapping refreshes so stale responses and removed API keys can no longer overwrite the latest dashboard state.
 - Fixed the sidebar to receive the current snapshot as soon as it opens, refresh again when the view becomes visible, and keep stale data visible during temporary refresh errors.
 - Restored the status bar click action and made runtime settings updates apply immediately without reloading the extension.
 
-## 0.2.3
+## [0.2.3]
 
 - Reworked the public documentation into a cleaner user-facing structure.
 - Added dedicated user guide and troubleshooting docs, and streamlined support, security, and contributing guidance.
 
-## 0.2.2
+## [0.2.2]
 
 - Reorganized the public documentation for a cleaner Marketplace and repository presentation.
 
-## 0.2.1
+## [0.2.1]
 
 - Removed the non-working status bar click action and its misleading tooltip hint.
 
-## 0.2.0
+## [0.2.0]
 
 - Republished the extension under the new Marketplace identity `mikesoft.chutes-usage-vscode`.
 - Removed development-only debug logging and cleaned up legacy command, view, and settings identifiers.
 
-## 0.1.8
+## [0.1.8]
 
 - Switched daily quota sync to prefer `quota_usage/me` with `invocations/stats/llm` as a live cross-check.
 - Show `--` with a sync delay hint instead of a stale `0`, and treat `quota: 0` as `Unlimited`.
 
-## 0.1.7
+## [0.1.7]
 
 - Added runtime debug logging for quota usage diagnostics.
 - Avoid showing a stale `0` daily usage value when live quota usage cannot be verified.
 
-## 0.1.6
+## [0.1.6]
 
 - Fixed daily quota usage so live request counts override stale daily values from subscription payloads.
 - Switched quota usage fetching to documented per-chute endpoints and aggregate multi-entry responses correctly.
 
-## 0.1.5
+## [0.1.5]
 
 - Fixed publisher identity alignment for marketplace publishing.
 - Refreshed the packaged extension icon colors.
 
-## 0.1.4
+## [0.1.4]
 
 - Improved packaging and marketplace metadata.
 
-## 0.1.3
+## [0.1.3]
 
 - Minor UI refinements.
 
-## 0.1.2
+## [0.1.2]
 
 - First public-ready release with stabilized usage parsing, daily quota usage support, improved sidebar UI, and repository polish for open-source publishing.
 
-## 0.1.1
+## [0.1.1]
 
 - Documentation and repository metadata updates.
 
-## 0.1.0
+## [0.1.0]
 
 - Repository and release process improvements.
 
-## 0.0.9
+## [0.0.9]
 
 - Improved plan and tier handling.
 - Documentation updates.
 
-## 0.0.8
+## [0.0.8]
 
 - Improved daily quota handling.
 
-## 0.0.7
+## [0.0.7]
 
 - Improved compatibility with live Chutes usage payloads.
 - Improved plan summary details.
 
-## 0.0.6
+## [0.0.6]
 
 - Improved API response parsing resilience.
 - Fixed extension packaging for webview assets.
 
-## 0.0.5
+## [0.0.5]
 
 - Improved plan summary and usage visibility.
 
-## 0.0.4
+## [0.0.4]
 
 - Refreshed the sidebar UI.
 
-## 0.0.3
+## [0.0.3]
 
 - Improved usage parsing and quota labeling.
 
-## 0.0.2
+## [0.0.2]
 
 - Improved quota parsing and local data cleanup behavior.
 
-## 0.0.1
+## [0.0.1]
 
 - Initial development scaffold.
-
