@@ -157,5 +157,10 @@
   "allowScripts": {
     "@vscode/vsce-sign@2.0.9": true,
     "keytar@7.9.0": true
+  },
+  "overrides": {
+    "@vscode/vsce": {
+      "minimatch": "^11.0.1"
+    }
   }
 }
