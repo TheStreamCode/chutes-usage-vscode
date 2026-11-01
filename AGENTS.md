@@ -121,9 +121,9 @@ npm version <patch|minor|major> --no-git-tag-version   # updates package.json an
 # Update CITATION.cff and CHANGELOG.md to the same version before validation.
 npm run preflight
 git tag v<version> && git push origin v<version>
-gh release create v<version> --title "..." --notes-file <notes>
-# Then dispatch the Release workflow with the release tag; it publishes the released
-# VSIX to both registries through OIDC trusted publishing.
+# The tag push runs the Release workflow, which creates the GitHub release with the
+# VSIX and checksum. Then dispatch the same workflow with the release tag; it
+# publishes the released VSIX to both registries through OIDC trusted publishing.
 ```
 
 Publishing stays owner-controlled: no tag-triggered publish. Dispatch the Release workflow manually
