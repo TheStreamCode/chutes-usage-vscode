@@ -2,14 +2,14 @@
   "name": "chutes-usage-vscode",
   "displayName": "Chutes Usage Monitor — Track Chutes API Usage & Quotas",
   "description": "Monitor Chutes AI usage, rolling limits, request quotas, and PAYG credit in a VS Code sidebar and status bar — read-only, secure key storage, auto-refresh. Unofficial third-party extension.",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "publisher": "mikesoft",
   "author": {
     "name": "Michael Gasperini",
     "url": "https://mikesoft.it"
   },
   "repository": "github:TheStreamCode/chutes-usage-vscode",
-  "homepage": "https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode",
+  "homepage": "https://github.com/TheStreamCode/chutes-usage-vscode",
   "bugs": {
     "url": "https://github.com/TheStreamCode/chutes-usage-vscode/issues"
   },

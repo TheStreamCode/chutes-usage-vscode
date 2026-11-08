@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.7] - 2026-11-08
+
+- Use the GitHub repository as the Marketplace homepage. `vsce publish` rejected the previous
+  Marketplace URL because it resolves to the publisher page, not this extension.
+
 ## [0.5.6] - 2026-11-08
 
 - Treat an uncapped monthly payload as pay-as-you-go: the dashboard shows a **Pay-as-you-go** billing
