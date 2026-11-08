@@ -299,6 +299,36 @@ test('normalizes the live Chutes subscription usage shape with monthly and four_
   assert.equal(result.plan?.dailyRequestLimit, 5000)
 })
 
+test('treats an uncapped monthly payload as pay-as-you-go', () => {
+  const subscriptionUsage: JsonObject = {
+    subscription: true,
+    custom: true,
+    monthly_price: 20,
+    monthly: { uncapped: true },
+    four_hour: {
+      usage: 0,
+      cap: 8.333333333333332,
+      remaining: 8.333333333333332,
+      reset_at: '2026-11-08T21:00:00+01:00'
+    }
+  }
+  const quotas: JsonObject = {
+    items: [{ chute_id: '*', quota: 5001, model: 'All Models' }]
+  }
+
+  const result = normalizeDashboardData(subscriptionUsage, quotas, null, { used: 0, quota: 5001 }, null, { balance: 53.5 })
+
+  assert.equal(result.plan?.planName, 'Pay-as-you-go')
+  assert.equal(result.plan?.monthlyPriceUsd, null)
+  assert.equal(result.plan?.monthlyCapUsd, null)
+  assert.equal(result.plan?.fourHourCapUsd, 8.333333333333332)
+  assert.equal(result.plan?.dailyRequestLimit, 5001)
+  assert.equal(result.paygCreditUsd, 53.5)
+  assert.ok(!result.windows.some((window) => window.kind === 'billing-cycle'))
+  assert.ok(result.windows.some((window) => window.kind === 'rolling-4h'))
+  assert.deepEqual(result.planLimits, [])
+})
+
 test('falls back to Free tier when the user is not on subscription', () => {
   const subscriptionUsage: JsonObject = {
     subscription: false,

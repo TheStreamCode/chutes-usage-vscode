@@ -126,7 +126,7 @@ export function normalizeUsageWindows(
       const resetLabel = pickString(raw, payload, candidate.resetKeys, candidate.nestedResetKeys ?? ['reset_label'])
       const label = pickString(raw, payload, [], 'label') ?? candidate.label
 
-      if (raw === null && used === null && limit === null && remaining === null) {
+      if (used === null && limit === null && remaining === null) {
         return null
       }
 
@@ -261,16 +261,8 @@ export function normalizePlan(payload: JsonObject, windows: UsageWindow[] = []):
   const fourHourCap = asObject(payload.four_hour_window)
   const dailyQuota = asObject(payload.daily_quota_usage)
 
-  const planName = asString(source.name)
-    ?? asString(payload.plan_name)
-    ?? derivePlanName(payload)
-  const monthlyPriceUsd = asNumber(source.monthly_price) ?? asNumber(payload.monthly_price)
-  const monthlyCapUsd = asNumber(source.monthly_cap_usd)
-    ?? asNumber(payload.monthly_cap_usd)
-    ?? asNumber(payload.billing_cycle_limit)
-    ?? asNumber(asObject(payload.monthly)?.cap)
-    ?? asNumber(billingCap?.limit)
-    ?? billingWindow?.limit
+  const monthly = asObject(payload.monthly)
+  const payAsYouGo = monthly?.uncapped === true
   const fourHourCapUsd = asNumber(source.four_hour_cap_usd)
     ?? asNumber(payload.four_hour_cap_usd)
     ?? asNumber(payload.four_hour_limit)
@@ -284,6 +276,27 @@ export function normalizePlan(payload: JsonObject, windows: UsageWindow[] = []):
     ?? dailyWindow?.limit
   const paygDiscountPercent = asNumber(source.payg_discount_percent) ?? asNumber(payload.payg_discount_percent)
 
+  if (payAsYouGo) {
+    return {
+      planName: 'Pay-as-you-go',
+      monthlyPriceUsd: null,
+      monthlyCapUsd: null,
+      fourHourCapUsd: fourHourCapUsd ?? null,
+      dailyRequestLimit: dailyRequestLimit ?? null,
+      paygDiscountPercent
+    }
+  }
+
+  const planName = asString(source.name)
+    ?? asString(payload.plan_name)
+    ?? derivePlanName(payload)
+  const monthlyPriceUsd = asNumber(source.monthly_price) ?? asNumber(payload.monthly_price)
+  const monthlyCapUsd = asNumber(source.monthly_cap_usd)
+    ?? asNumber(payload.monthly_cap_usd)
+    ?? asNumber(payload.billing_cycle_limit)
+    ?? asNumber(monthly?.cap)
+    ?? asNumber(billingCap?.limit)
+    ?? billingWindow?.limit
   const normalizedMonthlyPriceUsd = monthlyPriceUsd ?? null
   const normalizedMonthlyCapUsd = monthlyCapUsd ?? null
   const normalizedFourHourCapUsd = fourHourCapUsd ?? null
@@ -394,6 +407,11 @@ function getPlanNameFromMonthlyPrice(monthlyPrice: number): string | null {
 }
 
 function normalizePlanLimits(plan: PlanInfo | null): PlanLimitEntry[] {
+  // Monthly plan references are obsolete for pay-as-you-go accounts.
+  if (plan?.planName === 'Pay-as-you-go') {
+    return []
+  }
+
   // Public price and discount references verified on 2026-08-08. Exact limits
   // are never inferred for another tier; only current-account values may fill them.
   const references = [

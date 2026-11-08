@@ -2,7 +2,7 @@
 
 ## Overview
 
-`Chutes Usage Monitor` helps you monitor subscription usage, rolling limits, request quotas, and PAYG credit without leaving VS Code.
+`Chutes Usage Monitor` helps you monitor pay-as-you-go usage, rolling limits, request quotas, and PAYG credit without leaving VS Code.
 
 The extension provides:
 
@@ -27,9 +27,9 @@ The dashboard is the primary interface for the extension.
 It includes:
 
 - a header with connection status and actions
-- a plan snapshot with key subscription details, including your pay-as-you-go credit balance
-- stacked usage cards for the main billing windows
-- a `Plan Limits` section with public plan prices and PAYG discounts; monthly, daily, and burst limits are filled only for your current plan when the account API provides them
+- an account snapshot with the pay-as-you-go credit balance
+- stacked usage cards for the main rate-limit windows
+- a `Plan Limits` section for legacy subscription accounts; it is hidden for pay-as-you-go accounts
 
 Depending on the current state, the dashboard shows onboarding, loading, ready, or error content.
 
@@ -80,12 +80,11 @@ While the extension host remains active, reopening the dashboard can reuse its i
 
 Depending on the API responses available for your account, the extension can display:
 
-- billing cycle usage
+- pay-as-you-go billing status
 - 4-hour rolling window usage
 - daily request usage
-- plan information such as subscription price or caps when available
-- your pay-as-you-go credit balance (the account credit that funds requests beyond your subscription caps), with visible `Low credit` or `No credit` text and warning colors when applicable
-- a Plus and Pro reference using public prices and PAYG discounts; other limits show `--` unless they are verified from the current account
+- your pay-as-you-go credit balance (the account credit that funds requests), with visible `Low credit` or `No credit` text and warning colors when applicable
+- a Plus and Pro reference only for legacy subscription accounts; pay-as-you-go accounts do not see the monthly plan section
 
 ## Managing Your API Key
 

@@ -6,14 +6,18 @@ Track Chutes usage, quotas, and rolling limits in a VS Code sidebar without leav
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/mikesoft.chutes-usage-vscode?label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=mikesoft.chutes-usage-vscode)
 
-![Chutes Usage Monitor dashboard showing usage cards for the billing window](media/screenshot-chutes-usage.png)
+![Chutes Usage Monitor dashboard showing usage cards for the rate-limit windows](media/screenshot-chutes-usage.png)
 
 _Current dashboard rendered with synthetic, illustrative values._
 
+Chutes currently bills usage pay-as-you-go and does not offer monthly plans. The dashboard shows the
+4-hour rate-limit window, the daily request quota, and the pay-as-you-go credit. The Plus/Pro Plan
+Limits reference is hidden for pay-as-you-go accounts.
+
 Chutes Usage Monitor is a read-only VS Code extension for developers who run models through Chutes and
-want billing context while they code. It shows subscription spend, rolling limits, daily requests, and
-pay-as-you-go credit in an Activity Bar dashboard and an optional status bar summary, using only the
-API key you provide.
+want billing context while they code. It shows pay-as-you-go spend, rolling limits, daily requests, and
+credit in an Activity Bar dashboard and an optional status bar summary, using only the API key you
+provide.
 
 This is an independent, unofficial third-party extension. It is not affiliated with, sponsored by, or
 endorsed by Chutes.
@@ -40,8 +44,8 @@ regains focus. Run **`Chutes Usage Monitor: Refresh`** to refresh immediately.
 
 ## Features
 
-- Sidebar dashboard for billing-cycle, rolling four-hour, and daily request usage.
-- Plan context and pay-as-you-go credit with visible low-credit and no-credit warnings.
+- Sidebar dashboard for rolling four-hour and daily request usage, with pay-as-you-go credit.
+- Account context and pay-as-you-go credit with visible low-credit and no-credit warnings.
 - Optional status bar summary for quick checks without opening the dashboard.
 - Manual and automatic refresh, including refresh on view visibility and window focus.
 - Native Light, Dark, and High Contrast theme support, with keyboard and screen-reader accessibility.

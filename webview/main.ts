@@ -708,7 +708,7 @@ function applyMode(refs: DomRefs, state: DashboardState): void {
 
   toggle(refs.planSummary.root, hasData)
   toggle(refs.metricsGrid.root, hasData)
-  toggle(refs.planLimits.root, hasData)
+  toggle(refs.planLimits.root, hasData && (state.data?.planLimits.length ?? 0) > 0)
 }
 
 function applyPlanSummary(refs: DomRefs, plan: PlanInfo | null, windows: UsageWindow[], paygCreditUsd: number | null): void {
@@ -723,6 +723,8 @@ function applyPlanSummary(refs: DomRefs, plan: PlanInfo | null, windows: UsageWi
   setPlanStat(refs.planSummary.dailyLimit, 'Daily limit', formatRequestsLimitValue(plan?.dailyRequestLimit ?? daily?.limit ?? null))
   setPlanStat(refs.planSummary.paygCredit, 'PAYG credit', formatValue(paygCreditUsd, 'usd'))
   applyPaygCreditState(refs.planSummary.paygCredit, paygCreditUsd)
+  toggle(refs.planSummary.monthlyPrice.root, plan?.monthlyPriceUsd !== null && plan?.monthlyPriceUsd !== undefined)
+  toggle(refs.planSummary.monthlyLeft.root, billing?.remaining !== null && billing?.remaining !== undefined)
 
   const monthlyPrice = plan?.monthlyPriceUsd ?? null
   const monthlyCap = plan?.monthlyCapUsd ?? null

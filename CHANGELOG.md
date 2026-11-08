@@ -1,6 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [0.5.6] - 2026-11-08
+
+- Treat an uncapped monthly payload as pay-as-you-go: the dashboard shows a **Pay-as-you-go** billing
+  label, no monthly price or monthly cap, and hides the Plus/Pro Plan Limits reference.
+- Skip usage windows with no used, limit, or remaining values, so the uncapped monthly payload no
+  longer renders a blank billing-cycle card.
+- Keep showing the 4-hour rate-limit window, daily request quota, and PAYG credit from `/users/me`.
 
 ## [0.5.5] - 2026-08-08
 
